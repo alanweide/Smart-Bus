@@ -11,7 +11,7 @@ namespace Smart_Bus
         // Instance variables
 
         private const int timeBuckets = 12;
-        private double[] standbyArrivalDistribution;
+        private double[] arrivalDistribution;
         private double workingDuration;
         private double standbyBucketTimeInterval;
 
@@ -23,9 +23,9 @@ namespace Smart_Bus
 
             int i = (int)(t / this.standbyBucketTimeInterval);
             double baseTime = i * this.standbyBucketTimeInterval;
-            double baseFraction = standbyArrivalDistribution[i];
+            double baseFraction = arrivalDistribution[i];
             double dTime = this.standbyBucketTimeInterval;
-            double dFraction = standbyArrivalDistribution[i + 1] - baseFraction;
+            double dFraction = arrivalDistribution[i + 1] - baseFraction;
             double extraTime = t - baseTime;
             double extraFraction = extraTime * dFraction / dTime;
             return baseFraction + extraFraction;
@@ -36,13 +36,13 @@ namespace Smart_Bus
             // assert 0.0 <= f && f < 1.0;
 
             int i = 0;
-            while (standbyArrivalDistribution[i + 1] <= f)
+            while (arrivalDistribution[i + 1] <= f)
             {
                 i++;
             }
-            double baseFraction = standbyArrivalDistribution[i];
+            double baseFraction = arrivalDistribution[i];
             double baseTime = i * this.standbyBucketTimeInterval;
-            double dFraction = standbyArrivalDistribution[i + 1] - baseFraction;
+            double dFraction = arrivalDistribution[i + 1] - baseFraction;
             double dTime = this.standbyBucketTimeInterval;
             double extraFraction = f - baseFraction;
             double extraTime = extraFraction * dTime / dFraction;
@@ -58,14 +58,16 @@ namespace Smart_Bus
              * so scale accordingly
              */
 
-            standbyArrivalDistribution = new double[timeBuckets + 1];
-            standbyArrivalDistribution[0] = 0.0;
-            for (int i = 1; i < standbyArrivalDistribution.Length - 1; i++)
+            arrivalDistribution = new double[timeBuckets + 1];
+            arrivalDistribution[0] = 0.0;
+            
+            // Initialize arrivalDistribution to be uniform
+            for (int i = 1; i < arrivalDistribution.Length - 1; i++)
             {
                 double fractionInBucket = 1.0 / timeBuckets;
-                standbyArrivalDistribution[i] = standbyArrivalDistribution[i - 1] + fractionInBucket;
+                arrivalDistribution[i] = arrivalDistribution[i - 1] + fractionInBucket;
             }
-            standbyArrivalDistribution[standbyArrivalDistribution.Length - 1] = 1.0;
+            arrivalDistribution[arrivalDistribution.Length - 1] = 1.0;
 
             // Other variables
 

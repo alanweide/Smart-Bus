@@ -9,24 +9,16 @@ namespace Smart_Bus
 
         private enum State
         {
-            PRE, FASTVOTE_VQ, FASTVOTE_ELIGIBLE, FASTVOTE_PQ, STANDBY_Q, CHECKIN_S, VOTING_Q, VOTING_S, SCANNING_Q, SCANNING_S, POST
+            PRE, AT_STOP, RIDING, POST
         }
 
         // Note: numStates must match the number of values in the State enum 
-        // (these haven't been updated to reflect the Smart bus usage, they still reflect the voting system simulator.)
-        private const int numStates = 11;
-
-        public bool isFastVoteUser {get; private set;}
-        public double startOfWindow { get; private set; } // meaningful only for FastVote user
-        public double endOfWindow { get; private set; } // meaningful only for FastVote user
-
-        public double arrivalTime { get; private set; }
+        private const int numStates = 4;
 
         private State currentState;
         private double timeOfLastStateChange;
         private double[] timeEnteredState = new double[numStates];
         private double[] durationOfState = new double[numStates];
-        private int[] encounteredLengthOfQueue = new int[numQueues];
 
         private void updateTimesForCurrentState(double currentTime)
         {
@@ -37,23 +29,28 @@ namespace Smart_Bus
 
         /*--- Public -----------------------------------------------------------------------*/
 
-        public enum QueueName
-        {
-            FASTVOTE_VQ, FASTVOTE_PQ, STANDBY_Q, VOTING_Q, SCANNING_Q
-        }
-        public const int numQueues = 5;
+        //public enum QueueName
+        //{
+        //    FASTVOTE_VQ, FASTVOTE_PQ, STANDBY_Q, VOTING_Q, SCANNING_Q
+        //}
+        //public const int numQueues = 5;
 
-        public enum ServiceName
-        {
-            CHECKIN_S, VOTING_S, SCANNING_S
-        }
-        public const int numServices = 3;
+        //public enum ServiceName
+        //{
+        //    CHECKIN_S, VOTING_S, SCANNING_S
+        //}
+        //public const int numServices = 3;
 
-        public Rider(double currentTime, double arrivalTime)
+        public double earliestServingTime { get; private set; }
+        public double latestServingTime { get; private set; }
+
+        public BusStop origin { get; private set; }
+        public BusStop destination { get; private set; }
+
+        public Rider(double currentTime, double earliestServingTime, double latestServingTime)
         {
-            this.startOfWindow = 0.0; // only used if isFastVoteUser
-            this.endOfWindow = 0.0; // only used if isFastVoteUser
-            this.arrivalTime = arrivalTime;
+            this.earliestServingTime = earliestServingTime;
+            this.latestServingTime = latestServingTime;
             this.currentState = State.PRE;
             this.timeOfLastStateChange = currentTime;
             for (int i = 0; i < this.timeEnteredState.Length; i++)
@@ -64,15 +61,24 @@ namespace Smart_Bus
             {
                 this.durationOfState[i] = 0.0;
             }
-            for (int i = 0; i < this.encounteredLengthOfQueue.Length; i++)
-            {
-                this.encounteredLengthOfQueue[i] = 0;
-            }
+        }
+
+        public void arriveAtStop(double currentTime, double earliestServingTime, double latestServingTime, BusStop origin, BusStop destination)
+        {
+            updateTimesForCurrentState(currentTime);
+            this.currentState = State.AT_STOP;
+            this.origin = origin;
+            this.destination = destination;
+        }
+
+        public void boardBus(double currentTime)
+        {
+            updateTimesForCurrentState(currentTime);
+            this.currentState = State.RIDING;
         }
 
         public void leaveSystem(double currentTime)
         {
-            //assert this.currentState == State.VOTING_S || this.currentState == State.SCANNING_S;
             updateTimesForCurrentState(currentTime);
             this.timeEnteredState[(int)State.POST] = currentTime;
             this.currentState = State.POST;
@@ -83,113 +89,19 @@ namespace Smart_Bus
             return this.timeEnteredState[(int)State.PRE];
         }
 
-        //public boolean isFastVoteUser() {
-        //    return this.isFastVoteUser;
-        //}
-
-        //public double startOfWindow() {
-        //    //assert this.isFastVoteUser;
-        //    return this.startOfWindow;
-        //}
-
-        //public double endOfWindow() {
-        //    assert this.isFastVoteUser;
-        //    return this.endOfWindow;
-        //}
-
-        //public double desiredVotingTime() {
-        //    return this.desiredVotingTime;
-        //}
-
-        public double timeEnteredFastVoteVQ()
+        public double timeRequestSent()
         {
-
-            // OK to call if not FastVote user; result is then 0.0
-
-            return this.timeEnteredState[(int)State.FASTVOTE_VQ];
+            return this.timeEnteredState[(int)State.AT_STOP];
         }
 
-        public double timeEnteredFastVotePQ()
+        public double timeBoardedBus()
         {
-
-            // OK to call if not FastVote user; result is then 0.0
-
-            return this.timeEnteredState[(int)State.FASTVOTE_PQ];
+            return this.timeEnteredState[(int)State.RIDING];
         }
 
-        public double timeEnteredStandbyQ()
+        public double timeLeftSystem()
         {
-            return this.timeEnteredState[(int)State.STANDBY_Q];
-        }
-
-        public double timeEnteredVotingQ()
-        {
-            return this.timeEnteredState[(int)State.VOTING_Q];
-        }
-
-        public double waitTimeInFastVoteVQ()
-        {
-
-            // OK to call if not FastVote user; result is then 0.0
-
-            return this.durationOfState[(int)State.FASTVOTE_VQ];
-        }
-
-        public double waitTimeInEligibleSet()
-        {
-
-            // OK to call if not FastVote user; result is then 0.0
-
-            return this.durationOfState[(int)State.FASTVOTE_ELIGIBLE];
-        }
-
-        public double waitTimeInFastVotePQ()
-        {
-
-            // OK to call if not FastVote user; result is then 0.0
-
-            return this.durationOfState[(int)State.FASTVOTE_PQ];
-        }
-
-        public double waitTimeInStandbyQ()
-        {
-            return this.durationOfState[(int)State.STANDBY_Q];
-        }
-
-        public double waitTimeInVotingQ()
-        {
-            return this.durationOfState[(int)State.VOTING_Q];
-        }
-
-        public int lengthOfFastVoteVQ()
-        {
-
-            // OK to call if not FastVote user; result is then 0
-
-            return this.encounteredLengthOfQueue[(int)QueueName.FASTVOTE_VQ];
-        }
-
-        public int lengthOfFastVotePQ()
-        {
-
-            // OK to call if not FastVote user; result is then 0
-
-            return this.encounteredLengthOfQueue[(int)QueueName.FASTVOTE_PQ];
-        }
-
-        public int lengthOfStandbyQ()
-        {
-            return this.encounteredLengthOfQueue[(int)QueueName.STANDBY_Q];
-        }
-
-        public int lengthOfVotingQ()
-        {
-            return this.encounteredLengthOfQueue[(int)QueueName.VOTING_Q];
-        }
-
-        public int lengthOfScanningQ()
-        {
-            return this.encounteredLengthOfQueue[(int)QueueName.SCANNING_Q];
+            return this.timeEnteredState[(int)State.POST];
         }
 
         //public static String csvHeader() {
