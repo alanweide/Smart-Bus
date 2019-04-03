@@ -94,7 +94,7 @@ public class SmartBusSimulator {
 			// Take appropriate action for this event
             // TODO: Update these events
 
-			switch (thisEvent.event) {
+			switch (thisEvent.type) {
 			case CHECK_FASTVOTE_WINDOW: {
                 //assert sp.fastVotePopularity > 0.0;
                 //assert thisEvent.time < sp.pollClosingTime : "Checking FastVote window past closing time";
@@ -194,11 +194,11 @@ public class SmartBusSimulator {
 			}
 				break;
 			case START_FASTVOTE_VQ_WAITING: {
-				assert sp.fastVotePopularity > 0.0;
+                //assert sp.fastVotePopularity > 0.0;
 
 				// Put voter into FastVote queue
 
-				boolean skipVQ = fastVoteQ.addToVirtualQueue(thisEvent.time, thisEvent.voter);
+				bool skipVQ = fastVoteQ.addToVirtualQueue(thisEvent.time, thisEvent.rider);
 				if (skipVQ) {
 
 					/*
@@ -231,7 +231,7 @@ public class SmartBusSimulator {
 			}
 				break;
 			case START_FASTVOTE_ELIGIBLE: {
-				assert sp.fastVotePopularity > 0.0;
+                //assert sp.fastVotePopularity > 0.0;
 
 				// Make next voter in virtual queue eligible, if there is one
 
@@ -258,8 +258,8 @@ public class SmartBusSimulator {
 			}
 				break;
 			case START_FASTVOTE_PQ_WAITING: {
-				assert sp.fastVotePopularity > 0.0;
-				assert thisEvent.time < sp.pollClosingTime : "Voter trying to enter FastVote physical queue after closing";
+                //assert sp.fastVotePopularity > 0.0;
+                //assert thisEvent.time < sp.pollClosingTime : "Voter trying to enter FastVote physical queue after closing";
 
 				// Add voter to FastVote physical queue
 
@@ -334,7 +334,7 @@ public class SmartBusSimulator {
 			}
 				break;
 			case START_STANDBY_WAITING: {
-				assert thisEvent.time < sp.pollClosingTime : "Voter trying to enter standby queue after closing";
+                //assert thisEvent.time < sp.pollClosingTime : "Voter trying to enter standby queue after closing";
 
 				// Put voter into check-in queue
 
@@ -475,121 +475,6 @@ public class SmartBusSimulator {
 		}
 	}
 
-	@GET
-	@Path("run")
-	@Produces("application/json")
-	public static Response simulate(@Context UriInfo info) {
-
-		SimulationParameters sp = new SimulationParameters();
-
-		PollingPlaceSimulator sim = new PollingPlaceSimulator();
-
-		MultivaluedMap<String, String> params = info.getQueryParameters();
-
-		/*
-		 * Change simulation parameters that are different from defaults
-		 */
-
-		if (params.getFirst("numberOfRuns") != null) {
-			// sp.numberOfRuns =
-			// Math.min(Integer.parseInt(params.getFirst("numberOfRuns")), 50);
-			sp.numberOfRuns = Integer.parseInt(params.getFirst("numberOfRuns"));
-		}
-		if (params.getFirst("pollClosingTime") != null) {
-			sp.pollClosingTime = Double.parseDouble(params.getFirst("pollClosingTime"));
-		}
-		if (params.getFirst("numberOfRegisteredVoters") != null) {
-			sp.numberOfRegisteredVoters = Integer.parseInt(params.getFirst("numberOfRegisteredVoters"));
-		}
-		if (params.getFirst("turnout") != null) {
-			sp.turnout = Double.parseDouble(params.getFirst("turnout"));
-		}
-		if (params.getFirst("numberOfCheckInStations") != null) {
-			sp.numberOfCheckInStations = Integer.parseInt(params.getFirst("numberOfCheckInStations"));
-		}
-		if (params.getFirst("averageCheckInServiceTime") != null) {
-			sp.averageCheckInServiceTime = Double.parseDouble(params.getFirst("averageCheckInServiceTime"));
-		}
-		if (params.getFirst("capacityOfVotingQueue") != null) {
-			sp.capacityOfVotingQueue = Integer.parseInt(params.getFirst("capacityOfVotingQueue"));
-		}
-		if (params.getFirst("numberOfVotingStations") != null) {
-			sp.numberOfVotingStations = Integer.parseInt(params.getFirst("numberOfVotingStations"));
-		}
-		if (params.getFirst("averageVotingServiceTime") != null) {
-			sp.averageVotingServiceTime = Double.parseDouble(params.getFirst("averageVotingServiceTime"));
-		}
-
-		if (params.getFirst("fastVotePopularity") != null) {
-			sp.fastVotePopularity = Double.parseDouble(params.getFirst("fastVotePopularity"));
-		}
-		if (params.getFirst("numberOfFastVoteCheckInStations") != null) {
-			sp.numberOfFastVoteCheckInStations = Integer.parseInt(params.getFirst("numberOfFastVoteCheckInStations"));
-		}
-		if (params.getFirst("initialWindowDuration") != null) {
-			sp.initialWindowDuration = Double.parseDouble(params.getFirst("initialWindowDuration"));
-		}
-		if (params.getFirst("finalWindowDuration") != null) {
-			sp.finalWindowDuration = Double.parseDouble(params.getFirst("finalWindowDuration"));
-		}
-		if (params.getFirst("closingBuffer") != null) {
-			sp.closingBuffer = Double.parseDouble(params.getFirst("closingBuffer"));
-		}
-		if (params.getFirst("criticalWaitingTimeForFastVotePQ") != null) {
-			sp.criticalWaitingTimeForFastVotePQ = Double
-					.parseDouble(params.getFirst("criticalWaitingTimeForFastVotePQ"));
-		}
-		if (params.getFirst("eligibleSetSizeAsThrougphutFraction") != null) {
-			sp.eligibleSetSizeAsThroughputFraction = Double
-					.parseDouble(params.getFirst("eligibleSetSizeAsThroughputFraction"));
-		}
-
-		if (params.getFirst("averageWindowCheckLeadTime") != null) {
-			sp.averageWindowCheckLeadTime = Double.parseDouble(params.getFirst("averageWindowCheckLeadTime"));
-		}
-		if (params.getFirst("windowTooEarlyAcceptanceProbability") != null) {
-			sp.windowTooEarlyAcceptanceProbability = Double
-					.parseDouble(params.getFirst("windowTooEarlyAcceptanceProbability"));
-		}
-		if (params.getFirst("windowTooLateAcceptanceProbability") != null) {
-			sp.windowTooLateAcceptanceProbability = Double
-					.parseDouble(params.getFirst("windowTooLateAcceptanceProbability"));
-		}
-		if (params.getFirst("averageTimeBetweenWindowChecks") != null) {
-			sp.averageTimeBetweenWindowChecks = Double.parseDouble(params.getFirst("averageTimeBetweenWindowChecks"));
-		}
-
-		/*
-		 * Make sure parameters are valid; only non-trivial properties are
-		 * checked
-		 */
-
-		assert sp.capacityOfVotingQueue == 0
-				|| sp.capacityOfVotingQueue > sp.numberOfCheckInStations : "Invalid voting queue capacity";
-
-		/*
-		 * Create a list of voters through system for each run; useful to
-		 * separate into different lists if threads are employed
-		 */
-
-		for (int i = 0; i < sp.numberOfRuns; i++) {
-			sim.votersThroughSystem.add(new LinkedList<Voter>());
-		}
-
-		for (int i = 0; i < sp.numberOfRuns; i++) {
-			sim.runOneSimulation(sp, i);
-		}
-
-		sim.summarizeData(sp);
-		JSONArray report = new JSONArray();
-		try {
-			report = sim.reportSummaryJSON(sp);
-		} catch (JSONException e) {
-			report.put("ERROR: JSONException");
-		}
-		return Response.status(200).entity(report.toString()).build();
-	}
-
 	public static void main(String[] args) {
 
 		SimulationParameters sp = new SimulationParameters();
@@ -600,7 +485,7 @@ public class SmartBusSimulator {
 		 * Change simulation parameters that are different from defaults
 		 */
 
-		// sp.numberOfRuns = 1;
+         //sp.numberOfRuns = 1;
 		// sp.numberOfCheckInStations = 4;
 		// sp.numberOfVotingStations = 11;
 		// sp.arrivalPattern = ArrivalPattern.COMPOSITE_LOWER_LATE;
@@ -613,8 +498,8 @@ public class SmartBusSimulator {
 		 * checked
 		 */
 
-		assert sp.capacityOfVotingQueue == 0
-				|| sp.capacityOfVotingQueue > sp.numberOfCheckInStations : "Invalid voting queue capacity";
+        //assert sp.capacityOfVotingQueue == 0
+        //        || sp.capacityOfVotingQueue > sp.numberOfCheckInStations : "Invalid voting queue capacity";
 
 		/*
 		 * Create a list of voters through system for each run; useful to
@@ -630,26 +515,8 @@ public class SmartBusSimulator {
 		long startTime = System.currentTimeMillis();
 
 		for (int i = 0; i < sp.numberOfRuns; i++) {
-			// final int simId = i;
-			// threads.execute(new Runnable() {
-			// @Override
-			// public void run() {
-			// runOneSimulation(simId);
-			// }
-			// });
 			sim.runOneSimulation(sp, i);
 		}
-
-		// threads.shutdown();
-		// try {
-		// boolean didTerminate = threads.awaitTermination(30,
-		// TimeUnit.SECONDS);
-		// if (!didTerminate) {
-		// System.out.println("Thread Pool timed out!");
-		// }
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
 
 		System.out.println(Integer.toString(sp.numberOfRuns) + " simulations (excluding reporting) took "
 				+ (System.currentTimeMillis() - startTime) + " mSec");

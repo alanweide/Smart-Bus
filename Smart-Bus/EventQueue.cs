@@ -9,20 +9,20 @@ namespace Smart_Bus
         public class EventNotice
         {
 
-            public EventType thisEvent;
+            public EventType type;
             public Rider rider;
             public double time;
 
-            public EventNotice(EventType thisEvent, Rider rider, double time)
+            public EventNotice(EventType eventType, Rider rider, double time)
             {
-                this.thisEvent = thisEvent;
+                this.type = eventType;
                 this.rider = rider;
                 this.time = time;
             }
 
             public String toString()
             {
-                return "At time " + this.time + " : event " + this.thisEvent + " for voter "
+                return "At time " + this.time + " : event " + this.type + " for voter "
                         + (this.rider == null ? "null" : "who arrived at " + this.rider.timeEnteredSystem());
             }
         }
