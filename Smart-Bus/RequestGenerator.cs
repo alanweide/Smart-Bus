@@ -73,5 +73,14 @@ namespace Smart_Bus
             this.standbyBucketTimeInterval = this.workingDuration / timeBuckets;
         }
 
+        public double generatedRequestTime(double currentTime)
+        {
+            //assert 0.0 <= currentTime && currentTime < this.closingTime;
+
+            double currentFraction = standbyDistributionFunction(currentTime);
+            double f = currentFraction + random.NextDouble() * (1.0 - currentFraction);
+            return standbyDistributionFunctionInverse(f);
+        }
+
     }
 }

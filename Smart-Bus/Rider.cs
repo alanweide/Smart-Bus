@@ -20,7 +20,7 @@ namespace Smart_Bus
         public double startOfWindow { get; private set; } // meaningful only for FastVote user
         public double endOfWindow { get; private set; } // meaningful only for FastVote user
 
-        public double desiredVotingTime { get; private set; }
+        public double arrivalTime { get; private set; }
 
         private State currentState;
         private double timeOfLastStateChange;
@@ -49,11 +49,11 @@ namespace Smart_Bus
         }
         public const int numServices = 3;
 
-        public Rider(double currentTime, double desiredVotingTime)
+        public Rider(double currentTime, double arrivalTime)
         {
             this.startOfWindow = 0.0; // only used if isFastVoteUser
             this.endOfWindow = 0.0; // only used if isFastVoteUser
-            this.desiredVotingTime = desiredVotingTime;
+            this.arrivalTime = arrivalTime;
             this.currentState = State.PRE;
             this.timeOfLastStateChange = currentTime;
             for (int i = 0; i < this.timeEnteredState.Length; i++)
@@ -69,94 +69,6 @@ namespace Smart_Bus
                 this.encounteredLengthOfQueue[i] = 0;
             }
         }
-
-        public void setFastVoteUser(bool isFastVoteUser)
-        {
-            this.isFastVoteUser = isFastVoteUser;
-        }
-
-        public void enterFastVoteVirtualQueue(double currentTime, int currentQueueLength, double startOfWindow, double endOfWindow)
-        {
-            //assert this.isFastVoteUser && this.currentState == State.PRE;
-            updateTimesForCurrentState(currentTime);
-            this.currentState = State.FASTVOTE_VQ;
-            this.encounteredLengthOfQueue[(int)QueueName.FASTVOTE_VQ] = currentQueueLength;
-
-            /*
-             * Predicted start and end of window at time of entering virtual queue;
-             * likely will be different, and will be updated, when voter become
-             * eligible
-             */
-
-            this.startOfWindow = startOfWindow;
-            this.endOfWindow = endOfWindow;
-        }
-
-        public void enterEligibleSet(double currentTime, double updatedEndOfWindow)
-        {
-            //assert this.isFastVoteUser && this.currentState == State.FASTVOTE_VQ;
-            updateTimesForCurrentState(currentTime);
-            this.currentState = State.FASTVOTE_ELIGIBLE;
-
-            /*
-             * Update window; this code fragment can keep track of how accurate
-             * initial prediction of startOfWindow is compared to actual
-             * startOfWindow, and similarly endOfWindow
-             */
-
-            // if (this.startOfWindow != currentTime) {
-            // System.out.println("t = " + currentTime + ": deltaW = [" +
-            // (currentTime - this.startOfWindow) + ", "
-            // + (updatedEndOfWindow - this.endOfWindow) + "]");
-            // }
-
-            this.startOfWindow = currentTime;
-            this.endOfWindow = System.Math.Max(this.endOfWindow, updatedEndOfWindow);
-        }
-
-        public void enterQueue(double currentTime, int currentQueueLength, Rider.QueueName queueName)
-        {
-            updateTimesForCurrentState(currentTime);
-            switch (queueName)
-            {
-                case QueueName.FASTVOTE_PQ:
-                    //assert this.isFastVoteUser;
-                    this.currentState = State.FASTVOTE_PQ;
-                    break;
-                case QueueName.STANDBY_Q:
-                    //assert !this.isFastVoteUser;
-                    this.currentState = State.STANDBY_Q;
-                    break;
-                case QueueName.VOTING_Q:
-                    this.currentState = State.VOTING_Q;
-                    break;
-                case QueueName.SCANNING_Q:
-                    this.currentState = State.SCANNING_Q;
-                    break;
-                default:
-                    //assert false;
-                    break;
-            }
-            this.encounteredLengthOfQueue[(int)queueName] = currentQueueLength;
-        }
-
-        public void enterService(double currentTime, Rider.ServiceName serviceName) {
-		updateTimesForCurrentState(currentTime);
-		switch (serviceName) {
-		case ServiceName.CHECKIN_S:
-			this.currentState = State.CHECKIN_S;
-			break;
-		case ServiceName.VOTING_S:
-			this.currentState = State.VOTING_S;
-			break;
-		case ServiceName.SCANNING_S:
-			this.currentState = State.SCANNING_S;
-			break;
-		default:
-			// assert false;
-			break;
-		}
-	}
 
         public void leaveSystem(double currentTime)
         {
