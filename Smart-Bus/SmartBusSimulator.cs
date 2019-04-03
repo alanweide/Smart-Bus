@@ -4,7 +4,7 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
-public class PollingPlaceSimulator {
+public class SmartBusSimulator {
 
     // PRNG
 
@@ -96,8 +96,8 @@ public class PollingPlaceSimulator {
 
 			switch (thisEvent.event) {
 			case CHECK_FASTVOTE_WINDOW: {
-				assert sp.fastVotePopularity > 0.0;
-				assert thisEvent.time < sp.pollClosingTime : "Checking FastVote window past closing time";
+                //assert sp.fastVotePopularity > 0.0;
+                //assert thisEvent.time < sp.pollClosingTime : "Checking FastVote window past closing time";
 
 				/*
 				 * Check FastVote app to determine whether offered window
