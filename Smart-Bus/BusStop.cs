@@ -3,9 +3,13 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
-    class BusStop
+    public struct BusStop
     {
         public int id;
 
+        public BusStop(int id)
+        {
+            this.id = id;
+        }
     }
 }
