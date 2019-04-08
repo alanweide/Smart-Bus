@@ -6,8 +6,8 @@ namespace Smart_Bus
     class RequestPattern_2P_2S_2B: IRequestPattern
     {
 
-        private IRequestPattern.Request[] requests = 
-        { new IRequestPattern.Request(0, 1, 0, 1), new IRequestPattern.Request(0, 1, 1, 0) };
+        private Request[] requests = 
+        { new Request(0, 1, 0, 1), new Request(0, 1, 1, 0) };
         
         private int currentRequest = 0;
         private int numStops = 2;
@@ -41,7 +41,7 @@ namespace Smart_Bus
             return requests.Length - currentRequest;
         }
 
-        public IRequestPattern.Request getNextRequest()
+        public Request getNextRequest()
         {
             currentRequest++;
             return requests[currentRequest - 1];
