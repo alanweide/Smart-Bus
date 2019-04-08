@@ -1,0 +1,25 @@
+16:59:48.780 :: CORE :: Starting Emulation...
+16:59:48.780 :: CORE :: /******Samraksh NETMF4.3 Emulator, verion 2.0******/
+16:59:48.810 :: MFAPP :: 
+TinyCLR (Build 4.3.1.0)
+
+
+16:59:48.811 :: MFAPP :: Starting...
+
+16:59:48.815 :: MFAPP :: Created EE.
+
+16:59:48.817 :: MFAPP :: Started Hardware.
+
+16:59:48.827 :: MFAPP :: Found debugger!
+
+16:59:48.840 :: NETWORK :: Trying to connect to Network hub...
+16:59:48.842 :: NETWORK :: Success.
+16:59:48.842 :: CORE :: Found Emulator ADC port : Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+16:59:48.842 :: CORE :: Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+16:59:48.842 :: CORE :: I can write to ADC
+16:59:48.843 :: CORE :: Found Emulator USART port : Usart2
+16:59:48.843 :: CORE :: Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+16:59:48.843 :: CORE :: I can write to Emulator Serial Port
+16:59:48.845 :: NETWORK :: Got Something from neworkhub of length: 4
+16:59:48.892 :: NETWORK :: 1 1 0 0 0
+16:59:48.895 :: CORE :: Sending to APP: 4

@@ -7,11 +7,26 @@ namespace Smart_Bus
     {
 
         private Request[] requests = 
-        { new Request(0, 1, 0, 1), new Request(0, 1, 1, 0) };
+        { new Request(1000, 1000, 2000, 0, 1), new Request(2000, 2000, 3000, 1, 0) };
         
         private int currentRequest = 0;
         private int numStops = 2;
         private int numBuses = 2;
+
+        public int numberOfPassengers()
+        {
+            return requests.Length;
+        }
+
+        public int numberOfStops()
+        {
+            return numStops;
+        }
+
+        public int numberOfBuses()
+        {
+            return numBuses;
+        }
 
         public RequestPattern_2P_2S_2B()
         {
@@ -45,21 +60,6 @@ namespace Smart_Bus
         {
             currentRequest++;
             return requests[currentRequest - 1];
-        }
-
-        public int numberOfPassengers()
-        {
-            return requests.Length;
-        }
-
-        public int numberOfStops()
-        {
-            return numStops;
-        }
-
-        public int numberOfBuses()
-        {
-            return numBuses;
         }
     }
 }
