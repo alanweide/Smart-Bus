@@ -3,32 +3,20 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
-    class RequestPattern_2P_2S_2B: IRequestPattern
+    class RequestPattern_2P_2S: IRequestPattern
     {
 
         private Request[] requests = 
-        { new Request(1000, 1000, 2000, 0, 1), new Request(2000, 2000, 3000, 1, 0) };
+        { 
+            new Request(5000, 6000, 0, 1), 
+            new Request(10000, 11000, 1, 0)
+        };
         
         private int currentRequest = 0;
         private int numStops = 2;
         private int numBuses = 2;
 
-        public int numberOfPassengers()
-        {
-            return requests.Length;
-        }
-
-        public int numberOfStops()
-        {
-            return numStops;
-        }
-
-        public int numberOfBuses()
-        {
-            return numBuses;
-        }
-
-        public RequestPattern_2P_2S_2B()
+        public RequestPattern_2P_2S()
         {
             // Sort the requests array in order of earliestServingTime on startup
             // This is in-place selection sort so it's inefficient, but there won't be many requests so it's fine
@@ -49,6 +37,21 @@ namespace Smart_Bus
                     requests[minIdx] = temp;
                 }
             }
+        }
+
+        public int numberOfPassengers()
+        {
+            return requests.Length;
+        }
+
+        public int numberOfStops()
+        {
+            return numStops;
+        }
+
+        public int numberOfBuses()
+        {
+            return numBuses;
         }
 
         public int remainingRequests()

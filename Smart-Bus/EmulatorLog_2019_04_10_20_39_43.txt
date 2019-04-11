@@ -1,0 +1,319 @@
+20:39:31.420 :: CORE :: Starting Emulation...
+20:39:31.420 :: CORE :: /******Samraksh NETMF4.3 Emulator, verion 2.0******/
+20:39:31.431 :: MFAPP :: 
+TinyCLR (Build 4.3.1.0)
+
+
+20:39:31.432 :: MFAPP :: Starting...
+
+20:39:31.434 :: MFAPP :: Created EE.
+
+20:39:31.435 :: MFAPP :: Started Hardware.
+
+20:39:31.451 :: MFAPP :: Found debugger!
+
+20:39:31.461 :: NETWORK :: Trying to connect to Network hub...
+20:39:31.463 :: NETWORK :: Success.
+20:39:31.463 :: CORE :: Found Emulator ADC port : Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+20:39:31.464 :: CORE :: Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+20:39:31.464 :: CORE :: I can write to ADC
+20:39:31.464 :: CORE :: Found Emulator USART port : Usart2
+20:39:31.464 :: CORE :: Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+20:39:31.464 :: CORE :: I can write to Emulator Serial Port
+20:39:31.465 :: NETWORK :: Got Something from neworkhub of length: 4
+20:39:31.465 :: NETWORK :: 1 1 0 0 0
+20:39:31.465 :: CORE :: Sending to APP: 4
+20:39:32.797 :: MFAPP ::    Assembly: Microsoft.SPOT.Hardware.SerialPort (4.3.1.0)   (548 RAM - 3608 ROM - 1697 METADATA)
+
+
+20:39:32.801 :: MFAPP ::    AssemblyRef    =        8 bytes (       2 elements)
+
+20:39:32.803 :: MFAPP ::    TypeRef        =      100 bytes (      25 elements)
+
+20:39:32.804 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+20:39:32.806 :: MFAPP ::    MethodRef      =       88 bytes (      22 elements)
+
+20:39:32.807 :: MFAPP ::    TypeDef        =       16 bytes (       2 elements)
+
+20:39:32.809 :: MFAPP ::    FieldDef       =       32 bytes (      16 elements)
+
+20:39:32.811 :: MFAPP ::    MethodDef      =      108 bytes (      54 elements)
+
+20:39:32.812 :: MFAPP :: 
+
+20:39:32.814 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:32.815 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+20:39:32.817 :: MFAPP ::    Resources       =        0 bytes (       0 elements)
+
+20:39:32.819 :: MFAPP ::    Resources Files =        0 bytes (       0 elements)
+
+20:39:32.820 :: MFAPP ::    Resources Data  =        0 bytes
+
+20:39:32.822 :: MFAPP ::    Strings         =      667 bytes
+
+20:39:32.824 :: MFAPP ::    Signatures      =      257 bytes
+
+20:39:32.826 :: MFAPP ::    ByteCode        =     1114 bytes
+
+20:39:32.827 :: MFAPP :: 
+
+
+20:39:32.829 :: MFAPP ::    Assembly: Microsoft.SPOT.Hardware (4.3.1.0)   (1996 RAM - 14288 ROM - 8587 METADATA)
+
+
+20:39:32.831 :: MFAPP ::    AssemblyRef    =        8 bytes (       2 elements)
+
+20:39:32.833 :: MFAPP ::    TypeRef        =      132 bytes (      33 elements)
+
+20:39:32.834 :: MFAPP ::    FieldRef       =       24 bytes (       6 elements)
+
+20:39:32.837 :: MFAPP ::    MethodRef      =      132 bytes (      33 elements)
+
+20:39:32.838 :: MFAPP ::    TypeDef        =      536 bytes (      67 elements)
+
+20:39:32.840 :: MFAPP ::    FieldDef       =      208 bytes (     104 elements)
+
+20:39:32.889 :: MFAPP ::    MethodDef      =      544 bytes (     272 elements)
+
+20:39:32.891 :: MFAPP :: 
+
+20:39:32.892 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:32.894 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+20:39:32.896 :: MFAPP ::    Resources       =        0 bytes (       0 elements)
+
+20:39:32.898 :: MFAPP ::    Resources Files =        0 bytes (       0 elements)
+
+20:39:32.900 :: MFAPP ::    Resources Data  =        0 bytes
+
+20:39:32.902 :: MFAPP ::    Strings         =     2061 bytes
+
+20:39:32.903 :: MFAPP ::    Signatures      =     1195 bytes
+
+20:39:32.904 :: MFAPP ::    ByteCode        =     3511 bytes
+
+20:39:32.906 :: MFAPP :: 
+
+
+20:39:32.907 :: MFAPP ::    Assembly: Microsoft.SPOT.Native (4.3.1.0)   (1248 RAM - 7468 ROM - 4862 METADATA)
+
+
+20:39:32.908 :: MFAPP ::    AssemblyRef    =        4 bytes (       1 elements)
+
+20:39:32.909 :: MFAPP ::    TypeRef        =       88 bytes (      22 elements)
+
+20:39:32.910 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+20:39:32.911 :: MFAPP ::    MethodRef      =       60 bytes (      15 elements)
+
+20:39:32.912 :: MFAPP ::    TypeDef        =      368 bytes (      46 elements)
+
+20:39:32.914 :: MFAPP ::    FieldDef       =      220 bytes (     110 elements)
+
+20:39:32.915 :: MFAPP ::    MethodDef      =      244 bytes (     122 elements)
+
+20:39:32.916 :: MFAPP :: 
+
+20:39:32.917 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:32.918 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+20:39:32.920 :: MFAPP ::    Resources       =       72 bytes (       9 elements)
+
+20:39:32.921 :: MFAPP ::    Resources Files =        8 bytes (       1 elements)
+
+20:39:32.922 :: MFAPP ::    Resources Data  =      747 bytes
+
+20:39:32.923 :: MFAPP ::    Strings         =     1099 bytes
+
+20:39:32.989 :: MFAPP ::    Signatures      =      618 bytes
+
+20:39:32.990 :: MFAPP ::    ByteCode        =      535 bytes
+
+20:39:32.992 :: MFAPP :: 
+
+
+20:39:32.994 :: MFAPP ::    Assembly: mscorlib (4.3.1.0)   (4344 RAM - 42076 ROM - 22412 METADATA)
+
+
+20:39:32.997 :: MFAPP ::    AssemblyRef    =        0 bytes (       0 elements)
+
+20:39:32.999 :: MFAPP ::    TypeRef        =        0 bytes (       0 elements)
+
+20:39:33.000 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+20:39:33.002 :: MFAPP ::    MethodRef      =        0 bytes (       0 elements)
+
+20:39:33.004 :: MFAPP ::    TypeDef        =     1160 bytes (     145 elements)
+
+20:39:33.005 :: MFAPP ::    FieldDef       =      300 bytes (     149 elements)
+
+20:39:33.007 :: MFAPP ::    MethodDef      =     1828 bytes (     914 elements)
+
+20:39:33.008 :: MFAPP :: 
+
+20:39:33.010 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:33.011 :: MFAPP ::    TypeSpec        =       16 bytes (       4 elements)
+
+20:39:33.012 :: MFAPP ::    Resources       =      232 bytes (      29 elements)
+
+20:39:33.013 :: MFAPP ::    Resources Files =       16 bytes (       2 elements)
+
+20:39:33.015 :: MFAPP ::    Resources Data  =      437 bytes
+
+20:39:33.016 :: MFAPP ::    Strings         =     2774 bytes
+
+20:39:33.019 :: MFAPP ::    Signatures      =     3100 bytes
+
+20:39:33.020 :: MFAPP ::    ByteCode        =    16043 bytes
+
+20:39:33.022 :: MFAPP :: 
+
+
+20:39:33.023 :: MFAPP ::    Assembly: Smart-Bus (1.0.0.0)   (548 RAM - 3424 ROM - 1513 METADATA)
+
+
+20:39:33.025 :: MFAPP ::    AssemblyRef    =       12 bytes (       3 elements)
+
+20:39:33.026 :: MFAPP ::    TypeRef        =       92 bytes (      23 elements)
+
+20:39:33.028 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+20:39:33.029 :: MFAPP ::    MethodRef      =      112 bytes (      28 elements)
+
+20:39:33.089 :: MFAPP ::    TypeDef        =       64 bytes (       8 elements)
+
+20:39:33.090 :: MFAPP ::    FieldDef       =       36 bytes (      17 elements)
+
+20:39:33.094 :: MFAPP ::    MethodDef      =       60 bytes (      30 elements)
+
+20:39:33.096 :: MFAPP :: 
+
+20:39:33.098 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:33.100 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+20:39:33.104 :: MFAPP ::    Resources       =       16 bytes (       2 elements)
+
+20:39:33.111 :: MFAPP ::    Resources Files =        8 bytes (       1 elements)
+
+20:39:33.113 :: MFAPP ::    Resources Data  =       13 bytes
+
+20:39:33.115 :: MFAPP ::    Strings         =      792 bytes
+
+20:39:33.122 :: MFAPP ::    Signatures      =      261 bytes
+
+20:39:33.124 :: MFAPP ::    ByteCode        =      936 bytes
+
+20:39:33.126 :: MFAPP :: 
+
+
+20:39:33.127 :: MFAPP ::    Assembly: Samraksh.SPOT.Emulator (4.3.0.0)   (552 RAM - 3952 ROM - 1546 METADATA)
+
+
+20:39:33.129 :: MFAPP ::    AssemblyRef    =       12 bytes (       3 elements)
+
+20:39:33.131 :: MFAPP ::    TypeRef        =       68 bytes (      17 elements)
+
+20:39:33.133 :: MFAPP ::    FieldRef       =        4 bytes (       1 elements)
+
+20:39:33.134 :: MFAPP ::    MethodRef      =      104 bytes (      26 elements)
+
+20:39:33.136 :: MFAPP ::    TypeDef        =       80 bytes (      10 elements)
+
+20:39:33.138 :: MFAPP ::    FieldDef       =       52 bytes (      25 elements)
+
+20:39:33.140 :: MFAPP ::    MethodDef      =       60 bytes (      29 elements)
+
+20:39:33.142 :: MFAPP :: 
+
+20:39:33.145 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:33.149 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+20:39:33.152 :: MFAPP ::    Resources       =        0 bytes (       0 elements)
+
+20:39:33.154 :: MFAPP ::    Resources Files =        0 bytes (       0 elements)
+
+20:39:33.189 :: MFAPP ::    Resources Data  =        0 bytes
+
+20:39:33.191 :: MFAPP ::    Strings         =      806 bytes
+
+20:39:33.192 :: MFAPP ::    Signatures      =      254 bytes
+
+20:39:33.194 :: MFAPP ::    ByteCode        =     1472 bytes
+
+20:39:33.196 :: MFAPP :: 
+
+
+20:39:33.198 :: MFAPP :: Loading Deployment Assemblies.
+
+20:39:33.202 :: MFAPP :: ERROR: Could not find device for DEPLOYMENT usage
+
+20:39:33.204 :: MFAPP :: Resolving.
+
+20:39:33.206 :: MFAPP :: 
+Total: (7804 RAM - 74816 ROM - 40617 METADATA)
+
+
+20:39:33.208 :: MFAPP ::    AssemblyRef    =       44 bytes (      11 elements)
+
+20:39:33.217 :: MFAPP ::    TypeRef        =      480 bytes (     120 elements)
+
+20:39:33.219 :: MFAPP ::    FieldRef       =       28 bytes (       7 elements)
+
+20:39:33.221 :: MFAPP ::    MethodRef      =      496 bytes (     124 elements)
+
+20:39:33.223 :: MFAPP ::    TypeDef        =     2224 bytes (     278 elements)
+
+20:39:33.225 :: MFAPP ::    FieldDef       =      848 bytes (     421 elements)
+
+20:39:33.226 :: MFAPP ::    MethodDef      =     2844 bytes (    1421 elements)
+
+20:39:33.228 :: MFAPP :: 
+
+20:39:33.230 :: MFAPP ::    DebuggingInfo  =     1432 bytes
+
+20:39:33.232 :: MFAPP :: 
+
+20:39:33.233 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+20:39:33.235 :: MFAPP ::    TypeSpec        =       16 bytes (       4 elements)
+
+20:39:33.237 :: MFAPP ::    Resources Files =       96 bytes (       4 elements)
+
+20:39:33.239 :: MFAPP ::    Resources       =      320 bytes (      40 elements)
+
+20:39:33.241 :: MFAPP ::    Resources Data  =     1197 bytes
+
+20:39:33.243 :: MFAPP ::    Strings         =     8199 bytes
+
+20:39:33.245 :: MFAPP ::    Signatures      =     5685 bytes
+
+20:39:33.247 :: MFAPP ::    ByteCode        =    23611 bytes
+
+20:39:33.249 :: MFAPP :: 
+
+
+20:39:33.327 :: MFAPP :: Ready.
+
+20:39:38.840 :: MFAPP :: Emulator gave me an ID of1
+
+20:39:38.943 :: MFAPP :: Successfully got ID from the Hub: 1
+
+20:39:40.810 :: MFAPP :: Sending message 1 0 1 1000 2000
+
+20:39:40.842 :: PHYCOMM :: Writting bytes to hub: 15
+20:39:40.842 :: CORE :: Sent to model packet of length : 16
+20:39:40.956 :: MFAPP :: Sending message 1 1 0 2000 3000
+
+20:39:40.992 :: PHYCOMM :: Writting bytes to hub: 15
+20:39:40.992 :: CORE :: Sent to model packet of length : 16
+20:39:50.420 :: CORE :: Emulation Ended
+20:39:50.425 :: MFAPP :: Done.
+

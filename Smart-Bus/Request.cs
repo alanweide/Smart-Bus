@@ -6,15 +6,13 @@ namespace Smart_Bus
 {
     public class Request : IComparable
     {
-        public int requestSendTime;
         public int earliestServingTime;
         public int latestServingTime;
         public BusStop origin;
         public BusStop destination;
 
-        public Request(int requestSendTime, int earliestServingTime, int latestServingTime, int origin, int destination)
+        public Request(int earliestServingTime, int latestServingTime, int origin, int destination)
         {
-            this.requestSendTime = requestSendTime;
             this.earliestServingTime = earliestServingTime;
             this.latestServingTime = latestServingTime;
             this.origin = new BusStop(origin);

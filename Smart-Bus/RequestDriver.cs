@@ -15,12 +15,7 @@ namespace Smart_Bus
         // Suggested values are on the order of 100 (every 10 milliseconds of wall time is one second of simulation time)
         private static readonly int TIME_MULTIPLIER = 1;
 
-        private static long currentTimeInMillis()
-        {
-            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        }
-
-        private static int getRealDelay(int simulationMillis)
+        private static int getRealSendTime(int simulationMillis)
         {
             return simulationMillis / TIME_MULTIPLIER;
         }
@@ -29,7 +24,6 @@ namespace Smart_Bus
 
         NetInst NetPort;
         NetInst.ReceivePktCallback rcvcallBack;
-        TimerCallback broadcastTimerCallback = BuildAndBroadcast;
 
         static UInt16 appId;
 
@@ -48,10 +42,10 @@ namespace Smart_Bus
         {
             Request req = obj as Request;
             String msg = BuildMessage(req);
+            Debug.Print("Sending message " + msg);
             RequestDriver driver = RequestDriver.getInstance();
             byte[] msgBytes = Utilities.StringToByteArray(msg);
             driver.NetworkBroadcast(msgBytes, msg.Length);
-            Debug.Print("Sending message " + msg);
         }
         
         public static RequestDriver getInstance()
@@ -91,14 +85,19 @@ namespace Smart_Bus
             appId = driver.NetPort.GetID();
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
-            long startTime = currentTimeInMillis();
-            IRequestPattern pattern = new RequestPattern_2P_2S_2B();
+            DateTime startTime = DateTime.Now;
+            Debug.Print("startTime = " + startTime.ToString("HH:mm:ss.fff"));
+            IRequestPattern pattern = new RequestPattern_8P_2S();
+            int i = 0;
+
             while (pattern.remainingRequests() > 0)
             {
                 Request request = pattern.getNextRequest();
-                int elapsedMillis = (int)(currentTimeInMillis() - startTime);
-                int delayTilSend = System.Math.Max(0, getRealDelay(request.requestSendTime) - elapsedMillis);
-                Timer timer = new Timer(driver.broadcastTimerCallback, request, delayTilSend, Timeout.Infinite);
+                TimeSpan elapsedTime = DateTime.Now - startTime;
+                int elapsedMillis = (int)elapsedTime.Milliseconds;
+                int delayTilSend = System.Math.Max(0, getRealSendTime(request.earliestServingTime) - elapsedMillis);
+                new Timer(new TimerCallback(BuildAndBroadcast), request, delayTilSend, 0);
+                Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms");
             }
 
             Thread.Sleep(Timeout.Infinite);            
