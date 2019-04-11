@@ -76,9 +76,11 @@ namespace Smart_Bus
 
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
-            String msgString = Utilities.ByteArrayToString(msg);
+            // Received message from network (probably a broadcast from a stop or bus).
+            // We don't need to do anything about it.
 
-            // TODO: deal with messages from network to passengers. Do we need to do anything?
+            String msgString = Utilities.ByteArrayToString(msg);
+            Debug.Print("Received message: " + msgString);
         }
 
         public static void Main()
