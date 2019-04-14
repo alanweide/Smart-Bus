@@ -63,8 +63,8 @@ namespace Smart_Bus
             msg.Append(appId.ToString() + " ");
             msg.Append(request.origin.id.ToString() + " ");
             msg.Append(request.destination.id.ToString() + " ");
-            msg.Append(request.earliestServingTime.ToString() + " ");
-            msg.Append(request.latestServingTime.ToString());
+            msg.Append(request.earliestPickupTime.ToString() + " ");
+            msg.Append(request.earliestDeliveryTime.ToString());
             return msg.ToString();
         }
 
@@ -87,7 +87,7 @@ namespace Smart_Bus
 
             DateTime startTime = DateTime.Now;
             Debug.Print("startTime = " + startTime.ToString("HH:mm:ss.fff"));
-            IRequestPattern pattern = new RequestPattern_2P_2S();
+            IRequestPattern pattern = new RequestPattern_2P_2S_2B();
             int i = 0;
 
             while (pattern.remainingRequests() > 0)
@@ -95,9 +95,10 @@ namespace Smart_Bus
                 Request request = pattern.getNextRequest();
                 TimeSpan elapsedTime = DateTime.Now - startTime;
                 int elapsedMillis = (int)elapsedTime.Milliseconds;
-                int delayTilSend = System.Math.Max(0, getRealSendTime(request.earliestServingTime) - elapsedMillis);
+                int delayTilSend = System.Math.Max(0, getRealSendTime(request.earliestPickupTime) - elapsedMillis);
+                Debug.Print("--------\nScheduling request " + i + " for " + delayTilSend + " ms");
                 new Timer(new TimerCallback(BuildAndBroadcast), request, delayTilSend, 0);
-                Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms");
+                Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms\n--------");
             }
 
             Thread.Sleep(Timeout.Infinite);            

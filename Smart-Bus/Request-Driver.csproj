@@ -29,15 +29,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Bus.cs" />
     <Compile Include="BusStop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestDriver.cs" />
     <Compile Include="Request.cs" />
+    <Compile Include="RequestDriver.cs" />
+    <Compile Include="Request_OLD.cs" />
     <Compile Include="RequestPattern.cs" />
-    <Compile Include="RequestPattern_4P_4S.cs" />
-    <Compile Include="RequestPattern_8P_2S.cs" />
-    <Compile Include="RequestPattern_4P_2S.cs" />
-    <Compile Include="RequestPattern_2P_2S.cs" />
+    <Compile Include="RequestPattern_4P_4S_2B.cs" />
+    <Compile Include="RequestPattern_8P_2S_2B.cs" />
+    <Compile Include="RequestPattern_4P_2S_2B.cs" />
+    <Compile Include="RequestPattern_2P_2S_2B.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
