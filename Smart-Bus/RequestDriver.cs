@@ -87,7 +87,7 @@ namespace Smart_Bus
 
             DateTime startTime = DateTime.Now;
             Debug.Print("startTime = " + startTime.ToString("HH:mm:ss.fff"));
-            IRequestPattern pattern = new RequestPattern_8P_2S();
+            IRequestPattern pattern = new RequestPattern_2P_2S();
             int i = 0;
 
             while (pattern.remainingRequests() > 0)
