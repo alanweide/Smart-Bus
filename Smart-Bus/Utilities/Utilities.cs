@@ -4,8 +4,13 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
-    class Utilities
+    public class Utilities
     {
+        public static void Main(String[] args)
+        {
+            Debug.Print("Utilities started");
+        }
+
         public static byte[] StringToByteArray(String s)
         {
             byte[] sBytes = new byte[s.Length];

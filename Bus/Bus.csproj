@@ -30,7 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="BusDriver.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -52,9 +52,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Smart-Bus\Request-Driver.csproj">
-      <Project>{A7422A35-B8CC-43AA-8881-FD95E465E280}</Project>
-      <Name>Request-Driver</Name>
+    <ProjectReference Include="..\Smart-Bus\Utilities\Utilities And Classes.csproj">
+      <Project>{11BC6865-5578-4D60-9627-57B30C849178}</Project>
+      <Name>Utilities And Classes</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />

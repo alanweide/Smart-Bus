@@ -10,7 +10,7 @@ using Smart_Bus;
 
 namespace Smart_Bus
 {
-    public class RequestDriver
+    public class BusDriver
     {
         // 1 is Real Time (i.e., one second of wall time per second of simulation time)
         // Suggested values are on the order of 100 (every 10 milliseconds of wall time is one second of simulation time)
@@ -21,14 +21,17 @@ namespace Smart_Bus
             return simulationMillis / TIME_MULTIPLIER;
         }
 
-        private static RequestDriver instance;
+        private static BusDriver instance;
+
+        // Requires an id; this will be equivalent to appId, so do not create bus until after appId is initialized
+        Bus myBus;
 
         NetInst NetPort;
         NetInst.ReceivePktCallback rcvcallBack;
 
         static UInt16 appId;
 
-        private RequestDriver()
+        private BusDriver()
         {
             rcvcallBack = new NetInst.ReceivePktCallback(ReadNetworkPkt);
             NetPort = new NetInst(rcvcallBack);
@@ -44,18 +47,18 @@ namespace Smart_Bus
             Request req = obj as Request;
             String msg = BuildMessage(req);
             Debug.Print("Sending message " + msg);
-            RequestDriver driver = RequestDriver.getInstance();
+            BusDriver driver = BusDriver.getInstance();
             byte[] msgBytes = Utilities.StringToByteArray(msg);
             driver.NetworkBroadcast(msgBytes, msg.Length);
         }
-        
-        public static RequestDriver getInstance()
+
+        public static BusDriver getInstance()
         {
-            if (RequestDriver.instance == null)
+            if (BusDriver.instance == null)
             {
-                RequestDriver.instance = new RequestDriver();
+                BusDriver.instance = new BusDriver();
             }
-            return RequestDriver.instance;
+            return BusDriver.instance;
         }
 
         private static string BuildMessage(Request request)
@@ -71,38 +74,42 @@ namespace Smart_Bus
 
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
-            // Received message from network (probably a broadcast from a stop or bus).
-            // We don't need to do anything about it.
+            // Received message from network
+            // If broadcast from a stop, decide if we're close enough to respond
+            // (i.e., the stop that sent it is on our route in the future),
+            // then respond with our route info and current location.
+            // If it's any other message, or we aren't close enough to the stop to
+            // reply, then ignore it.
 
-            String msgString = Utilities.ByteArrayToString(msg);
+            string msgString = Utilities.ByteArrayToString(msg);
             Debug.Print("Received message: " + msgString);
+            if (isBusStopBroadcast(msgString))
+            {
+                int stopId = 0;
+                if (BusDriver.getInstance().myBus.futureRouteContains(stopId))
+                {
+                    // TODO: send reply
+                }
+            }
+        }
+
+        private static bool isBusStopBroadcast(string msg)
+        {
+            // TODO: Implement this
+            return true;
         }
 
         public static void Main()
         {
-            RequestDriver driver = RequestDriver.getInstance();
+            BusDriver driver = BusDriver.getInstance();
             driver.NetPort.Init();
             Thread.Sleep(100);
             appId = driver.NetPort.GetID();
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
-            DateTime startTime = DateTime.Now;
-            Debug.Print("startTime = " + startTime.ToString("HH:mm:ss.fff"));
-            IRequestPattern pattern = new RequestPattern_2P_2S_2B();
-            int i = 0;
+            instance.myBus = new Smart_Bus.Bus(appId, 0, 0, 100000);
 
-            while (pattern.remainingRequests() > 0)
-            {
-                Request request = pattern.getNextRequest();
-                TimeSpan elapsedTime = DateTime.Now - startTime;
-                int elapsedMillis = (int)elapsedTime.Milliseconds;
-                int delayTilSend = System.Math.Max(0, getRealSendTime(request.earliestPickupTime) - elapsedMillis);
-                Debug.Print("--------\nScheduling request " + i + " for " + delayTilSend + " ms");
-                new Timer(new TimerCallback(BuildAndBroadcast), request, delayTilSend, 0);
-                Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms\n--------");
-            }
-
-            Thread.Sleep(Timeout.Infinite);            
+            Thread.Sleep(Timeout.Infinite);
         }
 
     }

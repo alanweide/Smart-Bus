@@ -30,5 +30,11 @@ namespace Smart_Bus
         }
 
 
+
+        public bool futureRouteContains(int stopId)
+        {
+            // TODO: Implement this
+            return true;
+        }
     }
 }

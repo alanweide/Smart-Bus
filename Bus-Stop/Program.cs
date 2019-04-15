@@ -1,7 +1,7 @@
 using System;
 using Microsoft.SPOT;
 
-namespace Bus_Stop
+namespace Smart_Bus
 {
     public class Program
     {

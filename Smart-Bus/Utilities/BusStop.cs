@@ -38,7 +38,8 @@ namespace Smart_Bus
 
 
                 //Second, add the new request to the urgent list if (latestDeliveryTime - current time) < urgencyThreshold
-                if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
+                //if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
+                if (true)
                 {
                     urgent_request_list[urgent_request_list_count] = new_request;
                     urgent_request_list_count++;
@@ -76,7 +77,8 @@ namespace Smart_Bus
             {
                 for (int i = 0; i < request_list_count; i++)
                 {
-                    if (request_list[i].latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
+                    //if (request_list[i].latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
+                    if (true)
                     {
                         urgent_request_list[urgent_request_list_count] = request_list[i];
                         urgent_request_list_count++;
