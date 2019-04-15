@@ -6,12 +6,14 @@ namespace Smart_Bus
     public class Bus
     {
         public int id;
+        public DateTime simulation_start_time;
+
         public const int capacity = 5;
         public int avail_capacity;
         public int terminus_location;
         public int bus_start_time; //ts_k: expected start time at terminus 
         public int bus_end_time; //te_k: expected end time terminus
-        public Request_v[] routeInfo;
+        public Route routeInfo;
         public int routeInfo_count;
         public BusStop[] updateList;
         public int updateList_count;
@@ -29,12 +31,23 @@ namespace Smart_Bus
             this.updateList_count = 0;
         }
 
-
-
         public bool futureRouteContains(int stopId)
         {
             // TODO: Implement this
             return true;
+        }
+
+        public BusLocation currentLocation(DateTime currentTime)
+        {
+            TimeSpan elapsedTime = DateTime.Now - this.simulation_start_time;
+            int realElapsedMillis = (int)elapsedTime.Milliseconds;
+            int simElapsedMillis = realElapsedMillis / Utilities.TIME_MULTIPLIER;
+            int computeTime = bus_start_time;
+            int i = 0;
+            while (computeTime < simElapsedMillis)
+            {
+                
+            }
         }
     }
 }

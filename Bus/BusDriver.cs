@@ -75,15 +75,22 @@ namespace Smart_Bus
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
             // Received message from network
-            // If broadcast from a stop, decide if we're close enough to respond
-            // (i.e., the stop that sent it is on our route in the future),
-            // then respond with our route info and current location.
+            // There are a few possibilities for this message:
+            //  If broadcast from a stop, decide if we're close enough to respond
+            //  (i.e., the stop that sent it is on our route in the future),
+            //  then respond with our route info and current location.
+            // If it's a "start simulation" message from the RequestDriver,
+            //  keep track of the start time to know current location
             // If it's any other message, or we aren't close enough to the stop to
             // reply, then ignore it.
 
             string msgString = Utilities.ByteArrayToString(msg);
             Debug.Print("Received message: " + msgString);
-            if (isBusStopBroadcast(msgString))
+            if (isStartSimulationMessage(msgString))
+            {
+                
+            }
+            else if (isBusStopBroadcast(msgString))
             {
                 int stopId = 0;
                 if (BusDriver.getInstance().myBus.futureRouteContains(stopId))
@@ -91,6 +98,12 @@ namespace Smart_Bus
                     // TODO: send reply
                 }
             }
+        }
+
+        private static bool isStartSimulationMessage(string msg)
+        {
+            // TODO: Implement this
+            return true;
         }
 
         private static bool isBusStopBroadcast(string msg)

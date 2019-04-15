@@ -12,13 +12,10 @@ namespace Smart_Bus
 {
     public class RequestDriver
     {
-        // 1 is Real Time (i.e., one second of wall time per second of simulation time)
-        // Suggested values are on the order of 100 (every 10 milliseconds of wall time is one second of simulation time)
-        private static readonly int TIME_MULTIPLIER = 1;
 
         private static int getRealSendTime(int simulationMillis)
         {
-            return simulationMillis / TIME_MULTIPLIER;
+            return simulationMillis / Utilities.TIME_MULTIPLIER;
         }
 
         private static RequestDriver instance;
