@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Microsoft.SPOT;
 using System.Collections;
 
@@ -8,139 +9,124 @@ namespace Smart_Bus
     {
         public int id;
         public Bus[] busInfo_list;
-        public int busInfo_list_count;
         public Request[] request_list;
-        public int request_list_count;
-        public Request[] urgent_request_list;
-        public int urgent_request_list_count;
-        public const int urgencyThreshold = 10000;
+        public const int urgencyThreshold = 100;
 
         public BusStop(int id)
         {
             this.id = id;
-            this.busInfo_list = new Bus[2];
-            this.busInfo_list_count = 0;
-            this.request_list = new Request[100];
-            this.request_list_count = 0;
-            this.urgent_request_list = new Request[100];
-            this.urgent_request_list_count = 0;
         }
-
+        
         public void request_receive(Request new_request)
         {
-            request_lookup();
+            Debug.Print("Received new request");
+            Debug.Print("Origin: " + new_request.origin.id + ", Destination: " + new_request.destination.id);
+            Debug.Print("EarliestPickupTime: " + new_request.earliestPickupTime + ", LatestPickupTime: " + new_request.latestPickupTime);
+            Debug.Print("EarliestDeliveryTime: " + new_request.earliestDeliveryTime + ", LatestDeliveryTime: " + new_request.latestDeliveryTime);
 
             //First, add the new request to the request list
-            if (request_list_count < 100)
+            this.request_list = Append_request(new_request);
+
+            //Second, assign the new request immediately if (latestDeliveryTime - current time) < urgencyThreshold
+            if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
             {
-                request_list[request_list_count] = new_request;
-                request_list_count++;
-
-
-                //Second, add the new request to the urgent list if (latestDeliveryTime - current time) < urgencyThreshold
-                //if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
-                if (true)
-                {
-                    urgent_request_list[urgent_request_list_count] = new_request;
-                    urgent_request_list_count++;
-                }
+                request_assign(new_request);
+            }
+            //otherwise, start a timer with the period of latestDeliveryTime - (current time + urgencyThreshold),
+            // assign the new request when the timer timeout
+            else
+            {
+                request_assign(new_request);
+                //requestTimer = new Timer(new TimerCallback(requestHandler), null, 0, (new_request.latestDeliveryTime - (Global_Timer.C_Time + urgencyThreshold)) * 1000);
             }
 
         }
 
-        public void update_receive(Bus bus, bool is_upadate)
+        public void update_receive(Bus bus, bool is_update)
         {
-            for (int i = 0; i < busInfo_list_count; i++)
+            Debug.Print("Received route update from bus: " + bus.id + ", is_update: " + is_update);
+
+            if (busInfo_list == null && is_update == true)
+            {
+                this.busInfo_list = Append_busInfo(bus);
+            }
+            
+            
+            for (int i = 0; i < busInfo_list.Length; i++)
             {
                 //remove the bus info
                 if (busInfo_list[i].id == bus.id)
                 {
-                    if (i + 1 < busInfo_list_count)
-                    {
-                        busInfo_list[i] = busInfo_list[i + 1];
-                    }
-                    busInfo_list_count--;
+                    this.busInfo_list = Remove_busInfo(i);
                 }
             }
 
-            if (is_upadate)
+            if (is_update)
             {
-                busInfo_list[busInfo_list_count] = bus;
-                busInfo_list_count++;
+                this.busInfo_list = Append_busInfo(bus);
             }
         }
 
-        public void request_lookup()
-        {
-            //Copy the requests to urgent list if (latestDeliveryTime - current time) < urgencyThreshold
-            if (request_list_count > 0)
-            {
-                for (int i = 0; i < request_list_count; i++)
-                {
-                    //if (request_list[i].latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
-                    if (true)
-                    {
-                        urgent_request_list[urgent_request_list_count] = request_list[i];
-                        urgent_request_list_count++;
-                    }
-                }
-            }
-        }
-
-        public void request_assign()
+        public void request_assign(Request new_request)
         {
             int max_flex, flex_tmp;
             int matched_bus_index;
 
-            //check if there is any urgent request
-            if (urgent_request_list_count > 0)
+            Debug.Print("Assigning request: " + new_request);
+
+            max_flex = -1000000;
+            matched_bus_index = -1;
+            //assign this requests to the best matched bus
+            //check if there is any bus info
+            if (busInfo_list != null)
             {
-                //assign urgent requests to the best matched bus
-                for (int i = 0; i < urgent_request_list_count; i++)
+                for (int i = 0; i < busInfo_list.Length; i++)
                 {
-                    max_flex = -1000000;
-                    matched_bus_index = -1;
-
-                    //check if there is any bus info
-                    if (busInfo_list_count > 0)
+                    if (busInfo_list[i].routeInfo == null)
                     {
-                        for (int j = 0; j < busInfo_list_count; j++)
-                        {
-                            Request_v[] routeInfo_tmp = new Request_v[200];
-                            int routeInfo_tmp_count;
+                        matched_bus_index = i;
 
-                            for (int c = 0; c < busInfo_list[j].routeInfo_count; c++)
-                            {
-                                routeInfo_tmp[c] = busInfo_list[j].route[c];
-                            }
-                            routeInfo_tmp_count = busInfo_list[j].routeInfo_count;
+                        //calculate the flexibility after insert the new request to the current route of target bus
+                        flex_tmp = route_reschedule(busInfo_list[i], null, new_request);
+                        Debug.Print("After inserting, bus " + busInfo_list[i].id + " has flexibility of " + flex_tmp);
 
-                            flex_tmp = route_reschedule(busInfo_list[j], routeInfo_tmp, routeInfo_tmp_count, urgent_request_list[i]);
-                            if (flex_tmp > max_flex)
-                            {
-                                matched_bus_index = j;
-                            }
-                        }
+                        break;
+                    }
 
-                        if (matched_bus_index != -1)
-                        {
-                            //assign the request to the mateched available bus
-                            route_reschedule(busInfo_list[matched_bus_index], busInfo_list[matched_bus_index].route, busInfo_list[matched_bus_index].routeInfo_count, urgent_request_list[i]);
-                            busInfo_list[matched_bus_index].routeInfo_count++;
-                        }
+                    Request_v[] routeInfo_tmp = new Request_v[busInfo_list[i].routeInfo.Length];
+
+                    for (int c = 0; c < busInfo_list[i].routeInfo.Length; c++)
+                    {
+                        routeInfo_tmp[c] = busInfo_list[i].routeInfo[c];
+                    }
+                    
+                    //calculate the flexibility after insert the new request to the current route of target bus
+                    flex_tmp = route_reschedule(busInfo_list[i], routeInfo_tmp, new_request);
+                    Debug.Print("After inserting, bus " + busInfo_list[i].id + " has flexibility of " + flex_tmp);
+
+                    if (flex_tmp > max_flex)
+                    {
+                        matched_bus_index = i;
                     }
                 }
-            }
 
+                if (matched_bus_index != -1)
+                {
+                    //assign the request to the mateched available bus
+                    //route_reschedule(busInfo_list[matched_bus_index], busInfo_list[matched_bus_index].routeInfo, new_request);
+                    
+                    Debug.Print("Assign the request to bus: " + matched_bus_index);
+                }
+            }
         }
 
-        public int route_reschedule(Bus bus, Request_v[] routeInfo, int routeInfo_count, Request new_request)
+        public int route_reschedule(Bus bus, Request_v[] routeInfo, Request new_request)
         {
-            Request_v[] routeInfo_tmp = new Request_v[200];
-            int routeInfo_tmp_count;
+            Request_v[] routeInfo_tmp;
+            //int routeInfo_tmp_count;
             Request_v new_origin, new_destination;
             int flex, max_flex = -1000000;
-            int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
+            //int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
 
             new_origin.earliestServingTime = new_request.earliestPickupTime;
             new_origin.latestServingTime = new_request.latestPickupTime;
@@ -154,123 +140,115 @@ namespace Smart_Bus
             new_destination.location = new_request.destination.id;
             new_destination.served = false;
 
-            for (int i = 0; i < routeInfo_count; i++)
+            //The bus has not been assigned any request
+            if (routeInfo == null)
+            {
+                Request_v[] routeInfo_tmp_o = Append_route(null, new_origin);
+                Request_v[] routeInfo_tmp_o_d = Append_route(routeInfo_tmp_o, new_destination);
+                return flexibility_calculate(bus, routeInfo_tmp_o_d);
+            }
+            else
+            {
+                routeInfo_tmp = new Request_v[routeInfo.Length];
+            }
+
+            for (int i = 0; i < routeInfo.Length; i++)
             {
                 routeInfo_tmp[i] = routeInfo[i];
             }
-            routeInfo_tmp_count = routeInfo_count;
 
-            for (int i = 0; i < routeInfo_count; i++)
+            for (int i = 0; i < routeInfo_tmp.Length+1; i++)
             {
+                //Debug.Print("i: "+i);
                 // check all available insertion points to find the maximal flexibility
-                if (routeInfo[i].served == false)
+                if (i == routeInfo_tmp.Length)
                 {
-                    route_insert(routeInfo_tmp, routeInfo_tmp_count, new_origin, i);
-                    routeInfo_tmp_count++;
+                    Request_v[] routeInfo_tmp_o = Insert_route(routeInfo_tmp, new_origin, i);
+                    Request_v[] routeInfo_tmp_o_d = Insert_route(routeInfo_tmp_o, new_destination, i+1);
 
-                    for (int j = i + 1; j < routeInfo_tmp_count; j++)
+                    if (bus_capacity_check(routeInfo_tmp_o_d, Bus.capacity) == true)
                     {
-                        route_insert(routeInfo_tmp, routeInfo_tmp_count, new_destination, j);
-                        routeInfo_tmp_count++;
-
-                        if (bus_capacity_check(routeInfo_tmp, routeInfo_tmp_count, Bus.capacity) == true)
+                        flex = flexibility_calculate(bus, routeInfo_tmp_o_d);
+                        if (flex > max_flex)
                         {
-                            flex = flexibility_calculate(bus, routeInfo_tmp, routeInfo_tmp_count);
-                            if (flex > max_flex)
+                            max_flex = flex;
+                        }
+                    }
+                }
+                else
+                {
+                    if (routeInfo_tmp[i].served == false)
+                    {
+                        Request_v[] routeInfo_tmp_o = Insert_route(routeInfo_tmp, new_origin, i);
+
+                        for (int j = i + 1; j < routeInfo_tmp_o.Length + 1; j++)
+                        {
+                            //Debug.Print("j: " + j);
+                            Request_v[] routeInfo_tmp_o_d = Insert_route(routeInfo_tmp_o, new_destination, j);
+
+                            if (bus_capacity_check(routeInfo_tmp_o_d, Bus.capacity) == true)
                             {
-                                max_flex = flex;
-                                p_origin = i;
-                                p_destination = j;
+                                flex = flexibility_calculate(bus, routeInfo_tmp_o_d);
+                                if (flex > max_flex)
+                                {
+                                    max_flex = flex;
+                                }
                             }
                         }
-
-                        route_remove(routeInfo_tmp, routeInfo_tmp_count, j);
-                        routeInfo_tmp_count--;
                     }
-
-                    route_remove(routeInfo_tmp, routeInfo_tmp_count, i);
-                    routeInfo_tmp_count--;
                 }
             }
 
-            //update to the routeInfo if we find any available insertion points with maxmal flexibility
-            if (p_origin != -1 && p_destination != -1)
-            {
-                route_insert(routeInfo, routeInfo_count, new_origin, p_origin);
-                routeInfo_count++;
-                route_insert(routeInfo, routeInfo_count, new_destination, p_destination);
-                routeInfo_count++;
-            }
             return max_flex;
         }
 
-        public Request_v[] route_insert(Request_v[] routeInfo, int routeInfo_count, Request_v new_request, int insert_index)
-        {
-            for (int i = 0; i < routeInfo_count; i++)
-            {
-                if (i == insert_index)
-                {
-                    // shift the elements of i, i+1, ..., n to i+1, i+2, ..., n+1
-                    for (int j = routeInfo_count + 1; j > insert_index; j--)
-                    {
-                        routeInfo[j] = routeInfo[j - 1];
-                    }
-                    // insert the new request to ith element
-                    routeInfo[insert_index] = new_request;
-                }
-            }
-            return routeInfo;
-        }
-        public Request_v[] route_remove(Request_v[] routeInfo, int routeInfo_count, int remove_index)
-        {
-            for (int i = 0; i < routeInfo_count; i++)
-            {
-                if (i == remove_index)
-                {
-                    // shift the elements of i+1, i+2, ..., n to i, i+1, ..., n-1
-                    for (int j = i + 1; j < routeInfo_count; j++)
-                    {
-                        routeInfo[j - 1] = routeInfo[j];
-                    }
-                }
-            }
-            return routeInfo;
-        }
-
-        public int flexibility_calculate(Bus bus, Request_v[] routeInfo, int routeInfo_count)
+        public int flexibility_calculate(Bus bus, Request_v[] routeInfo)
         {
             int F = 0;
             int t_v = 0;
 
-            for (int i = 0; i < routeInfo_count; i++)
+            for (int i = 0; i < routeInfo.Length; i++)
             {
                 //Calculate each flexible time at stop v: f_v = l_v - t_v
 
                 if (i == 0)
                 {
                     //t_0 = ts_k + travel_time(terminus, v_0)
-                    t_v = bus.busStartTime + System.Math.Abs(routeInfo[i].location - bus.terminusLocation);
+                    t_v = bus.bus_start_time + System.Math.Abs(routeInfo[i].location - bus.terminus_location);
+                    //Debug.Print("t_v at location " + routeInfo[i].location + " is " + t_v);
 
                 }
                 else
                 {
                     //t_v = max(t_v-1, e_v-1) + travel_time(v-1, v)
                     t_v = System.Math.Max(t_v, routeInfo[i - 1].earliestServingTime) + System.Math.Abs(routeInfo[i].location - routeInfo[i - 1].location);
+                    //Debug.Print("t_v at location " + routeInfo[i].location + " is " + t_v);
                 }
 
                 F += routeInfo[i].latestServingTime - t_v;
+                //Debug.Print("f_v at location " + routeInfo[i].location + " is " + (routeInfo[i].latestServingTime - t_v));
             }
             //add up (l_0 - te_k) to F_k
-            F += bus.busEndTime - System.Math.Abs(bus.terminusLocation - routeInfo[routeInfo_count - 1].location);
+            F += bus.bus_end_time - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location));
+            //Debug.Print("t_v at terminus is " + (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location)));
+            //Debug.Print("f_v at terminus is " + (bus.bus_end_time - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location))));
 
+            /*
+            Debug.Print("Route: ");
+            for (int i = 0; i < routeInfo.Length; i++)
+            {
+                Debug.Print("[" + routeInfo[i].location + "]");
+            }
+            Debug.Print("Flexibility: " +F);
+            */
             return F;
         }
 
-        public bool bus_capacity_check(Request_v[] routeInfo, int routeInfo_count, int capacity)
+        public bool bus_capacity_check(Request_v[] routeInfo, int capacity)
         {
             int avail_capacity = capacity;
 
-            for (int i = 0; i < routeInfo_count; i++)
+            for (int i = 0; i < routeInfo.Length; i++)
             {
                 if (routeInfo[i].is_origin == true)
                 {
@@ -287,6 +265,173 @@ namespace Smart_Bus
                 }
             }
             return true;
+        }
+
+        public Bus[] Append_busInfo(Bus element)
+        {
+            Bus[] new_list;
+
+            if (this.busInfo_list == null)
+            {
+                new_list = new Bus[1];
+                new_list[0] = element;
+                return new_list;
+            }
+            else
+            {
+                new_list = new Bus[this.busInfo_list.Length + 1];
+            }
+
+            for (int i = 0; i < this.busInfo_list.Length; i++)
+            {
+                new_list[i] = this.busInfo_list[i];
+            }
+            new_list[this.busInfo_list.Length] = element;
+
+            return new_list;
+        }
+
+        public Bus[] Remove_busInfo(int index)
+        {
+            if (this.busInfo_list == null)
+            {
+                return null;
+            }
+
+            if (this.busInfo_list.Length == 0 && index == 0)
+            {
+                return null;
+            }
+
+            Bus[] new_list = new Bus[this.busInfo_list.Length - 1];
+
+            for (int i = 0; i < index; i++)
+            {
+                new_list[i] = this.busInfo_list[i];
+            }
+
+            for (int i = index; i < this.busInfo_list.Length-1; i++)
+            {
+                new_list[i] = this.busInfo_list[i+1];
+            }
+
+            return new_list;
+        }
+
+        public Request[] Append_request(Request element)
+        {   
+            Request[] new_list;
+            
+            if (this.request_list == null)
+            {
+                new_list = new Request[1];
+                new_list[0] = element;
+                return new_list;
+            }
+            else
+            {
+                new_list = new Request[this.request_list.Length + 1];
+            }
+
+            for (int i = 0; i < this.request_list.Length; i++)
+            {
+                new_list[i] = this.request_list[i];
+            }
+            new_list[this.request_list.Length] = element;
+
+            return new_list;
+        }
+
+        public Request[] Remove_request(int index)
+        {
+            if (this.request_list == null)
+            {
+                return null;
+            }
+
+            if (this.request_list.Length == 1 && index == 0)
+            {
+                return null;
+            }
+
+            Request[] new_list = new Request[this.request_list.Length - 1];
+
+            for (int i = 0; i < index; i++)
+            {
+                new_list[i] = this.request_list[i];
+            }
+
+            for (int i = index; i < this.busInfo_list.Length - 1; i++)
+            {
+                new_list[i] = this.request_list[i + 1];
+            }
+
+            return new_list;
+        }
+
+        public Request_v[] Append_route(Request_v[] routeInfo_list, Request_v element)
+        {
+            Request_v[] new_list;
+               
+            if (routeInfo_list == null)
+            {
+                new_list = new Request_v[1];
+                new_list[0] = element;
+                return new_list;
+            }
+            else
+            {
+                new_list = new Request_v[routeInfo_list.Length + 1];
+            }
+
+            for (int i = 0; i < routeInfo_list.Length; i++)
+            {
+                new_list[i] = routeInfo_list[i];
+            }
+            new_list[routeInfo_list.Length] = element;
+
+            return new_list;
+        }
+
+        public Request_v[] Insert_route(Request_v[] routeInfo, Request_v element, int insert_index)
+        {
+            Request_v[] new_list = new Request_v[routeInfo.Length + 1];
+
+            for (int i = 0; i < insert_index; i++)
+            {
+                new_list[i] = routeInfo[i];
+            }
+
+            new_list[insert_index] = element;
+
+            for (int i = insert_index; i < routeInfo.Length; i++)
+            {
+                new_list[i + 1] = routeInfo[i];
+            }
+
+            return new_list;
+        }
+
+        public Request_v[] Remove_route(Request_v[] routeInfo, int remove_index)
+        {
+            if (routeInfo.Length == 0)
+            {
+                return null;
+            }
+
+            Request_v[] new_list = new Request_v[routeInfo.Length - 1];
+
+            for (int i = 0; i < remove_index; i++)
+            {
+                new_list[i] = routeInfo[i];
+            }
+
+            for (int i = remove_index; i < routeInfo.Length - 1; i++)
+            {
+                new_list[i] = routeInfo[i + 1];
+            }
+
+            return new_list;
         }
     }
 
