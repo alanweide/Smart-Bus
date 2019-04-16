@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
-    <AssemblyName>Utilities</AssemblyName>
+    <AssemblyName>Utilities_and_Classes</AssemblyName>
     <OutputType>Exe</OutputType>
     <RootNamespace>Smart_Bus</RootNamespace>
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -30,7 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Bus.cs" />
+    <Compile Include="BusStatus.cs" />
     <Compile Include="BusStop.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Resources.Designer.cs">
@@ -38,6 +40,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Route.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>

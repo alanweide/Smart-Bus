@@ -6,48 +6,80 @@ namespace Smart_Bus
     public class Bus
     {
         public int id;
-        public DateTime simulation_start_time;
+        public DateTime simStartTime;
 
         public const int capacity = 5;
-        public int avail_capacity;
-        public int terminus_location;
-        public int bus_start_time; //ts_k: expected start time at terminus 
-        public int bus_end_time; //te_k: expected end time terminus
-        public Route routeInfo;
-        public int routeInfo_count;
-        public BusStop[] updateList;
-        public int updateList_count;
+        public int availCapacity;
+        public int terminusLocation;
+        public int busStartTime; //ts_k: expected start time at terminus 
+        public int busEndTime; //te_k: expected end time terminus
+        public Route route;
 
-        public Bus(int id, int terminus_id, int bus_start_time, int bus_end_time)
+        public Bus(int id, int terminusId, int busStartTime, int busEndTime)
         {
             this.id = id;
-            this.avail_capacity = capacity;
-            this.terminus_location = terminus_id;
-            this.bus_start_time = bus_start_time;
-            this.bus_end_time = bus_end_time;
-            this.routeInfo = new Request_v[200];
-            this.routeInfo_count = 0;
-            this.updateList = new BusStop[2];
-            this.updateList_count = 0;
+            this.availCapacity = capacity;
+            this.terminusLocation = terminusId;
+            this.busStartTime = busStartTime;
+            this.busEndTime = busEndTime;
+            this.route = new Route();
         }
 
-        public bool futureRouteContains(int stopId)
+        public int StopsUntilEncounter(int stopId)
         {
-            // TODO: Implement this
-            return true;
+            BusStatus currLoc = this.StatusAtTime(DateTime.Now);
+            int stopsUntilEncounter = -1;
+            for (int i = currLoc.routeIdx; i < this.route.Count && stopsUntilEncounter < 0; i++)
+            {
+                if (this.route[i].stopId == stopId)
+                {
+                    stopsUntilEncounter = i - currLoc.routeIdx;
+                }
+            }
+            return stopsUntilEncounter;
         }
 
-        public BusLocation currentLocation(DateTime currentTime)
+        public BusStatus StatusAtTime(DateTime time)
         {
-            TimeSpan elapsedTime = DateTime.Now - this.simulation_start_time;
+            BusStatus currStatus = new BusStatus();
+            TimeSpan elapsedTime = time - this.simStartTime;
             int realElapsedMillis = (int)elapsedTime.Milliseconds;
-            int simElapsedMillis = realElapsedMillis / Utilities.TIME_MULTIPLIER;
-            int computeTime = bus_start_time;
+            int simElapsedMillis = realElapsedMillis / Constants.TIME_MULTIPLIER;
+            int computeTime = busStartTime;
+            int computeCap = capacity;
             int i = 0;
             while (computeTime < simElapsedMillis)
             {
-                
+                RouteStop stop = this.route[i];
+                computeTime += stop.duration;
+                computeCap += stop.capDelta;
+
+                if (computeTime > simElapsedMillis)
+                {
+                    // We're currently waiting at a stop
+                    currStatus.previousStop = stop.stopId;
+                    currStatus.nextStop = stop.stopId;
+                    currStatus.timeRemainingInState = computeTime - simElapsedMillis;
+                    currStatus.routeIdx = i;
+                    currStatus.capacity = computeCap;
+                }
+                else
+                {
+                    computeTime += Constants.BUS_HOP_TIME;
+                    if (computeTime > simElapsedMillis)
+                    {
+                        // We're currently in transit to a stop
+                        RouteStop nextStop = this.route[i + 1];
+                        currStatus.previousStop = stop.stopId;
+                        currStatus.nextStop = nextStop.stopId;
+                        currStatus.timeRemainingInState = computeTime - simElapsedMillis;
+                        currStatus.routeIdx = i;
+                        currStatus.capacity = computeCap;
+                    }
+                }
+                i++;
             }
+            return currStatus;
         }
     }
 }

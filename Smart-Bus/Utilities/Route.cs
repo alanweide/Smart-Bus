@@ -4,33 +4,54 @@ using System.Collections;
 
 namespace Smart_Bus
 {
-    class Route
+    public class Route
     {
         IList stops;
 
-        public void addStop(int stopId, int duration)
+        public int Count
         {
-            RouteStop newStop = new RouteStop(stopId, duration);
-            stops.Add(newStop);
+            get { return this.stops.Count; }
+            private set { }
         }
 
-        public void InsertStop(int stopId, int duration, int routeIdx)
+        public void AddStop(int stopId, int duration, int capDelta)
         {
-            RouteStop newStop = new RouteStop(stopId, duration);
-            stops.Insert(routeIdx, newStop);
+            RouteStop newStop = new RouteStop(stopId, duration, capDelta);
+            this.stops.Add(newStop);
+        }
+
+        public void InsertStop(int stopId, int duration, int capDelta, int routeIdx)
+        {
+            RouteStop newStop = new RouteStop(stopId, duration, capDelta);
+            this.stops.Insert(routeIdx, newStop);
+        }
+
+        public RouteStop RemoveStop(int index)
+        {
+            RouteStop removed = (RouteStop) this.stops[index];
+            this.stops.RemoveAt(index);
+            return removed;
+        }
+
+        public RouteStop this[int i]
+        {
+            get { return (RouteStop)this.stops[i]; }
+            private set {}
         }
 
     }
 
-    struct RouteStop
+    public struct RouteStop
     {
-        int stopId;
-        int duration;
+        public int stopId;
+        public int duration;
+        public int capDelta;
 
-        public RouteStop(int stopId, int duration)
+        public RouteStop(int stopId, int duration, int capDelta)
         {
             this.stopId = stopId;
             this.duration = duration;
+            this.capDelta = capDelta;
         }
     }
 }

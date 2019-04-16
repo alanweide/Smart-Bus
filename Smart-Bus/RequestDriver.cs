@@ -6,7 +6,6 @@ using Microsoft.SPOT.Hardware;
 using Microsoft.SPOT.Messaging;
 using System.IO.Ports;
 using Samraksh.SPOT.Emulator.Network;
-using Smart_Bus;
 
 namespace Smart_Bus
 {
@@ -15,7 +14,7 @@ namespace Smart_Bus
 
         private static int getRealSendTime(int simulationMillis)
         {
-            return simulationMillis / Utilities.TIME_MULTIPLIER;
+            return simulationMillis / Constants.TIME_MULTIPLIER;
         }
 
         private static RequestDriver instance;

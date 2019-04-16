@@ -111,7 +111,7 @@ namespace Smart_Bus
 
                             for (int c = 0; c < busInfo_list[j].routeInfo_count; c++)
                             {
-                                routeInfo_tmp[c] = busInfo_list[j].routeInfo[c];
+                                routeInfo_tmp[c] = busInfo_list[j].route[c];
                             }
                             routeInfo_tmp_count = busInfo_list[j].routeInfo_count;
 
@@ -125,7 +125,7 @@ namespace Smart_Bus
                         if (matched_bus_index != -1)
                         {
                             //assign the request to the mateched available bus
-                            route_reschedule(busInfo_list[matched_bus_index], busInfo_list[matched_bus_index].routeInfo, busInfo_list[matched_bus_index].routeInfo_count, urgent_request_list[i]);
+                            route_reschedule(busInfo_list[matched_bus_index], busInfo_list[matched_bus_index].route, busInfo_list[matched_bus_index].routeInfo_count, urgent_request_list[i]);
                             busInfo_list[matched_bus_index].routeInfo_count++;
                         }
                     }
@@ -249,7 +249,7 @@ namespace Smart_Bus
                 if (i == 0)
                 {
                     //t_0 = ts_k + travel_time(terminus, v_0)
-                    t_v = bus.bus_start_time + System.Math.Abs(routeInfo[i].location - bus.terminus_location);
+                    t_v = bus.busStartTime + System.Math.Abs(routeInfo[i].location - bus.terminusLocation);
 
                 }
                 else
@@ -261,7 +261,7 @@ namespace Smart_Bus
                 F += routeInfo[i].latestServingTime - t_v;
             }
             //add up (l_0 - te_k) to F_k
-            F += bus.bus_end_time - System.Math.Abs(bus.terminus_location - routeInfo[routeInfo_count - 1].location);
+            F += bus.busEndTime - System.Math.Abs(bus.terminusLocation - routeInfo[routeInfo_count - 1].location);
 
             return F;
         }
