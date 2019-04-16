@@ -45,6 +45,7 @@ namespace Smart_Bus
             //update bus1 info to stop1
             stop_1.update_receive(bus[1], true);
             stop_1.request_receive(requests[1]);
+            
         }
     }
 }
