@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Smart_Bus
 {
-    public class Route
+    public class Route : IMessagePayload
     {
         IList stops;
 
@@ -12,6 +12,24 @@ namespace Smart_Bus
         {
             get { return this.stops.Count; }
             private set { }
+        }
+
+        public Route()
+        { 
+            this.stops = new ArrayList(); 
+        }
+
+        public Route(string[] messageComponents, int headerLength)
+        {
+            this.stops = new ArrayList();
+            for (int i = headerLength; i < messageComponents.Length; i+=3)
+            {
+                int stopId = int.Parse(messageComponents[i]);
+                int duration = int.Parse(messageComponents[i+1]);
+                int capDelta = int.Parse(messageComponents[i+2]);
+                RouteStop newStop = new RouteStop(stopId, duration, capDelta);
+                this.stops.Add(newStop);
+            }
         }
 
         public void AddStop(int stopId, int duration, int capDelta)
@@ -28,7 +46,7 @@ namespace Smart_Bus
 
         public RouteStop RemoveStop(int index)
         {
-            RouteStop removed = (RouteStop) this.stops[index];
+            RouteStop removed = (RouteStop)this.stops[index];
             this.stops.RemoveAt(index);
             return removed;
         }
@@ -36,9 +54,19 @@ namespace Smart_Bus
         public RouteStop this[int i]
         {
             get { return (RouteStop)this.stops[i]; }
-            private set {}
+            private set { }
         }
 
+
+        public string BuildPayload()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FromStringArray(string[] payload, int headerLength)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public struct RouteStop

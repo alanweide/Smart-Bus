@@ -65,7 +65,7 @@ namespace Smart_Bus
                 }
                 else
                 {
-                    computeTime += Constants.BUS_HOP_TIME;
+                    computeTime += Constants.HOP_DURATION;
                     if (computeTime > simElapsedMillis)
                     {
                         // We're currently in transit to a stop

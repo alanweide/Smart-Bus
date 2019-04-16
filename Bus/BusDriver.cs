@@ -6,7 +6,6 @@ using Microsoft.SPOT.Hardware;
 using Microsoft.SPOT.Messaging;
 using System.IO.Ports;
 using Samraksh.SPOT.Emulator.Network;
-using Smart_Bus;
 
 namespace Smart_Bus
 {
@@ -101,7 +100,32 @@ namespace Smart_Bus
             //     reply, then ignore it.
 
             string msgString = Utilities.ByteArrayToString(msg);
+            SBMessage message = new SBMessage(msgString);
             Debug.Print("Received message: " + msgString);
+            switch(message.msgType)
+            {
+                case SBMessage.MessageType.START_SIMULATION:
+                    BusDriver.SimStart = ((PayloadDateTime)message.payload).date;
+                    break;
+                case SBMessage.MessageType.ROUTE_INFO_REQUEST:
+                    // TODO: Get stopId from msgString
+                    int stopId = 0;
+                    if (BusDriver.getInstance().myBus.StopsUntilEncounter(stopId) >= 0)
+                    {
+                        // A bus stop is asking for route information from "nearby" buses,
+                        //   and we're one of them
+                        // TODO: send reply
+                        string replyMsg = BuildRouteReply(stopId);
+                        BroadcastMessage(replyMsg);
+                    }
+                    break;
+                case SBMessage.MessageType.ROUTE_INFO_RELAY_REQUEST:
+                    // TODO
+                    break;
+                case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
+                    // TODO
+                    break;
+            }
             if (IsStartSimulationMessage(msgString))
             {
                 // TODO: Parse this from msgString, rather than setting it to "now"

@@ -4,7 +4,7 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
-    public class Request : IComparable
+    public class Request : IComparable, IMessagePayload
     {
         public int requestSendTime;
         public int earliestPickupTime;
@@ -19,11 +19,32 @@ namespace Smart_Bus
         {
             this.requestSendTime = earliestPickupTime;
             this.earliestPickupTime = earliestPickupTime;
-            this.earliestDeliveryTime = earliestPickupTime + travelTime(origin, destination);
-            this.latestDeliveryTime = latestDeliveryTime;
-            this.latestPickupTime = latestDeliveryTime - travelTime(origin, destination);
             this.origin = new BusStop(origin);
             this.destination = new BusStop(destination);
+            this.earliestDeliveryTime = earliestPickupTime + TravelTime(this.origin, this.destination);
+            this.latestDeliveryTime = latestDeliveryTime;
+            this.latestPickupTime = latestDeliveryTime - TravelTime(this.origin, this.destination);
+            this.served = false;
+        }
+
+        public Request(string[] messageComponents, int headerLength)
+        {
+            // After the header, the array is organized as follows:
+            //  [earliestPickupTime, latestDeliveryTime, origin, destination]
+            // where the times are in ms since simulation start
+
+            int earliestPickupTime = int.Parse(messageComponents[headerLength]);
+            int latestDeliveryTime = int.Parse(messageComponents[headerLength + 1]);
+            int originId = int.Parse(messageComponents[headerLength + 2]);
+            int destinationId = int.Parse(messageComponents[headerLength + 3]);
+
+            this.requestSendTime = earliestPickupTime;
+            this.earliestPickupTime = earliestPickupTime;
+            this.origin = new BusStop(originId);
+            this.destination = new BusStop(destinationId);
+            this.earliestDeliveryTime = earliestPickupTime + TravelTime(this.origin, this.destination);
+            this.latestDeliveryTime = latestDeliveryTime;
+            this.latestPickupTime = latestDeliveryTime - TravelTime(origin, destination);
             this.served = false;
         }
 
@@ -42,10 +63,22 @@ namespace Smart_Bus
             }
         }
 
-        public int travelTime(int origin, int destination)
+        public int TravelTime(BusStop origin, BusStop destination)
         {
-            //travel time = hopcount * 10000 (ticks)
-            return System.Math.Abs(origin - destination) * 1000;
+            // travel time = hopcount * Constants.HOP_DURATION (ms)
+            // TODO: compute this from graph topology -- BFS?
+
+            return System.Math.Abs(origin.id - destination.id) * Constants.HOP_DURATION;
+        }
+
+        public string BuildPayload()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FromStringArray(string[] payload, int headerLength)
+        {
+            throw new NotImplementedException();
         }
     }
 
