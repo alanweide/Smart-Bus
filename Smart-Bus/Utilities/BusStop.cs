@@ -28,13 +28,13 @@ namespace Smart_Bus
             this.request_list = Append_request(new_request);
 
             //Second, assign the new request immediately if (latestDeliveryTime - current time) < urgencyThreshold
-            if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
+            //if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
             {
                 request_assign(new_request);
             }
             //otherwise, start a timer with the period of latestDeliveryTime - (current time + urgencyThreshold),
             // assign the new request when the timer timeout
-            else
+            //else
             {
                 request_assign(new_request);
                 //requestTimer = new Timer(new TimerCallback(requestHandler), null, 0, (new_request.latestDeliveryTime - (Global_Timer.C_Time + urgencyThreshold)) * 1000);
@@ -214,7 +214,7 @@ namespace Smart_Bus
                 if (i == 0)
                 {
                     //t_0 = ts_k + travel_time(terminus, v_0)
-                    t_v = bus.bus_start_time + System.Math.Abs(routeInfo[i].location - bus.terminus_location);
+                    t_v = bus.busStartTime + System.Math.Abs(routeInfo[i].location - bus.terminusLocation);
                     //Debug.Print("t_v at location " + routeInfo[i].location + " is " + t_v);
 
                 }
@@ -229,7 +229,7 @@ namespace Smart_Bus
                 //Debug.Print("f_v at location " + routeInfo[i].location + " is " + (routeInfo[i].latestServingTime - t_v));
             }
             //add up (l_0 - te_k) to F_k
-            F += bus.bus_end_time - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location));
+            F += bus.busEndTime - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminusLocation - routeInfo[routeInfo.Length - 1].location));
             //Debug.Print("t_v at terminus is " + (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location)));
             //Debug.Print("f_v at terminus is " + (bus.bus_end_time - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location))));
 
