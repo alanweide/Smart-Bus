@@ -29,7 +29,7 @@ namespace Smart_Bus
         {
             BusStatus currLoc = this.StatusAtTime(DateTime.Now);
             int stopsUntilEncounter = -1;
-            for (int i = currLoc.routeIdx; i < this.route.Count && stopsUntilEncounter < 0; i++)
+            for (int i = currLoc.routeIdx; i < this.route.StopCount && stopsUntilEncounter < 0; i++)
             {
                 if (this.route[i].stopId == stopId)
                 {

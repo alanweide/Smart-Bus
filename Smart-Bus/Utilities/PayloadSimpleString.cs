@@ -3,19 +3,19 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
-    public class SimplePayloadString: IMessagePayload
+    public class PayloadSimpleString: IMessagePayload
     {
 
         public string str;
 
-        public SimplePayloadString(string s = "")
+        public PayloadSimpleString(string s = "")
         {
             this.str = s;
         }
 
-        public void FromStringArray(string[] payload, int headerLength)
+        public PayloadSimpleString(string[] messageComponents, ref int startIdx)
         {
-            this.str = payload[headerLength];
+            this.str = messageComponents[startIdx++];
         }
 
         public string BuildPayload()

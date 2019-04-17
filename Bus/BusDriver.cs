@@ -33,18 +33,18 @@ namespace Smart_Bus
             NetPort = new NetInst(rcvcallBack);
         }
 
-        private void NetworkBroadcast(byte[] msg, int size)
-        {
-            NetPort.Broadcast(msg, size);
-        }
+        //private void NetworkBroadcast(byte[] msg, int size)
+        //{
+        //    NetPort.Broadcast(msg, size);
+        //}
 
-        private static void BroadcastMessage(string msg)
-        {
-            Debug.Print("Sending message " + msg);
-            BusDriver driver = BusDriver.getInstance();
-            byte[] msgBytes = Utilities.StringToByteArray(msg);
-            driver.NetworkBroadcast(msgBytes, msg.Length);
-        }
+        //private static void BroadcastMessage(string msg)
+        //{
+        //    Debug.Print("Sending message " + msg);
+        //    BusDriver driver = BusDriver.getInstance();
+        //    byte[] msgBytes = Utilities.StringToByteArray(msg);
+        //    driver.NetworkBroadcast(msgBytes, msg.Length);
+        //}
 
         public static BusDriver getInstance()
         {
@@ -55,34 +55,17 @@ namespace Smart_Bus
             return BusDriver.instance;
         }
 
-        //private static string BuildMessage(Request request)
-        //{
-        //    StringBuilder msg = new StringBuilder();
-        //    msg.Append(appId.ToString() + " ");
-        //    msg.Append(request.origin.id.ToString() + " ");
-        //    msg.Append(request.destination.id.ToString() + " ");
-        //    msg.Append(request.earliestPickupTime.ToString() + " ");
-        //    msg.Append(request.earliestDeliveryTime.ToString());
-        //    return msg.ToString();
-        //}
-
         private static string BuildRouteReply(int stopId)
         {
             StringBuilder msg = new StringBuilder();
             msg.Append(appId.ToString() + " ");
             Bus bus = getInstance().myBus;
             msg.Append(bus.id.ToString() + " ");
-            for (int i = 0; i < bus.route.Count; i++)
+            for (int i = 0; i < bus.route.StopCount; i++)
             {
                 msg.Append(bus.route[i].stopId + "," + bus.route[i].duration + " ");
             }
             return msg.ToString();
-        }
-
-        // produces a message to stopId either confirming or rejecting a route addition
-        private static string BuildAckReply(int stopId, bool didConfirm)
-        {
-            return appId.ToString() + " " + stopId.ToString() + " " + (didConfirm ? "Y" : "N");
         }
 
         public static void ReadNetworkPkt(byte[] msg, int size)
@@ -102,76 +85,49 @@ namespace Smart_Bus
             string msgString = Utilities.ByteArrayToString(msg);
             SBMessage message = new SBMessage(msgString);
             Debug.Print("Received message: " + msgString);
-            switch(message.msgType)
+            SBMessage.MessageType msgType = message.header.type;
+            Bus bus = BusDriver.getInstance().myBus;
+            switch (msgType)
             {
                 case SBMessage.MessageType.START_SIMULATION:
-                    BusDriver.SimStart = ((PayloadDateTime)message.payload).date;
-                    break;
-                case SBMessage.MessageType.ROUTE_INFO_REQUEST:
-                    // TODO: Get stopId from msgString
-                    int stopId = 0;
-                    if (BusDriver.getInstance().myBus.StopsUntilEncounter(stopId) >= 0)
                     {
-                        // A bus stop is asking for route information from "nearby" buses,
-                        //   and we're one of them
-                        // TODO: send reply
-                        string replyMsg = BuildRouteReply(stopId);
-                        BroadcastMessage(replyMsg);
+                        BusDriver.SimStart = ((PayloadDateTime)message.payload).date;
+                        Utilities.SimStart = BusDriver.SimStart;
+                        break;
                     }
-                    break;
-                case SBMessage.MessageType.ROUTE_INFO_RELAY_REQUEST:
-                    // TODO
-                    break;
+                case SBMessage.MessageType.ROUTE_INFO_REQUEST:
+                    {
+                        int stopId = message.header.origin.srcId;
+
+                        // Only reply if we're "nearby"
+                        if (bus.StopsUntilEncounter(stopId) >= 0)
+                        {
+                            // A bus stop is asking for route information from "nearby" buses,
+                            //   and we're one of them
+
+                            IMessagePayload replyPayload = bus.route;
+                            SBMessage reply = new SBMessage(SBMessage.MessageType.ROUTE_INFO_RESPONSE, message.header.destination, message.header.origin, replyPayload);
+                        }
+                        break;
+                    }
                 case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
-                    // TODO
-                    break;
+                    {
+                        // TODO: Accept the route change request if it contains (at least) all of my unserved requests
+                        Route other = (Route)message.payload;
+                        IMessagePayload replyPayload;
+                        if (bus.route.IsRequestSubsetOf(other))
+                        {
+                            bus.route = other;
+                            replyPayload = new PayloadRouteChangeAckResponse(true, other);
+                        }
+                        else
+                        {
+                            replyPayload = new PayloadRouteChangeAckResponse(false, bus.route);
+                        }
+                        SBMessage reply = new SBMessage(SBMessage.MessageType.ROUTE_CHANGE_ACK, message.header.destination, message.header.origin, replyPayload);
+                        break;
+                    }
             }
-            if (IsStartSimulationMessage(msgString))
-            {
-                // TODO: Parse this from msgString, rather than setting it to "now"
-                BusDriver.SimStart = DateTime.Now;
-            }
-            else if (IsBusStopRouteRequest(msgString))
-            {
-                // TODO: Get stopId from msgString
-                int stopId = 0;
-                if (BusDriver.getInstance().myBus.StopsUntilEncounter(stopId) >= 0)
-                {
-                    // A bus stop is asking for route information from "nearby" buses,
-                    //   and we're one of them
-                    // TODO: send reply
-                    string replyMsg = BuildRouteReply(stopId);
-                    BroadcastMessage(replyMsg);                    
-                }
-            }
-            else if (IsRouteChangeConfirmationRequest(msgString))
-            {
-                // TODO: Get stopId from msgString
-                int stopId = 0;
-
-                // TODO: Figure out whether to confirm a route change
-                bool confirm = true;
-                string replyMsg = BuildAckReply(stopId, confirm);
-                BroadcastMessage(replyMsg);
-            }
-        }
-
-        private static bool IsRouteChangeConfirmationRequest(string msgString)
-        {
-            // TODO: Implement this
-            return true;
-        }
-
-        private static bool IsStartSimulationMessage(string msg)
-        {
-            // TODO: Implement this
-            return true;
-        }
-
-        private static bool IsBusStopRouteRequest(string msg)
-        {
-            // TODO: Implement this
-            return true;
         }
 
         public static void Main()

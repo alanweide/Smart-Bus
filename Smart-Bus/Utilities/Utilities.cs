@@ -6,11 +6,11 @@ namespace Smart_Bus
 {
     public class Utilities
     {
-        public static DateTime simStart;
+        public static DateTime SimStart;
 
         public int ElapsedMillis()
         {
-            TimeSpan elapsedTime = DateTime.Now - simStart;
+            TimeSpan elapsedTime = DateTime.Now - SimStart;
             return (int)elapsedTime.Milliseconds;
         }
 

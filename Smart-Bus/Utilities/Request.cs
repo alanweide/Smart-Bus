@@ -27,16 +27,16 @@ namespace Smart_Bus
             this.served = false;
         }
 
-        public Request(string[] messageComponents, int headerLength)
+        public Request(string[] messageComponents, ref int startIdx)
         {
             // After the header, the array is organized as follows:
             //  [earliestPickupTime, latestDeliveryTime, origin, destination]
             // where the times are in ms since simulation start
 
-            int earliestPickupTime = int.Parse(messageComponents[headerLength]);
-            int latestDeliveryTime = int.Parse(messageComponents[headerLength + 1]);
-            int originId = int.Parse(messageComponents[headerLength + 2]);
-            int destinationId = int.Parse(messageComponents[headerLength + 3]);
+            int earliestPickupTime = int.Parse(messageComponents[startIdx++]);
+            int latestDeliveryTime = int.Parse(messageComponents[startIdx++]);
+            int originId = int.Parse(messageComponents[startIdx++]);
+            int destinationId = int.Parse(messageComponents[startIdx++]);
 
             this.requestSendTime = earliestPickupTime;
             this.earliestPickupTime = earliestPickupTime;
@@ -75,11 +75,6 @@ namespace Smart_Bus
         {
             throw new NotImplementedException();
         }
-
-        public void FromStringArray(string[] payload, int headerLength)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public struct Request_v
@@ -89,5 +84,14 @@ namespace Smart_Bus
         public bool is_origin;
         public int location;
         public bool served;
+
+        public Request_v(string[] messageComponents, ref int startIdx)
+        {
+            this.earliestServingTime = int.Parse(messageComponents[startIdx++]);
+            this.latestServingTime = int.Parse(messageComponents[startIdx++]);
+            this.is_origin = (int.Parse(messageComponents[startIdx++]) != 0);
+            this.location = int.Parse(messageComponents[startIdx++]);
+            this.served = (int.Parse(messageComponents[startIdx++]) != 0);
+        }
     }
 }

@@ -18,6 +18,11 @@ namespace Smart_Bus
             this.date = date;
         }
 
+        public PayloadDateTime(string[] payload, ref int startIdx)
+        {
+            this.date = Utilities.ParseDateTime(payload[startIdx++]);
+        }
+
         public static TimeSpan operator -(PayloadDateTime pd, DateTime d)
         {
             return pd.date - d;
@@ -36,11 +41,6 @@ namespace Smart_Bus
         public string BuildPayload()
         {
             return this.date.ToString(Constants.DATE_TIME_FORMAT);
-        }
-
-        public void FromStringArray(string[] payload, int headerLength)
-        {
-            this.date = Utilities.ParseDateTime(payload[headerLength]);
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Smart_Bus
         //  Request
         //  Route
         //  PayloadDateTime
-        //  SimplePayloadInt
+        //  PayloadSimpleString
+        //  PayloadRouteRequestForward
 
-        void FromStringArray(string[] payload, int headerLength);
         string BuildPayload();
     }
 }
