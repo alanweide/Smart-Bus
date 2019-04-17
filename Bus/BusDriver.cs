@@ -26,6 +26,7 @@ namespace Smart_Bus
 
         private static UInt16 appId;
         private static DateTime SimStart;
+        private const int NearbyThreshold = 1;
 
         private BusDriver()
         {
@@ -98,12 +99,13 @@ namespace Smart_Bus
                 case SBMessage.MessageType.ROUTE_INFO_REQUEST:
                     {
                         int stopId = message.header.origin.srcId;
+                        int stopsUntilEncounter = bus.StopsUntilEncounter(stopId);
 
-                        // Only reply if we're "nearby"
-                        if (bus.StopsUntilEncounter(stopId) >= 0)
+                        // Only reply if we're "nearby"; that is, this stop is in our immediate future
+                        if (0 <= stopsUntilEncounter && stopsUntilEncounter < NearbyThreshold)
                         {
-                            // A bus stop is asking for route information from "nearby" buses,
-                            //   and we're one of them
+                            // A bus stop is asking for route information
+                            // from "nearby" buses, and we're one of them
 
                             IMessagePayload replyPayload = bus.route;
                             SBMessage reply = new SBMessage(SBMessage.MessageType.ROUTE_INFO_RESPONSE, message.header.destination, message.header.origin, replyPayload);
@@ -112,7 +114,6 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
                     {
-                        // TODO: Accept the route change request if it contains (at least) all of my unserved requests
                         Route other = (Route)message.payload;
                         IMessagePayload replyPayload;
                         if (bus.route.IsRequestSubsetOf(other))
