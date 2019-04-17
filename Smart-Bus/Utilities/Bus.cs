@@ -30,7 +30,7 @@ namespace Smart_Bus
         {
             BusStatus currLoc = this.StatusAtTime(DateTime.Now);
             int stopsUntilEncounter = -1;
-            for (int i = currLoc.routeIdx; i < this.route.Count && stopsUntilEncounter < 0; i++)
+            for (int i = currLoc.routeIdx; i < this.route.StopCount && stopsUntilEncounter < 0; i++)
             {
                 if (this.route[i].stopId == stopId)
                 {
@@ -66,7 +66,7 @@ namespace Smart_Bus
                 }
                 else
                 {
-                    computeTime += Constants.BUS_HOP_TIME;
+                    computeTime += Constants.HOP_DURATION;
                     if (computeTime > simElapsedMillis)
                     {
                         // We're currently in transit to a stop
