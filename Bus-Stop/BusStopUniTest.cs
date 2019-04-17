@@ -6,7 +6,7 @@ namespace Smart_Bus
     class BusStopTest
     {
 
-        public static void Main()
+        public static void Main(string[] args)
         {
             Request[] requests = 
             { 

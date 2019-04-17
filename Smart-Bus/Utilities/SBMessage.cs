@@ -99,6 +99,7 @@ namespace Smart_Bus
             int headLength = MessageHeader.Length;
             switch (msgType)
             {
+                    // Message from Passenger
                 case MessageType.START_SIMULATION:
                     this.payload = new PayloadDateTime(components, ref headLength);
                     break;
@@ -106,6 +107,7 @@ namespace Smart_Bus
                     this.payload = new Request(components, ref headLength);
                     break;
 
+                    // Message from Bus Stop
                 case MessageType.ROUTE_INFO_REQUEST:
                     this.payload = new PayloadSimpleString();
                     break;
@@ -119,6 +121,7 @@ namespace Smart_Bus
                     this.payload = new Request(components, ref headLength);
                     break;
 
+                    // Message from Bus
                 case MessageType.ROUTE_INFO_RESPONSE:
                     this.payload = new Route(components, ref headLength);
                     break;
