@@ -9,6 +9,7 @@ namespace Smart_Bus
         public DateTime simStartTime;
 
         public const int capacity = 5;
+        public const int NearbyThreshold = 1;
         public int availCapacity;
         public int terminusLocation;
         public int busStartTime; //ts_k: expected start time at terminus 
@@ -81,6 +82,13 @@ namespace Smart_Bus
                 i++;
             }
             return currStatus;
+        }
+
+        public bool IsNearbyStop(int stopId)
+        {
+            //int stopsUntilEncounter = this.StopsUntilEncounter(stopId);
+            //return 0 <= stopsUntilEncounter && stopsUntilEncounter < NearbyThreshold;
+            return true;
         }
     }
 }
