@@ -190,3 +190,4 @@ ModelManifest.xml
 *.dat
 *.smd
 Bus-Stop/EmulatorLog_*.txt
+.DS_Store
