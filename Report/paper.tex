@@ -1,0 +1,151 @@
+
+%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the LaTeX source for the instructions to authors using
+% the LaTeX document class 'llncs.cls' for contributions to
+% the Lecture Notes in Computer Sciences series.
+% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
+%
+% It may be used as a template for your own input - copy it
+% to a new file with a new name and use it as the basis
+% for your article.
+%
+% NB: the document class 'llncs' has its own and detailed documentation, see
+% ftp://ftp.springer.de/data/pubftp/pub/tex/latex/llncs/latex2e/llncsdoc.pdf
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%\documentclass[runningheads,a4paper]{llncs}
+\documentclass[runningheads]{llncs}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+
+\usepackage{amsmath}
+\usepackage{listings}
+
+\usepackage{verbatim}
+\usepackage{longtable}
+\usepackage[table]{xcolor}
+\usepackage{tabularx, booktabs}
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage{pdflscape} 
+
+%\usepackage{algorithm2e}
+%\usepackage[linesnumbered]{algorithm2e}
+%\usepackage[linesnumbered,ruled]{algorithm2e}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% \renewcommand{\ttdefault}{pcr} % makes bold available in a fixed-width font (use )
+
+\lstMakeShortInline[basicstyle=\small]|
+
+\lstset{
+%    numbers=left
+  , numberstyle=\tiny, stepnumber=5, firstnumber=1, numbersep=5pt
+  , language=[Sharp]C
+  , breaklines=true
+  , tabsize=4
+  , columns=fullflexible
+  , keepspaces=true
+  , basicstyle=\fontfamily{lmtt}\selectfont  % fixed-width font (better, but too wide for 2-column layout)
+  , captionpos=t
+  , frame=single
+}
+
+%%\usepackage{url}
+%%\urldef{\mailsa}\path|{alfred.hofmann, ursula.barth, ingrid.haas, frank.holzwarth,|
+%%\urldef{\mailsb}\path|anna.kramer, leonie.kunz, christine.reiss, nicole.sator,|
+%%\urldef{\mailsc}\path|erika.siebert-cole, peter.strasser, lncs}@springer.com|    
+%%\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+%%\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{An Algorithm for In-Situ Bus Scheduling and Passenger State Update}
+
+% a short form should be given in case it is too long for the running head
+\titlerunning{In-Situ Bus Scheduling}
+
+% the name(s) of the author(s) follow(s) next
+%
+% NB: Chinese authors should write their first names(s) in front of
+% their surnames. This ensures that the names appear correctly in
+% the running heads and the author index.
+%
+\author{Yung-Fu Chen \and Alan Weide}
+\authorrunning{Yung-Fu Chen \and et al.}
+
+% the affiliations are given next; don't give your e-mail address
+% unless you accept that it will be published
+
+\institute{The Ohio State University, Columbus OH 43221, USA\\
+\email{chen.6655@osu.edu, weide.3@osu.edu}}
+
+%%\toctitle{Lecture Notes in Computer Science}
+%%\tocauthor{Authors' Instructions}
+\maketitle
+
+% Avoid using chapter/section number in numbering a listing
+\renewcommand\thelstlisting{\arabic{lstlisting}}
+
+% Sections
+
+\section{Introduction}
+Your final project report should include:
+1. A write-up describing 
+
+(a) the design rationale of the module(s) you developed, along with the algorithm you have designed/used and a detailed API
+
+(b) instructions and illustration of use, in terms of a README file and/or user guide, 
+
+(c) how your implementation has been tested, 
+
+(d) performance of your implementation,
+
+(e) assumptions or limitations of your design,
+
+(f) any omissions or errors in your implementation, and 
+
+(g) any bugs or weaknesses you have found in the algorithm/protocol. (Only if some of these do not apply to your project should you omit them.)
+
+2. Program sources and executable (including any test programs). Credit will be reserved for the quality of documentation of your programs.
+
+3. Script of a session showing the program under test.
+
+\subsection{Problem Specification}
+\subsection{Bus Stop Functions}
+
+\section{Algorithm}
+\subsection{Request Assignment Algorithm}
+
+\section{Implementation}
+\subsection{.NOW motes vs. Emulator}
+\subsection{Software Architecture}
+\subsection{Testing and Evaluation}
+\subsection{Limitations, Challenges, and Omissions}
+\begin{itemize}
+  \item Request Generation
+  \item Search for nearby buses: BFS vs. Broadcast
+  \item No time synchronization---instead, use Emulator's absolute time, which is based on the host's time, which is the same for all nodes
+\end{itemize}
+\subsection{Using the Smart-Bus Application}
+
+\section{Conclusion}
+
+\newpage
+\appendix
+\section{Source Code}
+
+% \bibliographystyle{abbrv}
+% \bibliography{merged-bibliography,siv-bibliography,bibliography_3,bibliography_lastminute,Xiong2017Abstract} % ,weide-bibliography}
+
+\end{document}
