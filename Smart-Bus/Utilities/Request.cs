@@ -6,6 +6,12 @@ namespace Smart_Bus
 {
     public class Request : IComparable, IMessagePayload
     {
+        // TODO: Refactor to Pair of Request_v
+        //public int sendTime;
+        //public Request_v origin;
+        //public Request_v dest;
+        //public bool delay;
+
         public int requestSendTime;
         public int earliestPickupTime;
         public int latestPickupTime;
@@ -14,6 +20,7 @@ namespace Smart_Bus
         public BusStop origin;
         public BusStop destination;
         public bool served;
+        public bool delay;
 
         public Request(int earliestPickupTime, int latestDeliveryTime, int origin, int destination)
         {

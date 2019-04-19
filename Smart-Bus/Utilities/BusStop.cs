@@ -4,42 +4,90 @@ using Microsoft.SPOT;
 using System.Collections;
 
 namespace Smart_Bus
-{
+{   
     public class BusStop
     {
         public int id;
         public Bus[] busInfo_list;
         public Request[] request_list;
-        public const int urgencyThreshold = 100;
+        public const int urgencyThreshold = 300000; //5 minutes
+        public DateTime SimStart;
 
         public BusStop(int id)
         {
             this.id = id;
         }
-        
-        public void request_receive(Request new_request)
+
+        public void request_receive(Request new_request, bool delay)
         {
+            TimeSpan elapsedTime = DateTime.Now - SimStart;
+            int simulationMillis = (int)elapsedTime.Milliseconds;
+
             Debug.Print("Received new request");
             Debug.Print("Origin: " + new_request.origin.id + ", Destination: " + new_request.destination.id);
             Debug.Print("EarliestPickupTime: " + new_request.earliestPickupTime + ", LatestPickupTime: " + new_request.latestPickupTime);
             Debug.Print("EarliestDeliveryTime: " + new_request.earliestDeliveryTime + ", LatestDeliveryTime: " + new_request.latestDeliveryTime);
 
-            //First, add the new request to the request list
-            this.request_list = Append_request(new_request);
+            
+
+            if (delay == true)
+            {
+                new_request.delay = true;
+                //First, add the new request to the request list
+                this.request_list = Append_request(new_request);
+
+                new Timer(new TimerCallback(request_delay_timer_handler), null, 5000, 0);
+                return;
+            }
+            else
+            {
+                new_request.delay = false;
+                //First, add the new request to the request list
+                this.request_list = Append_request(new_request);
+            }
 
             //Second, assign the new request immediately if (latestDeliveryTime - current time) < urgencyThreshold
-            //if (new_request.latestDeliveryTime - Global_Timer.C_Time < urgencyThreshold)
+            if (new_request.latestDeliveryTime - simulationMillis < urgencyThreshold)
             {
                 request_assign(new_request);
             }
             //otherwise, start a timer with the period of latestDeliveryTime - (current time + urgencyThreshold),
             // assign the new request when the timer timeout
-            //else
+            else
             {
-                request_assign(new_request);
-                //requestTimer = new Timer(new TimerCallback(requestHandler), null, 0, (new_request.latestDeliveryTime - (Global_Timer.C_Time + urgencyThreshold)) * 1000);
+                //request_assign(new_request);
+                new Timer(new TimerCallback(request_timer_handler), new_request, (new_request.latestDeliveryTime - (simulationMillis + urgencyThreshold)), 0);
             }
 
+        }
+
+        private void request_timer_handler(object obj)
+        {
+            Request request = obj as Request;
+
+            request_assign(request);
+        }
+
+        private void request_delay_timer_handler(object obj)
+        {
+            TimeSpan elapsedTime = DateTime.Now - SimStart;
+
+            // assign delayed requests to the matched bus
+            for (int i = 0; i < this.request_list.Length; i++) 
+            {
+                if (this.request_list[i].delay == true)
+                {
+                    if (this.request_list[i].latestDeliveryTime - (int)elapsedTime.Milliseconds < urgencyThreshold)
+                    {
+                        request_assign(this.request_list[i]);
+                    }
+                    else 
+                    {
+                        new Timer(new TimerCallback(request_timer_handler), this.request_list[i], (this.request_list[i].latestDeliveryTime - ((int)elapsedTime.Milliseconds + urgencyThreshold)), 0);
+                    }
+                }
+
+            }
         }
 
         public void update_receive(Bus bus, bool is_update)
@@ -123,7 +171,7 @@ namespace Smart_Bus
         public int route_reschedule(Bus bus, Request_v[] routeInfo, Request new_request)
         {
             Request_v[] routeInfo_tmp;
-            //int routeInfo_tmp_count;
+
             Request_v new_origin, new_destination;
             int flex, max_flex = -1000000;
             //int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
@@ -242,6 +290,11 @@ namespace Smart_Bus
             Debug.Print("Flexibility: " +F);
             */
             return F;
+        }
+
+        public int travel_time(int origin, int destination)
+        {
+            return 0;
         }
 
         public bool bus_capacity_check(Request_v[] routeInfo, int capacity)

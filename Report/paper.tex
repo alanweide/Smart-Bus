@@ -115,19 +115,19 @@ Your final project report should include:
 \subsection{Request Assignment Algorithm}
 
 \section{Implementation}
-This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops.
+This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops, as well as a sequence of passenger requests.
 
 \subsection{.NOW motes vs. Emulator}
-This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for this are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, any interestin gdemonstration of the algorithm involves at least three bus stops and two buses; that is, five motes would have ben an absolute minimum to showcase the capabilities of this algorithm. Thus, the devision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
+This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for this are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, an interesting demonstration of the algorithm involves at least three bus stops and one bus. Evaluating the efficacy and scalability of the algorithm with such a limited number of nodes would be impossible. Thus, the decision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
 
 \subsubsection{Simplifications}
 First, by eliminating many distinct pieces of hardware from the equation and consolidating them into instances of an emulator running on a host machine, the system can simplify its timekeeping. Rather than implementing a distibuted time synchronization algorithm, the system can rely on the host's clock to keep time.
 
-Second, by foregoing a physically distributed network of nodes with relatively weak radios and antennae, all messages became broadcasts (at least when it was convenient). The emulator's networking capabilities enforce that all messages are broadcast to all other nodes, but in cases where a peer-to-peer communication was desired, the broadcast message was annotated with several pieces of metadata: the kind of message it is, the originating node, and the intended destination node. Instances of broadcasts for the sake of simplicity and convenience are documented in the source code itself, but are detailed here.
+Second, by foregoing a physically distributed network of nodes with relatively weak radios and antennae, all messages can be broadcasts (when it is convenient). The emulator's networking capabilities enforce that all messages are broadcast to all other nodes, but in cases where a peer-to-peer communication is desired, the broadcast message is annotated with several pieces of metadata: the kind of message it is, the originating node, and the intended destination node. Instances of broadcasts for the sake of simplicity and convenience are documented in the source code itself, but are detailed here.
 
-One such instance was the response by a Bus when a Bus Stop requests its route information. In a ``real'' system, due to physical limitations a Bus Stop might only communicate with buses that are nearby; a breadth-first search approach could be used to (eventually) retrieve information about all buses. In our proof-of-concept, each bus will always respond to a broadcast from a stop asking for route information.
+One such instance is the response by a Bus when a Bus Stop requests its route information. In a ``real'' system, due to physical limitations a Bus Stop might only communicate with buses that are nearby; a breadth-first search approach could be used to (eventually) retrieve information about all buses. In our proof-of-concept, each bus will always respond to a broadcast from a stop asking for route information.
 
-Another instance where the broadcast nature of messages was taken advantage of was in the simulation start-up phase. The \lstinline{RequestDriver} process, upon start up, broadcasts to all nodes in the network the absolute time at which it began sending requests. This is used by each other process as the reference to determine how much simulated time has passed, in order to, for example, determine a bus's current location along its route.
+Another instance where the broadcast nature of messages is taken advantage of is in the simulation start-up phase. The \lstinline{RequestDriver} process, upon start up, broadcasts to all nodes in the network the absolute time at which it began sending requests. This is used by each other process as the reference to determine how much simulated time has passed, in order to, for example, determine a bus's current location along its route.
 
 Another simplification enabled by the decision to use the Emulator is that one instance can be reserved as the ``passengers''. Since each node in the Emulator network can communicate with all the others, a single instance can simulate the requests from many different passengers to many different bus stops. A detailed discussion of the behavior of passengers in our system appears in Section~\ref{sub:passengers}.
 
@@ -137,13 +137,13 @@ Designing the software structure to make use of multiple instances of the Emulat
 Each entity-specific project is composed primarily of a single class, the Driver. The Driver contains an instance of the appropriate entity. The Driver is responsible for sending appropriate messages to the network, and for handling the receipt of messages from the network.
 
 \subsection{Message Structure}
-Due to the broadcast nature of the Emulator network capabilities, it was necessary to define a relatively complex structure for the messages, which include the originating node, the destination node (if any), the kind of message, and any data associated with the message. There was also a need for the developers to agree upon this structure.
+Due to the broadcast nature of the Emulator network capabilities and a lack of support for peer-to-peer communication, it was necessary to define a relatively complex structure for the messages, which include the originating node, the destination node (if any), the kind of message, and any data associated with the message.
 
 The final project contains a suite of classes relating to messaging in this system. The primary class is \lstinline{SBMessage}, which defines the overall structure of a message and provides a utility to broadcast the message.
 
-Also required was an interface, \lstinline{IMessagePayload}, to be implemented by any component which might need to be included in a message in this system. Such components include \lstinline{Route}, \lstinline{DateTime},\footnote{A payload with type \lstinline|DateTime| is actually a wrapper type, \lstinline|PayloadDateTime| due to C\# restrictions on extending \lstinline|struct|s.} \lstinline{Request}, and others.
+Also required was an interface, \lstinline{IMessagePayload}, to be implemented by any component which might need to be included in a message in this system. Such components include \lstinline{Route}, \lstinline{DateTime},\footnote{A payload with type \lstinline|DateTime| is enclosed by a wrapper type, \lstinline|PayloadDateTime| due to C\# restrictions on extending \lstinline|struct|s.} \lstinline{Request}, and others.
 
-\subsection{Testing and Evaluation}
+
 \subsection{Limitations, Challenges, and Omissions}
 \subsubsection{Passenger Behavior}
 \label{sub:passengers}
@@ -151,7 +151,40 @@ Initially, the plan for simulating passengers was to randomly generate requests 
 
 In lieu of dynamic passenger requests, a \lstinline{RequestPattern} interface was devised which permits the arbitrary, static instantiation of passenger requests, to be processed in real-time by the \lstinline{RequestDriver} Emulator instance. For each request in the pattern, the driver schedules a timer to fire at the time when that passenger is intended to dispatch the request. However, the \lstinline{RequestPattern} interface is general enough that an implementation could, theoretically, generate random requests on the fly, though that implementation does not appear in this project.
 
-\subsection{Using the Smart-Bus Application}
+\subsection{Testing and Evaluation}
+The efficacy of this (admittedly complicated) distributed algorithm versus a naive, static scheduling approach was evaluated. The static scheduling approach is similar to that employed by real public bus systems in the world: there are $n$ buses, each with a predetermined route $R$ through a number of stops.
+
+Evaluation metrics include
+\begin{itemize}
+	\item The number of buses required to service $k$ passenger requests on time (lower is better)
+	\item The number of requests that can be served on time with $n$ buses (higher is better)
+\end{itemize}
+
+\subsubsection{Specification of Static Approach}
+
+\subsubsection{Request Patterns}
+A variety of request patterns were used for evaluation. The scales of these patterns range from two passengers to ???, from three bus stops to ???, and from two buses to ???.
+
+\section{Using the Smart-Bus Application}
+There are several steps to running the application:
+\begin{itemize}
+	\item Launch $n$ instances of \lstinline{Bus-Driver}
+	\item Launch $m$ instances of \lstinline{Bus-Stop-Driver}
+	\item Ensure the simulation parameters of \lstinline{Request-Driver} match the number of buses and stops that have been launched
+	\item Launch an instance of \lstinline{Request-Driver} with the requisite simulation parameters (i.e., Request Pattern and Time Multiplier)
+	\item Wait for simulation to conclude
+\end{itemize} 
+
+\subsection{Extending the Smart-Bus Application}
+It is, of course, possible to extend or improve the functionality of this application in many ways.
+\begin{itemize}
+	\item For work on generating dynamic requests, implement the \lstinline{RequestPattern} interface 
+	\item To change the request assignment behavior, modify the \lstinline{BusStop} class in \lstinline{Utilities and Classes}
+	\item To implement breadth-first search to find buses, modify the \lstinline{BusStopDriver} class
+	\begin{itemize}
+		\item Changes to \lstinline{Bus} will also be necessary to restrict its responses to those stops within its immediate vicinity
+	\end{itemize}
+\end{itemize}
 
 \section{Conclusion}
 

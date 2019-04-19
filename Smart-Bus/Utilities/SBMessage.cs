@@ -23,7 +23,7 @@ namespace Smart_Bus
             public SourceType srcType;
             public int srcId;
 
-            // Initializer defaults to PASSENGER with no id
+            // Initializer defaults to BROADCAST with no id
             public MessageSource(string srcType = "0", string srcId = "-1")
             {
                 this.srcType = (SourceType)int.Parse(srcType);
