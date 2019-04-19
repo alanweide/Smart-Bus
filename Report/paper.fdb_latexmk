@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1555685331 "paper.tex" "paper.pdf" "paper" 1555685331
+["pdflatex"] 1555690882 "paper.tex" "paper.pdf" "paper" 1555690882
   "/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/lm/lm-rmtt.enc" 1254269338 2359 de53213020575850c8f8debc35095765 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -12,7 +12,6 @@
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm" 1246382020 940 228d6584342e91276bf566bcf9716b83 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1136768653 1324 c910af8c371558dc20f2d7822f66fe64 ""
-  "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmbx9.tfm" 1136768653 1328 5442e22a7072966dbaf88ca900acf3f0 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1136768653 1512 f21f83efb36853c0b70002322c1ab3ad ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmmi9.tfm" 1136768653 1524 d89e2d087a9828407a196f428428ef4a ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmr12.tfm" 1136768653 1288 655e228510b4c2a1abe905c368440826 ""
@@ -25,10 +24,9 @@
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmtk10.tfm" 1254269338 1336 cd5d5949a1a8258ba2142355fab78e6f ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmtt10.tfm" 1254269338 1340 adaa94f9add991a099a6fc98bbb5f02c ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmtt9.tfm" 1254269338 1340 95bafc1340b1c519d1b4b4bcc33f5afc ""
-  "/usr/local/texlive/2016/texmf-dist/fonts/tfm/public/lm/rm-lmtti10.tfm" 1254269338 1340 7042fba54e6301adc4002664af965e60 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb" 1248133631 34811 78b52f49e893bcba91bd7581cdc144c0 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1248133631 32080 340ef9bf63678554ee606688e7b5339d ""
-  "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb" 1248133631 32298 c6d25bb16d1eac01ebdc6d7084126a1e ""
+  "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1248133631 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb" 1248133631 32734 69e00a6b65cedb993666e42eedb3d48f ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
@@ -39,7 +37,6 @@
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/lm/lmtk10.pfb" 1255129361 117319 7f8361f845845ce6d5b36cbd9f9cf377 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/lm/lmtt10.pfb" 1255129361 113227 1010e11451afc2822c95dae77c390042 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/lm/lmtt9.pfb" 1255129361 108480 ee1de99df36ee0a16b36023b9c9d8a58 ""
-  "/usr/local/texlive/2016/texmf-dist/fonts/type1/public/lm/lmtti10.pfb" 1255129361 98822 859130196f7a6d2d1173200c66afbcff ""
   "/usr/local/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1461363279 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2016/texmf-dist/tex/generic/ifxetex/ifxetex.sty" 1284331290 1458 43ab4710dc82f3edeabecd0d099626b2 ""
   "/usr/local/texlive/2016/texmf-dist/tex/generic/oberdiek/etexcmds.sty" 1463608860 7612 729a8cc22a1ee0029997c7f74717ae05 ""
@@ -100,9 +97,9 @@
   "/usr/local/texlive/texmf-local/tex/latex/local/llncs2e/aliascnt.sty" 1308772042 2598 b30528bf103263149326b7572d9672a5 ""
   "/usr/local/texlive/texmf-local/tex/latex/local/llncs2e/remreset.sty" 1327611838 1096 6a75275ca00e32428c6f059d2f618ea7 ""
   "llncs.cls" 1555684586 41702 c53aeb6af2981c2c13265ad1a8cffa80 ""
-  "paper.aux" 1555685331 2607 9e635167f91bdeec4e61bfcf89bf2cde ""
-  "paper.tex" 1555685326 14666 8a9b9e09f7e3efc4a6e855d59821bd1c ""
+  "paper.aux" 1555690882 1840 505aef7ec64ab6e1c3251cf5474d9c65 ""
+  "paper.tex" 1555690880 12280 841e7b3f061cf85002df57c04a781e97 ""
   (generated)
-  "paper.log"
-  "paper.pdf"
   "paper.aux"
+  "paper.pdf"
+  "paper.log"

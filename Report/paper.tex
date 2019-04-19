@@ -118,7 +118,7 @@ Your final project report should include:
 This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops, as well as a sequence of passenger requests.
 
 \subsection{.NOW motes vs. Emulator}
-This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for this are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, an interesting demonstration of the algorithm involves at least three bus stops and two buses; that is, five motes would have been the minimum to showcase the capabilities of this algorithm. Thus, the decision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
+This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for this are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, an interesting demonstration of the algorithm involves at least three bus stops and one bus. Evaluating the efficacy and scalability of the algorithm with such a limited number of nodes would be impossible. Thus, the decision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
 
 \subsubsection{Simplifications}
 First, by eliminating many distinct pieces of hardware from the equation and consolidating them into instances of an emulator running on a host machine, the system can simplify its timekeeping. Rather than implementing a distibuted time synchronization algorithm, the system can rely on the host's clock to keep time.
@@ -141,147 +141,9 @@ Due to the broadcast nature of the Emulator network capabilities and a lack of s
 
 The final project contains a suite of classes relating to messaging in this system. The primary class is \lstinline{SBMessage}, which defines the overall structure of a message and provides a utility to broadcast the message.
 
-\begin{lstlisting}[label=lst:sbmessage,caption={Source code for the \lstinline|SBMessage| class}]
-public class SBMessage
-{
-    public struct MessageSource
-    {
-        public enum SourceType
-        {
-            BROADCAST = 0,
-            PASSENGER = 1,
-            BUS_STOP = 2,
-            BUS = 3
-        }
-        public SourceType srcType;
-        public int srcId;
+Also required was an interface, \lstinline{IMessagePayload}, to be implemented by any component which might need to be included in a message in this system. Such components include \lstinline{Route}, \lstinline{DateTime},\footnote{A payload with type \lstinline|DateTime| is enclosed by a wrapper type, \lstinline|PayloadDateTime| due to C\# restrictions on extending \lstinline|struct|s.} \lstinline{Request}, and others.
 
-        // Initializer defaults to BROADCAST with no id
-        public MessageSource(string srcType = "0", string srcId = "-1")
-        {
-            this.srcType = (SourceType)int.Parse(srcType);
-            this.srcId = int.Parse(srcId);
-        }
 
-        public MessageSource(SourceType srcType = SourceType.BROADCAST, int srcId = -1)
-        {
-            this.srcType = srcType;
-            this.srcId = srcId;
-        }
-
-        public override string ToString()
-        {
-            return this.srcType.ToString() + " " + this.srcId.ToString();
-        }
-    }
-
-    public struct MessageHeader
-    {
-        public const int Length = 5;
-
-        public MessageType type;
-        public MessageSource origin;
-        public MessageSource destination;
-
-        public MessageHeader(MessageType type, MessageSource origin, MessageSource destination)
-        {
-            this.type = type;
-            this.origin = origin;
-            this.destination = destination;
-        }
-
-        public override string ToString()
-        {
-            return type.ToString() + " " + origin.ToString() + " " + destination.ToString();
-        }
-    }
-
-    public enum MessageType
-    {
-        START_SIMULATION = 10,
-        SEND_PASSENGER_REQUEST = 11,
-
-        ROUTE_INFO_REQUEST = 20,
-        ROUTE_INFO_RELAY_REQUEST = 21,
-        ROUTE_CHANGE_REQUEST = 22,
-        REQUEST_SCHEDULED = 23,
-
-        ROUTE_INFO_RESPONSE = 30,
-        ROUTE_CHANGE_ACK = 31
-    }
-
-    public MessageHeader header;
-    public IMessagePayload payload;
-
-    public SBMessage() { }
-
-    public SBMessage(MessageType type, MessageSource origin, MessageSource destination, IMessagePayload payload)
-    {
-        this.header = new MessageHeader(type, origin, destination);
-        this.payload = payload;
-    }
-
-    public SBMessage(string msgString)
-    {
-        string[] components = msgString.Split();
-        MessageType msgType = (MessageType)int.Parse(components[1]);
-        MessageSource source = new MessageSource(components[1], components[2]);
-        MessageSource destination = new MessageSource(components[3], components[4]);
-        int headLength = MessageHeader.Length;
-        switch (msgType)
-        {
-                // Message from Passenger
-            case MessageType.START_SIMULATION:
-                this.payload = new PayloadDateTime(components, ref headLength);
-                break;
-            case MessageType.SEND_PASSENGER_REQUEST:
-                this.payload = new Request(components, ref headLength);
-                break;
-
-                // Message from Bus Stop
-            case MessageType.ROUTE_INFO_REQUEST:
-                this.payload = new PayloadSimpleString();
-                break;
-            case MessageType.ROUTE_INFO_RELAY_REQUEST:
-                this.payload = new PayloadRouteRequestForward(components, ref headLength);
-                break;
-            case MessageType.ROUTE_CHANGE_REQUEST:
-                this.payload = new Route(components, ref headLength);
-                break;
-            case MessageType.REQUEST_SCHEDULED:
-                this.payload = new Request(components, ref headLength);
-                break;
-
-                // Message from Bus
-            case MessageType.ROUTE_INFO_RESPONSE:
-                this.payload = new Route(components, ref headLength);
-                break;
-            case MessageType.ROUTE_CHANGE_ACK:
-                this.payload = new PayloadRouteChangeAckResponse(components, ref headLength);
-                break;
-        }
-    }
-
-    public override string ToString()
-    {
-        StringBuilder msg = new StringBuilder();
-        msg.Append(this.header.ToString() + " ");
-        msg.Append(this.payload.BuildPayload());
-        return msg.ToString();
-    }
-
-    public void Broadcast(NetInst NetPort)
-    {
-        Debug.Print("Sending message " + this.ToString());
-        byte[] msgBytes = Utilities.StringToByteArray(this.ToString());
-        NetPort.Broadcast(msgBytes, msgBytes.Length);
-    }
-}
-\end{lstlisting}
-
-Also required was an interface, \lstinline{IMessagePayload}, to be implemented by any component which might need to be included in a message in this system. Such components include \lstinline{Route}, \lstinline{DateTime},\footnote{A payload with type \lstinline|DateTime| is actually a wrapper type, \lstinline|PayloadDateTime| due to C\# restrictions on extending \lstinline|struct|s.} \lstinline{Request}, and others.
-
-\subsection{Testing and Evaluation}
 \subsection{Limitations, Challenges, and Omissions}
 \subsubsection{Passenger Behavior}
 \label{sub:passengers}
@@ -289,7 +151,40 @@ Initially, the plan for simulating passengers was to randomly generate requests 
 
 In lieu of dynamic passenger requests, a \lstinline{RequestPattern} interface was devised which permits the arbitrary, static instantiation of passenger requests, to be processed in real-time by the \lstinline{RequestDriver} Emulator instance. For each request in the pattern, the driver schedules a timer to fire at the time when that passenger is intended to dispatch the request. However, the \lstinline{RequestPattern} interface is general enough that an implementation could, theoretically, generate random requests on the fly, though that implementation does not appear in this project.
 
-\subsection{Using the Smart-Bus Application}
+\subsection{Testing and Evaluation}
+The efficacy of this (admittedly complicated) distributed algorithm versus a naive, static scheduling approach was evaluated. The static scheduling approach is similar to that employed by real public bus systems in the world: there are $n$ buses, each with a predetermined route $R$ through a number of stops.
+
+Evaluation metrics include
+\begin{itemize}
+	\item The number of buses required to service $k$ passenger requests on time (lower is better)
+	\item The number of requests that can be served on time with $n$ buses (higher is better)
+\end{itemize}
+
+\subsubsection{Specification of Static Approach}
+
+\subsubsection{Request Patterns}
+A variety of request patterns were used for evaluation. The scales of these patterns range from two passengers to ???, from three bus stops to ???, and from two buses to ???.
+
+\section{Using the Smart-Bus Application}
+There are several steps to running the application:
+\begin{itemize}
+	\item Launch $n$ instances of \lstinline{Bus-Driver}
+	\item Launch $m$ instances of \lstinline{Bus-Stop-Driver}
+	\item Ensure the simulation parameters of \lstinline{Request-Driver} match the number of buses and stops that have been launched
+	\item Launch an instance of \lstinline{Request-Driver} with the requisite simulation parameters (i.e., Request Pattern and Time Multiplier)
+	\item Wait for simulation to conclude
+\end{itemize} 
+
+\subsection{Extending the Smart-Bus Application}
+It is, of course, possible to extend or improve the functionality of this application in many ways.
+\begin{itemize}
+	\item For work on generating dynamic requests, implement the \lstinline{RequestPattern} interface 
+	\item To change the request assignment behavior, modify the \lstinline{BusStop} class in \lstinline{Utilities and Classes}
+	\item To implement breadth-first search to find buses, modify the \lstinline{BusStopDriver} class
+	\begin{itemize}
+		\item Changes to \lstinline{Bus} will also be necessary to restrict its responses to those stops within its immediate vicinity
+	\end{itemize}
+\end{itemize}
 
 \section{Conclusion}
 
