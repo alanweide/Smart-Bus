@@ -25,7 +25,7 @@ namespace Smart_Bus
             stop_1.update_receive(bus[0], true);
 
             //assing request to stop1
-            stop_1.request_receive(requests[0]);
+            stop_1.request_receive(requests[0], false);
 
             //update bus1 info to stop1
             bus[0].routeInfo = new Request_v[2];
@@ -44,7 +44,7 @@ namespace Smart_Bus
 
             //update bus1 info to stop1
             stop_1.update_receive(bus[1], true);
-            stop_1.request_receive(requests[1]);
+            stop_1.request_receive(requests[1], false);
             
         }
     }
