@@ -115,19 +115,19 @@ Your final project report should include:
 \subsection{Request Assignment Algorithm}
 
 \section{Implementation}
-This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops.
+This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops, as well as a sequence of passenger requests.
 
 \subsection{.NOW motes vs. Emulator}
-This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for this are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, any interestin gdemonstration of the algorithm involves at least three bus stops and two buses; that is, five motes would have ben an absolute minimum to showcase the capabilities of this algorithm. Thus, the devision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
+This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for this are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, an interesting demonstration of the algorithm involves at least three bus stops and two buses; that is, five motes would have been the minimum to showcase the capabilities of this algorithm. Thus, the decision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
 
 \subsubsection{Simplifications}
 First, by eliminating many distinct pieces of hardware from the equation and consolidating them into instances of an emulator running on a host machine, the system can simplify its timekeeping. Rather than implementing a distibuted time synchronization algorithm, the system can rely on the host's clock to keep time.
 
-Second, by foregoing a physically distributed network of nodes with relatively weak radios and antennae, all messages became broadcasts (at least when it was convenient). The emulator's networking capabilities enforce that all messages are broadcast to all other nodes, but in cases where a peer-to-peer communication was desired, the broadcast message was annotated with several pieces of metadata: the kind of message it is, the originating node, and the intended destination node. Instances of broadcasts for the sake of simplicity and convenience are documented in the source code itself, but are detailed here.
+Second, by foregoing a physically distributed network of nodes with relatively weak radios and antennae, all messages can be broadcasts (when it is convenient). The emulator's networking capabilities enforce that all messages are broadcast to all other nodes, but in cases where a peer-to-peer communication is desired, the broadcast message is annotated with several pieces of metadata: the kind of message it is, the originating node, and the intended destination node. Instances of broadcasts for the sake of simplicity and convenience are documented in the source code itself, but are detailed here.
 
-One such instance was the response by a Bus when a Bus Stop requests its route information. In a ``real'' system, due to physical limitations a Bus Stop might only communicate with buses that are nearby; a breadth-first search approach could be used to (eventually) retrieve information about all buses. In our proof-of-concept, each bus will always respond to a broadcast from a stop asking for route information.
+One such instance is the response by a Bus when a Bus Stop requests its route information. In a ``real'' system, due to physical limitations a Bus Stop might only communicate with buses that are nearby; a breadth-first search approach could be used to (eventually) retrieve information about all buses. In our proof-of-concept, each bus will always respond to a broadcast from a stop asking for route information.
 
-Another instance where the broadcast nature of messages was taken advantage of was in the simulation start-up phase. The \lstinline{RequestDriver} process, upon start up, broadcasts to all nodes in the network the absolute time at which it began sending requests. This is used by each other process as the reference to determine how much simulated time has passed, in order to, for example, determine a bus's current location along its route.
+Another instance where the broadcast nature of messages is taken advantage of is in the simulation start-up phase. The \lstinline{RequestDriver} process, upon start up, broadcasts to all nodes in the network the absolute time at which it began sending requests. This is used by each other process as the reference to determine how much simulated time has passed, in order to, for example, determine a bus's current location along its route.
 
 Another simplification enabled by the decision to use the Emulator is that one instance can be reserved as the ``passengers''. Since each node in the Emulator network can communicate with all the others, a single instance can simulate the requests from many different passengers to many different bus stops. A detailed discussion of the behavior of passengers in our system appears in Section~\ref{sub:passengers}.
 
@@ -137,9 +137,147 @@ Designing the software structure to make use of multiple instances of the Emulat
 Each entity-specific project is composed primarily of a single class, the Driver. The Driver contains an instance of the appropriate entity. The Driver is responsible for sending appropriate messages to the network, and for handling the receipt of messages from the network.
 
 \subsection{Message Structure}
-Due to the broadcast nature of the Emulator network capabilities, it was necessary to define a relatively complex structure for the messages, which include the originating node, the destination node (if any), the kind of message, and any data associated with the message. There was also a need for the developers to agree upon this structure.
+Due to the broadcast nature of the Emulator network capabilities and a lack of support for peer-to-peer communication, it was necessary to define a relatively complex structure for the messages, which include the originating node, the destination node (if any), the kind of message, and any data associated with the message.
 
 The final project contains a suite of classes relating to messaging in this system. The primary class is \lstinline{SBMessage}, which defines the overall structure of a message and provides a utility to broadcast the message.
+
+\begin{lstlisting}[label=lst:sbmessage,caption={Source code for the \lstinline|SBMessage| class}]
+public class SBMessage
+{
+    public struct MessageSource
+    {
+        public enum SourceType
+        {
+            BROADCAST = 0,
+            PASSENGER = 1,
+            BUS_STOP = 2,
+            BUS = 3
+        }
+        public SourceType srcType;
+        public int srcId;
+
+        // Initializer defaults to BROADCAST with no id
+        public MessageSource(string srcType = "0", string srcId = "-1")
+        {
+            this.srcType = (SourceType)int.Parse(srcType);
+            this.srcId = int.Parse(srcId);
+        }
+
+        public MessageSource(SourceType srcType = SourceType.BROADCAST, int srcId = -1)
+        {
+            this.srcType = srcType;
+            this.srcId = srcId;
+        }
+
+        public override string ToString()
+        {
+            return this.srcType.ToString() + " " + this.srcId.ToString();
+        }
+    }
+
+    public struct MessageHeader
+    {
+        public const int Length = 5;
+
+        public MessageType type;
+        public MessageSource origin;
+        public MessageSource destination;
+
+        public MessageHeader(MessageType type, MessageSource origin, MessageSource destination)
+        {
+            this.type = type;
+            this.origin = origin;
+            this.destination = destination;
+        }
+
+        public override string ToString()
+        {
+            return type.ToString() + " " + origin.ToString() + " " + destination.ToString();
+        }
+    }
+
+    public enum MessageType
+    {
+        START_SIMULATION = 10,
+        SEND_PASSENGER_REQUEST = 11,
+
+        ROUTE_INFO_REQUEST = 20,
+        ROUTE_INFO_RELAY_REQUEST = 21,
+        ROUTE_CHANGE_REQUEST = 22,
+        REQUEST_SCHEDULED = 23,
+
+        ROUTE_INFO_RESPONSE = 30,
+        ROUTE_CHANGE_ACK = 31
+    }
+
+    public MessageHeader header;
+    public IMessagePayload payload;
+
+    public SBMessage() { }
+
+    public SBMessage(MessageType type, MessageSource origin, MessageSource destination, IMessagePayload payload)
+    {
+        this.header = new MessageHeader(type, origin, destination);
+        this.payload = payload;
+    }
+
+    public SBMessage(string msgString)
+    {
+        string[] components = msgString.Split();
+        MessageType msgType = (MessageType)int.Parse(components[1]);
+        MessageSource source = new MessageSource(components[1], components[2]);
+        MessageSource destination = new MessageSource(components[3], components[4]);
+        int headLength = MessageHeader.Length;
+        switch (msgType)
+        {
+                // Message from Passenger
+            case MessageType.START_SIMULATION:
+                this.payload = new PayloadDateTime(components, ref headLength);
+                break;
+            case MessageType.SEND_PASSENGER_REQUEST:
+                this.payload = new Request(components, ref headLength);
+                break;
+
+                // Message from Bus Stop
+            case MessageType.ROUTE_INFO_REQUEST:
+                this.payload = new PayloadSimpleString();
+                break;
+            case MessageType.ROUTE_INFO_RELAY_REQUEST:
+                this.payload = new PayloadRouteRequestForward(components, ref headLength);
+                break;
+            case MessageType.ROUTE_CHANGE_REQUEST:
+                this.payload = new Route(components, ref headLength);
+                break;
+            case MessageType.REQUEST_SCHEDULED:
+                this.payload = new Request(components, ref headLength);
+                break;
+
+                // Message from Bus
+            case MessageType.ROUTE_INFO_RESPONSE:
+                this.payload = new Route(components, ref headLength);
+                break;
+            case MessageType.ROUTE_CHANGE_ACK:
+                this.payload = new PayloadRouteChangeAckResponse(components, ref headLength);
+                break;
+        }
+    }
+
+    public override string ToString()
+    {
+        StringBuilder msg = new StringBuilder();
+        msg.Append(this.header.ToString() + " ");
+        msg.Append(this.payload.BuildPayload());
+        return msg.ToString();
+    }
+
+    public void Broadcast(NetInst NetPort)
+    {
+        Debug.Print("Sending message " + this.ToString());
+        byte[] msgBytes = Utilities.StringToByteArray(this.ToString());
+        NetPort.Broadcast(msgBytes, msgBytes.Length);
+    }
+}
+\end{lstlisting}
 
 Also required was an interface, \lstinline{IMessagePayload}, to be implemented by any component which might need to be included in a message in this system. Such components include \lstinline{Route}, \lstinline{DateTime},\footnote{A payload with type \lstinline|DateTime| is actually a wrapper type, \lstinline|PayloadDateTime| due to C\# restrictions on extending \lstinline|struct|s.} \lstinline{Request}, and others.
 
