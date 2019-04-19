@@ -32,7 +32,7 @@
 \usepackage{tabularx, booktabs}
 \usepackage{multirow}
 \usepackage{epsfig}
-\usepackage{pdflscape} 
+\usepackage{pdflscape}
 
 %\usepackage{algorithm2e}
 %\usepackage[linesnumbered]{algorithm2e}
@@ -61,7 +61,7 @@
 %%\usepackage{url}
 %%\urldef{\mailsa}\path|{alfred.hofmann, ursula.barth, ingrid.haas, frank.holzwarth,|
 %%\urldef{\mailsb}\path|anna.kramer, leonie.kunz, christine.reiss, nicole.sator,|
-%%\urldef{\mailsc}\path|erika.siebert-cole, peter.strasser, lncs}@springer.com|    
+%%\urldef{\mailsc}\path|erika.siebert-cole, peter.strasser, lncs}@springer.com|
 %%\newcommand{\keywords}[1]{\par\addvspace\baselineskip
 %%\noindent\keywordname\enspace\ignorespaces#1}
 
@@ -101,19 +101,19 @@
 
 \section{Introduction}
 Your final project report should include:
-1. A write-up describing 
+1. A write-up describing
 
 (a) the design rationale of the module(s) you developed, along with the algorithm you have designed/used and a detailed API
 
-(b) instructions and illustration of use, in terms of a README file and/or user guide, 
+(b) instructions and illustration of use, in terms of a README file and/or user guide,
 
-(c) how your implementation has been tested, 
+(c) how your implementation has been tested,
 
 (d) performance of your implementation,
 
 (e) assumptions or limitations of your design,
 
-(f) any omissions or errors in your implementation, and 
+(f) any omissions or errors in your implementation, and
 
 (g) any bugs or weaknesses you have found in the algorithm/protocol. (Only if some of these do not apply to your project should you omit them.)
 
@@ -128,7 +128,15 @@ Your final project report should include:
 \subsection{Request Assignment Algorithm}
 
 \section{Implementation}
+This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops.
+
 \subsection{.NOW motes vs. Emulator}
+This project was implemented on the Samraksh Emulator, not .NOW motes. The reasons for thei are varied, but one deciding factor was a lack of availability of motes to use in testing and demonstration. Because this project was built as part of the curriculum for a semester-long class, the developers had access to at most three motes. Unfortunately, any interestin gdemonstration of the algorithm involves at least three bus stops and two buses; that is, five motes would have ben an absolute minimum to showcase the capabilities of this algorithm. Thus, the devision was made to implement the project using the Samraksh Emulator, of which arbitrarily many instances can be launched to simulate an arbitrarily large network. Using the emulator instead of motes also enabled some simplifications to the protocol which made it possible to produce a high-quality project in the time allotted.
+\subsubection{Simplifications}
+First, by eliminating many distinct pieces of hardware from the equation and consolidating them into instances of an emulator running on a host machine, the system can simplify its timekeeping. Rather than implementing a distibuted time synchronization algorithm, the system can rely on the host's clock to keep time.
+
+Second, by foregoing a physically distributed network of nodes with relatively weak radios and antennae, all messages became broadcasts (at least when it was convenient). The emulator's networking capabilities enforce that all messages are broadcast to all other nodes, but in cases where a peer-to-peer communication was desired, the broadcast message was annotated with several pieces of metadata: the kind of message it is, the originating node, and the intended destination node. Instances of broadcasts for the sake of simplicity and convenience are documented in the source code itself, but are detailed here. One such instance was the response by a Bus when a Bus Stop requests its route information. In a ``real'' system, due to physical limitations a Bus Stop might only communicate with buses that are nearby;
+
 \subsection{Software Architecture}
 \subsection{Testing and Evaluation}
 \subsection{Limitations, Challenges, and Omissions}
