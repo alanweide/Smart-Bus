@@ -14,6 +14,7 @@ namespace Smart_Bus
         public BusStop origin;
         public BusStop destination;
         public bool served;
+        public bool delay;
 
         public Request(int earliestPickupTime, int latestDeliveryTime, int origin, int destination)
         {
