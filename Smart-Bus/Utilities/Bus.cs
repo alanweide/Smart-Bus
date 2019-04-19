@@ -15,7 +15,7 @@ namespace Smart_Bus
         public int busStartTime; //ts_k: expected start time at terminus 
         public int busEndTime; //te_k: expected end time terminus
         public Route route;
-        public Request_v[] routeInfo;
+        //public Request_v[] routeInfo;
 
         public Bus(int id, int terminusId, int busStartTime, int busEndTime)
         {
