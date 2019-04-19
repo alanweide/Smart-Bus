@@ -82,14 +82,14 @@ namespace Smart_Bus
 
                             //Send ROUTE_CHANGE_REQUEST to the matched bus
                         }
-                       
+
                         break;
                     }
                 case SBMessage.MessageType.ROUTE_INFO_RESPONSE:
                     {
                         //Save the bus info (with route) to busInfo_list
                         //instance.myBusStop.Append_busInfo();
-                        
+
 
                         break;
                     }
