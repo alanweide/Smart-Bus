@@ -172,7 +172,7 @@ namespace Smart_Bus
         {
             Request_v[] routeInfo_tmp;
 
-            Request_v new_origin, new_destination;
+            Request_v new_origin = new Request_v(), new_destination = new Request_v();
             int flex, max_flex = -1000000;
             //int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
 

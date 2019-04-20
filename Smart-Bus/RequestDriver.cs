@@ -48,7 +48,7 @@ namespace Smart_Bus
         {
             Request req = obj as Request;
             SBMessage.MessageSource origin = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.PASSENGER);
-            SBMessage.MessageSource destination = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.BUS_STOP, req.origin.id);
+            SBMessage.MessageSource destination = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.BUS_STOP, req.origin.stop.id);
             IMessagePayload payload = req;
             SBMessage message = new SBMessage(SBMessage.MessageType.SEND_PASSENGER_REQUEST, origin, destination, payload);
             message.Broadcast(RequestDriver.getInstance().NetPort);
@@ -69,16 +69,16 @@ namespace Smart_Bus
             return RequestDriver.instance;
         }
 
-        private static string BuildMessage(Request request)
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.Append(appId.ToString() + " ");
-            msg.Append(request.origin.id.ToString() + " ");
-            msg.Append(request.destination.id.ToString() + " ");
-            msg.Append(request.earliestPickupTime.ToString() + " ");
-            msg.Append(request.earliestDeliveryTime.ToString());
-            return msg.ToString();
-        }
+        //private static string BuildMessage(Request request)
+        //{
+        //    StringBuilder msg = new StringBuilder();
+        //    msg.Append(appId.ToString() + " ");
+        //    msg.Append(request.origin.stop.id.ToString() + " ");
+        //    msg.Append(request.destination.stop.id.ToString() + " ");
+        //    msg.Append(request.earliestPickupTime.ToString() + " ");
+        //    msg.Append(request.earliestDeliveryTime.ToString());
+        //    return msg.ToString();
+        //}
 
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
@@ -108,7 +108,7 @@ namespace Smart_Bus
                 Request request = pattern.getNextRequest();
                 TimeSpan elapsedTime = DateTime.Now - startTime;
                 int elapsedMillis = (int)elapsedTime.Milliseconds;
-                int delayTilSend = System.Math.Max(0, getRealSendTime(request.earliestPickupTime) - elapsedMillis);
+                int delayTilSend = System.Math.Max(0, getRealSendTime(request.origin.earliestServingTime) - elapsedMillis);
                 Debug.Print("--------\nScheduling request " + i + " for " + delayTilSend + " ms");
                 new Timer(new TimerCallback(BuildAndSendPassengerRequest), request, delayTilSend, 0);
                 Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms\n--------");
