@@ -24,9 +24,9 @@ namespace Smart_Bus
             int simulationMillis = (int)elapsedTime.Milliseconds;
 
             Debug.Print("Received new request");
-            Debug.Print("Origin: " + new_request.origin.id + ", Destination: " + new_request.destination.id);
-            Debug.Print("EarliestPickupTime: " + new_request.earliestPickupTime + ", LatestPickupTime: " + new_request.latestPickupTime);
-            Debug.Print("EarliestDeliveryTime: " + new_request.earliestDeliveryTime + ", LatestDeliveryTime: " + new_request.latestDeliveryTime);
+            Debug.Print("Origin: " + new_request.origin.stop.id + ", Destination: " + new_request.destination.stop.id);
+            Debug.Print("EarliestPickupTime: " + new_request.origin.earliestServingTime + ", LatestPickupTime: " + new_request.origin.latestServingTime);
+            Debug.Print("EarliestDeliveryTime: " + new_request.destination.earliestServingTime + ", LatestDeliveryTime: " + new_request.destination.latestServingTime);
 
             
 
@@ -47,7 +47,7 @@ namespace Smart_Bus
             }
 
             //Second, assign the new request immediately if (latestDeliveryTime - current time) < urgencyThreshold
-            if (new_request.latestDeliveryTime - simulationMillis < urgencyThreshold)
+            if (new_request.destination.latestServingTime - simulationMillis < urgencyThreshold)
             {
                 request_assign(new_request);
             }
@@ -56,7 +56,7 @@ namespace Smart_Bus
             else
             {
                 //request_assign(new_request);
-                new Timer(new TimerCallback(request_timer_handler), new_request, (new_request.latestDeliveryTime - (simulationMillis + urgencyThreshold)), 0);
+                new Timer(new TimerCallback(request_timer_handler), new_request, (new_request.destination.latestServingTime - (simulationMillis + urgencyThreshold)), 0);
             }
 
         }
@@ -77,13 +77,13 @@ namespace Smart_Bus
             {
                 if (this.request_list[i].delay == true)
                 {
-                    if (this.request_list[i].latestDeliveryTime - (int)elapsedTime.Milliseconds < urgencyThreshold)
+                    if (this.request_list[i].destination.latestServingTime - (int)elapsedTime.Milliseconds < urgencyThreshold)
                     {
                         request_assign(this.request_list[i]);
                     }
                     else 
                     {
-                        new Timer(new TimerCallback(request_timer_handler), this.request_list[i], (this.request_list[i].latestDeliveryTime - ((int)elapsedTime.Milliseconds + urgencyThreshold)), 0);
+                        new Timer(new TimerCallback(request_timer_handler), this.request_list[i], (this.request_list[i].destination.latestServingTime - ((int)elapsedTime.Milliseconds + urgencyThreshold)), 0);
                     }
                 }
 
@@ -176,16 +176,16 @@ namespace Smart_Bus
             int flex, max_flex = -1000000;
             //int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
 
-            new_origin.earliestServingTime = new_request.earliestPickupTime;
-            new_origin.latestServingTime = new_request.latestPickupTime;
+            new_origin.earliestServingTime = new_request.origin.earliestServingTime;
+            new_origin.latestServingTime = new_request.origin.latestServingTime;
             new_origin.is_origin = true;
-            new_origin.location = new_request.origin.id;
+            new_origin.stop = new BusStop(new_request.origin.stop.id);
             new_origin.served = false;
 
-            new_destination.earliestServingTime = new_request.earliestDeliveryTime;
-            new_destination.latestServingTime = new_request.latestDeliveryTime;
+            new_destination.earliestServingTime = new_request.destination.earliestServingTime;
+            new_destination.latestServingTime = new_request.destination.latestServingTime;
             new_destination.is_origin = false;
-            new_destination.location = new_request.destination.id;
+            new_destination.stop = new BusStop(new_request.destination.stop.id);
             new_destination.served = false;
 
             //The bus has not been assigned any request
@@ -262,14 +262,14 @@ namespace Smart_Bus
                 if (i == 0)
                 {
                     //t_0 = ts_k + travel_time(terminus, v_0)
-                    t_v = bus.busStartTime + System.Math.Abs(routeInfo[i].location - bus.terminusLocation);
+                    t_v = bus.busStartTime + System.Math.Abs(routeInfo[i].stop.id - bus.terminusLocation);
                     //Debug.Print("t_v at location " + routeInfo[i].location + " is " + t_v);
 
                 }
                 else
                 {
                     //t_v = max(t_v-1, e_v-1) + travel_time(v-1, v)
-                    t_v = System.Math.Max(t_v, routeInfo[i - 1].earliestServingTime) + System.Math.Abs(routeInfo[i].location - routeInfo[i - 1].location);
+                    t_v = System.Math.Max(t_v, routeInfo[i - 1].earliestServingTime) + System.Math.Abs(routeInfo[i].stop.id - routeInfo[i - 1].stop.id);
                     //Debug.Print("t_v at location " + routeInfo[i].location + " is " + t_v);
                 }
 
@@ -277,7 +277,7 @@ namespace Smart_Bus
                 //Debug.Print("f_v at location " + routeInfo[i].location + " is " + (routeInfo[i].latestServingTime - t_v));
             }
             //add up (l_0 - te_k) to F_k
-            F += bus.busEndTime - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminusLocation - routeInfo[routeInfo.Length - 1].location));
+            F += bus.busEndTime - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminusLocation - routeInfo[routeInfo.Length - 1].stop.id));
             //Debug.Print("t_v at terminus is " + (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location)));
             //Debug.Print("f_v at terminus is " + (bus.bus_end_time - (System.Math.Max(t_v, routeInfo[routeInfo.Length - 1].earliestServingTime) + System.Math.Abs(bus.terminus_location - routeInfo[routeInfo.Length - 1].location))));
 

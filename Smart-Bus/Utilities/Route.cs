@@ -77,6 +77,25 @@ namespace Smart_Bus
             private set { }
         }
 
+        public void AddRequest(Request r)
+        {
+            this.requests.Add(r);
+        }
+
+        public Request RemoveEarliestRequest()
+        {
+            Request minRequest = null;
+            for (int i = 0; i < this.requests.Count; i++)
+            {
+                Request thisRequest = this.requests[i] as Request;
+                if (minRequest == null || thisRequest.origin.earliestServingTime < minRequest.origin.earliestServingTime)
+                {
+                    minRequest = thisRequest;
+                }
+            }
+            return minRequest;
+        }
+
         public string BuildPayload()
         {
             StringBuilder payload = new StringBuilder();

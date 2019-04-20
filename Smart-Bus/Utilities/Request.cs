@@ -6,32 +6,21 @@ namespace Smart_Bus
 {
     public class Request : IComparable, IMessagePayload
     {
-        // TODO: Refactor to Pair of Request_v
-        //public int sendTime;
-        //public Request_v origin;
-        //public Request_v dest;
-        //public bool delay;
-
         public int requestSendTime;
-        public int earliestPickupTime;
-        public int latestPickupTime;
-        public int earliestDeliveryTime;
-        public int latestDeliveryTime;
-        public BusStop origin;
-        public BusStop destination;
-        public bool served;
+        public Request_v origin;
+        public Request_v destination;
         public bool delay;
 
         public Request(int earliestPickupTime, int latestDeliveryTime, int origin, int destination)
         {
+            BusStop originStop = new BusStop(origin);
+            BusStop destStop = new BusStop(destination);
+            int latestPickupTime = latestDeliveryTime - TravelTime(originStop, destStop);
+            int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
+
             this.requestSendTime = earliestPickupTime;
-            this.earliestPickupTime = earliestPickupTime;
-            this.origin = new BusStop(origin);
-            this.destination = new BusStop(destination);
-            this.earliestDeliveryTime = earliestPickupTime + TravelTime(this.origin, this.destination);
-            this.latestDeliveryTime = latestDeliveryTime;
-            this.latestPickupTime = latestDeliveryTime - TravelTime(this.origin, this.destination);
-            this.served = false;
+            this.origin = new Request_v(earliestPickupTime, latestPickupTime, true, originStop, false);
+            this.destination = new Request_v(earliestDeliveryTime, latestDeliveryTime, false, destStop, false);
         }
 
         public Request(string[] messageComponents, ref int startIdx)
@@ -45,14 +34,14 @@ namespace Smart_Bus
             int originId = int.Parse(messageComponents[startIdx++]);
             int destinationId = int.Parse(messageComponents[startIdx++]);
 
+            BusStop originStop = new BusStop(originId);
+            BusStop destStop = new BusStop(destinationId);
+            int latestPickupTime = latestDeliveryTime - TravelTime(originStop, destStop);
+            int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
+
             this.requestSendTime = earliestPickupTime;
-            this.earliestPickupTime = earliestPickupTime;
-            this.origin = new BusStop(originId);
-            this.destination = new BusStop(destinationId);
-            this.earliestDeliveryTime = earliestPickupTime + TravelTime(this.origin, this.destination);
-            this.latestDeliveryTime = latestDeliveryTime;
-            this.latestPickupTime = latestDeliveryTime - TravelTime(origin, destination);
-            this.served = false;
+            this.origin = new Request_v(earliestPickupTime, latestPickupTime, true, originStop, false);
+            this.destination = new Request_v(earliestDeliveryTime, latestDeliveryTime, false, destStop, false);
         }
 
         public int CompareTo(object obj)
@@ -62,7 +51,7 @@ namespace Smart_Bus
             Request other = obj as Request;
             if (other != null)
             {
-                return System.Math.Sign(this.earliestPickupTime - other.earliestPickupTime);
+                return System.Math.Sign(this.origin.earliestServingTime - other.origin.earliestServingTime);
             }
             else
             {
@@ -89,15 +78,24 @@ namespace Smart_Bus
         public int earliestServingTime;
         public int latestServingTime;
         public bool is_origin;
-        public int location;
+        public BusStop stop;
         public bool served;
+
+        public Request_v(int earliestServingTime, int latestServingTime, bool is_origin, BusStop stop, bool served)
+        {
+            this.earliestServingTime = earliestServingTime;
+            this.latestServingTime = latestServingTime;
+            this.is_origin = is_origin;
+            this.stop = stop;
+            this.served = served;
+        }
 
         public Request_v(string[] messageComponents, ref int startIdx)
         {
             this.earliestServingTime = int.Parse(messageComponents[startIdx++]);
             this.latestServingTime = int.Parse(messageComponents[startIdx++]);
             this.is_origin = (int.Parse(messageComponents[startIdx++]) != 0);
-            this.location = int.Parse(messageComponents[startIdx++]);
+            this.stop = new BusStop(int.Parse(messageComponents[startIdx++]));
             this.served = (int.Parse(messageComponents[startIdx++]) != 0);
         }
     }
