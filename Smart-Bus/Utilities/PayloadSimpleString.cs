@@ -20,7 +20,7 @@ namespace Smart_Bus
 
         public string BuildPayload()
         {
-            throw new NotImplementedException();
+            return this.str;
         }
     }
 }

@@ -11,34 +11,34 @@ namespace Smart_Bus
 {
     public class SBMessage
     {
-        public struct MessageSource
+        public struct MessageEndpoint
         {
-            public enum SourceType
+            public enum EndpointType
             {
                 BROADCAST = 0,
                 PASSENGER = 1,
                 BUS_STOP = 2,
                 BUS = 3
             }
-            public SourceType srcType;
-            public int srcId;
+            public EndpointType endptType;
+            public int endptId;
 
             // Initializer defaults to BROADCAST with no id
-            public MessageSource(string srcType = "0", string srcId = "-1")
+            public MessageEndpoint(string endptType = "0", string endptId = "-1")
             {
-                this.srcType = (SourceType)int.Parse(srcType);
-                this.srcId = int.Parse(srcId);
+                this.endptType = (EndpointType)int.Parse(endptType);
+                this.endptId = int.Parse(endptId);
             }
 
-            public MessageSource(SourceType srcType = SourceType.BROADCAST, int srcId = -1)
+            public MessageEndpoint(EndpointType endptType = EndpointType.BROADCAST, int endptId = -1)
             {
-                this.srcType = srcType;
-                this.srcId = srcId;
+                this.endptType = endptType;
+                this.endptId = endptId;
             }
 
             public override string ToString()
             {
-                return this.srcType.ToString() + " " + this.srcId.ToString();
+                return this.endptType.ToString() + " " + this.endptId.ToString();
             }
         }
 
@@ -47,10 +47,10 @@ namespace Smart_Bus
             public const int Length = 5;
 
             public MessageType type;
-            public MessageSource origin;
-            public MessageSource destination;
+            public MessageEndpoint origin;
+            public MessageEndpoint destination;
 
-            public MessageHeader(MessageType type, MessageSource origin, MessageSource destination)
+            public MessageHeader(MessageType type, MessageEndpoint origin, MessageEndpoint destination)
             {
                 this.type = type;
                 this.origin = origin;
@@ -77,56 +77,67 @@ namespace Smart_Bus
             ROUTE_CHANGE_ACK = 31
         }
 
-        public MessageHeader header;
-        public IMessagePayload payload;
+        private MessageHeader _header;
+        private IMessagePayload _payload;
+
+        public MessageHeader header
+        {
+            get { return _header; }
+            private set { }
+        }
+        public IMessagePayload payload
+        {
+            get { return _payload; }
+            private set { }
+        }
 
         public SBMessage()
         {
         }
 
-        public SBMessage(MessageType type, MessageSource origin, MessageSource destination, IMessagePayload payload)
+        public SBMessage(MessageType type, MessageEndpoint origin, MessageEndpoint destination, IMessagePayload payload)
         {
-            this.header = new MessageHeader(type, origin, destination);
-            this.payload = payload;
+            this._header = new MessageHeader(type, origin, destination);
+            this._payload = payload;
         }
 
         public SBMessage(string msgString)
         {
             string[] components = msgString.Split();
             MessageType msgType = (MessageType)int.Parse(components[1]);
-            MessageSource source = new MessageSource(components[1], components[2]);
-            MessageSource destination = new MessageSource(components[3], components[4]);
+            MessageEndpoint source = new MessageEndpoint(components[1], components[2]);
+            MessageEndpoint destination = new MessageEndpoint(components[3], components[4]);
             int headLength = MessageHeader.Length;
             switch (msgType)
             {
                     // Message from Passenger
                 case MessageType.START_SIMULATION:
-                    this.payload = new PayloadDateTime(components, ref headLength);
+                    this._payload = new PayloadDateTime(components, ref headLength);
                     break;
                 case MessageType.SEND_PASSENGER_REQUEST:
-                    this.payload = new Request(components, ref headLength);
+                    this._payload = new Request(components, ref headLength);
                     break;
 
                     // Message from Bus Stop
                 case MessageType.ROUTE_INFO_REQUEST:
-                    this.payload = new PayloadSimpleString();
+                    this._payload = new PayloadSimpleString();
                     break;
                 case MessageType.ROUTE_INFO_RELAY_REQUEST:
-                    this.payload = new PayloadRouteRequestForward(components, ref headLength);
+                    this._payload = new PayloadRouteRequestForward(components, ref headLength);
                     break;
                 case MessageType.ROUTE_CHANGE_REQUEST:
-                    this.payload = new Route(components, ref headLength);
+                    this._payload = new Route(components, ref headLength);
                     break;
                 case MessageType.REQUEST_SCHEDULED:
-                    this.payload = new Request(components, ref headLength);
+                    this._payload = new Request(components, ref headLength);
                     break;
 
                     // Message from Bus
                 case MessageType.ROUTE_INFO_RESPONSE:
-                    this.payload = new Route(components, ref headLength);
+                    this._payload = new Route(components, ref headLength);
                     break;
                 case MessageType.ROUTE_CHANGE_ACK:
-                    this.payload = new PayloadRouteChangeAckResponse(components, ref headLength);
+                    this._payload = new PayloadRouteChangeAckResponse(components, ref headLength);
                     break;
             }
         }
@@ -134,8 +145,8 @@ namespace Smart_Bus
         public override string ToString()
         {
             StringBuilder msg = new StringBuilder();
-            msg.Append(this.header.ToString() + " ");
-            msg.Append(this.payload.BuildPayload());
+            msg.Append(this._header.ToString() + " ");
+            msg.Append(this._payload.BuildPayload());
             return msg.ToString();
         }
 

@@ -37,8 +37,8 @@ namespace Smart_Bus
 
         private static void BuildAndSendStartSimBroadcast(DateTime startTime)
         {
-            SBMessage.MessageSource origin = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.PASSENGER);
-            SBMessage.MessageSource destination = new SBMessage.MessageSource();
+            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
+            SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint();
             IMessagePayload payload = new PayloadDateTime(startTime);
             SBMessage message = new SBMessage(SBMessage.MessageType.START_SIMULATION, origin, destination, payload);
             message.Broadcast(RequestDriver.getInstance().NetPort);
@@ -47,8 +47,8 @@ namespace Smart_Bus
         private static void BuildAndSendPassengerRequest(object obj)
         {
             Request req = obj as Request;
-            SBMessage.MessageSource origin = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.PASSENGER);
-            SBMessage.MessageSource destination = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.BUS_STOP, req.origin.stop.id);
+            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
+            SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, req.origin.stop.id);
             IMessagePayload payload = req;
             SBMessage message = new SBMessage(SBMessage.MessageType.SEND_PASSENGER_REQUEST, origin, destination, payload);
             message.Broadcast(RequestDriver.getInstance().NetPort);

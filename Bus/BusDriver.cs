@@ -6,6 +6,7 @@ using Microsoft.SPOT.Hardware;
 using Microsoft.SPOT.Messaging;
 using System.IO.Ports;
 using Samraksh.SPOT.Emulator.Network;
+using System.Collections;
 
 namespace Smart_Bus
 {
@@ -84,7 +85,7 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.ROUTE_INFO_REQUEST:
                     {
-                        int stopId = message.header.origin.srcId;
+                        int stopId = message.header.origin.endptId;
 
                         // Only reply if we're "nearby"
                         //  *Note: IsNearbyStop simply returns true for this project;
@@ -109,32 +110,42 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
                     {
-                        //Route other = (Route)message.payload;
-                        Request_v[] requests = new Request_v[4];
-                        int[] requestIds = new int[4];
-                        IMessagePayload replyPayload;
+                        string[] messageComponents = msgString.Split();
+                        IList requestList = new ArrayList();
+                        int i = SBMessage.MessageHeader.Length;
+                        while (i < messageComponents.Length)
+                        {
+                            requestList.Add(new Request_v(messageComponents, ref i));
+                        }
+
+                        Request_v[] requests = new Request_v[requestList.Count];
+                        i = 0;
+                        while (requestList.Count > 0)
+                        {
+                            requests[i] = (Request_v)requestList[0];
+                            requestList.RemoveAt(0);
+                            i++;
+                        }
 
                         bus.UpdateServedRequests();
 
-                        Route other = new Route(requests);
+                        Route newRoute = new Route(requests);
+                        bool confirm = false;
 
-                        // I believe the only way we might end up with the else case here
-                        //  is if another stop has changed our route since this stop last
+                        // I believe the only way we this won't be true here is if
+                        //  another stop has changed our route since this stop last
                         //  received info about our route.
-                        if (bus.route.IsRequestSubsetOf(other))
+                        if (bus.route.IsRequestSubsetOf(newRoute))
                         {
                             // If this is an acceptable route to change to, 
-                            //  then set our route and notify the stop
-                            bus.route = other;
+                            //  then update our route
+                            bus.route = newRoute;
+                            confirm = true;
+                        }
 
-                            replyPayload = new PayloadRouteChangeAckResponse(true, bus.route);
-                        }
-                        else
-                        {
-                            // Else, reject the new route (keep our own), 
-                            //  and update the stop with our route
-                            replyPayload = new PayloadRouteChangeAckResponse(false, bus.route);
-                        }
+                        IMessagePayload replyPayload = new PayloadRouteChangeAckResponse(confirm, bus.route);
+
+                        // Notify the stop one way or the other about whether we accepted the new route
                         SBMessage reply = new SBMessage(
                             SBMessage.MessageType.ROUTE_CHANGE_ACK,
                             message.header.destination,
@@ -154,7 +165,7 @@ namespace Smart_Bus
             appId = driver.NetPort.GetID();
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
-            instance.myBus = new Smart_Bus.Bus(appId, 0, 0, 100000);
+            instance.myBus = new Bus(appId, 0, 0, 100000);
 
             Thread.Sleep(Timeout.Infinite);
         }

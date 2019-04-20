@@ -284,5 +284,11 @@ namespace Smart_Bus
             RouteStop other = (RouteStop)obj;
             return this.stopId == other.stopId && this.duration == other.duration && this.capDelta == other.capDelta;
         }
+
+        // Here just to rid myself of a warning
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

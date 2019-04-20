@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Microsoft.SPOT;
+using System.Text;
 
 namespace Smart_Bus
 {
@@ -20,16 +21,16 @@ namespace Smart_Bus
 
             this.requestSendTime = earliestPickupTime;
             this.origin = new Request_v(
-                requestId, 
-                earliestPickupTime, 
-                latestPickupTime, 
+                requestId,
+                earliestPickupTime,
+                latestPickupTime,
                 true,
-                originStop, 
+                originStop,
                 false);
             this.destination = new Request_v(
                 requestId,
-                earliestDeliveryTime, 
-                latestDeliveryTime, 
+                earliestDeliveryTime,
+                latestDeliveryTime,
                 false,
                 destStop,
                 false);
@@ -60,20 +61,8 @@ namespace Smart_Bus
             int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
 
             this.requestSendTime = earliestPickupTime;
-            this.origin = new Request_v(
-                requestId, 
-                earliestPickupTime, 
-                latestPickupTime,
-                true, 
-                originStop, 
-                false);
-            this.destination = new Request_v(
-                requestId, 
-                earliestDeliveryTime,
-                latestDeliveryTime, 
-                false,
-                destStop,
-                false);
+            this.origin = new Request_v(requestId, earliestPickupTime, latestPickupTime, true, originStop, false);
+            this.destination = new Request_v(requestId, earliestDeliveryTime, latestDeliveryTime, false, destStop, false);
         }
 
         public int CompareTo(object obj)
@@ -101,11 +90,20 @@ namespace Smart_Bus
 
         public string BuildPayload()
         {
-            throw new NotImplementedException();
+            // After the header, the array is organized as follows:
+            //  [earliestPickupTime, latestDeliveryTime, origin, destination]
+            // where the times are in ms since simulation start
+
+            StringBuilder payload = new StringBuilder();
+            payload.Append(this.origin.earliestServingTime.ToString() + " ");
+            payload.Append(this.destination.latestServingTime.ToString() + " ");
+            payload.Append(this.origin.stop.id.ToString() + " ");
+            payload.Append(this.destination.stop.id.ToString() + " ");
+            return payload.ToString();
         }
     }
 
-    public struct Request_v
+    public struct Request_v : IMessagePayload
     {
         public int requestId;
         public int earliestServingTime;
@@ -132,6 +130,18 @@ namespace Smart_Bus
             this.is_origin = (int.Parse(messageComponents[startIdx++]) != 0);
             this.stop = new BusStop(int.Parse(messageComponents[startIdx++]));
             this.served = (int.Parse(messageComponents[startIdx++]) != 0);
+        }
+
+        public string BuildPayload()
+        {
+            StringBuilder payload = new StringBuilder();
+            payload.Append(this.requestId.ToString() + " ");
+            payload.Append(this.earliestServingTime.ToString() + " ");
+            payload.Append(this.latestServingTime.ToString() + " ");
+            payload.Append(this.is_origin ? "1 " : "0 ");
+            payload.Append(this.stop.id);
+            payload.Append(this.served ? "1 " : "0 ");
+            return payload.ToString();
         }
     }
 }
