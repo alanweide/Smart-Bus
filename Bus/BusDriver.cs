@@ -116,7 +116,7 @@ namespace Smart_Bus
 
                         bus.UpdateServedRequests();
 
-                        Route other = new Route(requests, requestIds);
+                        Route other = new Route(requests);
 
                         // I believe the only way we might end up with the else case here
                         //  is if another stop has changed our route since this stop last

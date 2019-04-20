@@ -11,7 +11,7 @@ namespace Smart_Bus
         public Request_v destination;
         public bool delay;
 
-        public Request(int earliestPickupTime, int latestDeliveryTime, int origin, int destination)
+        public Request(int requestId, int earliestPickupTime, int latestDeliveryTime, int origin, int destination)
         {
             BusStop originStop = new BusStop(origin);
             BusStop destStop = new BusStop(destination);
@@ -19,8 +19,20 @@ namespace Smart_Bus
             int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
 
             this.requestSendTime = earliestPickupTime;
-            this.origin = new Request_v(earliestPickupTime, latestPickupTime, true, originStop, false);
-            this.destination = new Request_v(earliestDeliveryTime, latestDeliveryTime, false, destStop, false);
+            this.origin = new Request_v(
+                requestId, 
+                earliestPickupTime, 
+                latestPickupTime, 
+                true,
+                originStop, 
+                false);
+            this.destination = new Request_v(
+                requestId,
+                earliestDeliveryTime, 
+                latestDeliveryTime, 
+                false,
+                destStop,
+                false);
         }
 
         public Request(Request_v origin, Request_v destination)
@@ -36,6 +48,7 @@ namespace Smart_Bus
             //  [earliestPickupTime, latestDeliveryTime, origin, destination]
             // where the times are in ms since simulation start
 
+            int requestId = int.Parse(messageComponents[startIdx++]);
             int earliestPickupTime = int.Parse(messageComponents[startIdx++]);
             int latestDeliveryTime = int.Parse(messageComponents[startIdx++]);
             int originId = int.Parse(messageComponents[startIdx++]);
@@ -47,8 +60,20 @@ namespace Smart_Bus
             int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
 
             this.requestSendTime = earliestPickupTime;
-            this.origin = new Request_v(earliestPickupTime, latestPickupTime, true, originStop, false);
-            this.destination = new Request_v(earliestDeliveryTime, latestDeliveryTime, false, destStop, false);
+            this.origin = new Request_v(
+                requestId, 
+                earliestPickupTime, 
+                latestPickupTime,
+                true, 
+                originStop, 
+                false);
+            this.destination = new Request_v(
+                requestId, 
+                earliestDeliveryTime,
+                latestDeliveryTime, 
+                false,
+                destStop,
+                false);
         }
 
         public int CompareTo(object obj)
@@ -82,14 +107,16 @@ namespace Smart_Bus
 
     public struct Request_v
     {
+        public int requestId;
         public int earliestServingTime;
         public int latestServingTime;
         public bool is_origin;
         public BusStop stop;
         public bool served;
 
-        public Request_v(int earliestServingTime, int latestServingTime, bool is_origin, BusStop stop, bool served)
+        public Request_v(int id, int earliestServingTime, int latestServingTime, bool is_origin, BusStop stop, bool served)
         {
+            this.requestId = id;
             this.earliestServingTime = earliestServingTime;
             this.latestServingTime = latestServingTime;
             this.is_origin = is_origin;
@@ -99,6 +126,7 @@ namespace Smart_Bus
 
         public Request_v(string[] messageComponents, ref int startIdx)
         {
+            this.requestId = int.Parse(messageComponents[startIdx++]);
             this.earliestServingTime = int.Parse(messageComponents[startIdx++]);
             this.latestServingTime = int.Parse(messageComponents[startIdx++]);
             this.is_origin = (int.Parse(messageComponents[startIdx++]) != 0);

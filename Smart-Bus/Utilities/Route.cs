@@ -40,9 +40,8 @@ namespace Smart_Bus
             this.requests = new ArrayList();
         }
 
-        public Route(Request_v[] importantStops, int[] requestIds)
+        public Route(Request_v[] importantStops)
         {
-            Debug.Assert(importantStops.Length == requestIds.Length);
             Debug.Assert(importantStops.Length % 2 == 0);
             Debug.Assert(importantStops.Length > 0);
 
@@ -60,7 +59,7 @@ namespace Smart_Bus
                     if (thisStop.is_origin)
                     {
                         // This is the origin for a request, so add it to the "started" list
-                        startedRequests.Add(new RouteBuilderPair(thisStop, requestIds[i]));
+                        startedRequests.Add(new RouteBuilderPair(thisStop, thisStop.requestId));
                         prevStop.capDelta--;
                     }
                     else
@@ -74,7 +73,7 @@ namespace Smart_Bus
                         for (j = 0; j < startedRequests.Count; j++)
                         {
                             RouteBuilderPair pair = (RouteBuilderPair)startedRequests[i];
-                            if (pair.requestId == requestIds[i])
+                            if (pair.requestId == thisStop.requestId)
                             {
                                 origin = pair.origin;
                                 break;
@@ -108,7 +107,7 @@ namespace Smart_Bus
                     if (thisStop.is_origin)
                     {
                         // This is the origin, so add it to the "started" list
-                        startedRequests.Add(new RouteBuilderPair(thisStop, requestIds[i]));
+                        startedRequests.Add(new RouteBuilderPair(thisStop, thisStop.requestId));
                         newStop.capDelta--;
                     }
                     else
@@ -121,7 +120,7 @@ namespace Smart_Bus
                         for (j = 0; j < startedRequests.Count; j++)
                         {
                             RouteBuilderPair pair = (RouteBuilderPair)startedRequests[i];
-                            if (pair.requestId == requestIds[i])
+                            if (pair.requestId == thisStop.requestId)
                             {
                                 origin = pair.origin;
                                 break;
