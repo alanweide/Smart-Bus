@@ -109,8 +109,14 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
                     {
-                        Route other = (Route)message.payload;
+                        //Route other = (Route)message.payload;
+                        Request_v[] requests = new Request_v[4];
+                        int[] requestIds = new int[4];
                         IMessagePayload replyPayload;
+
+                        bus.UpdateServedRequests();
+
+                        Route other = new Route(requests, requestIds);
 
                         // I believe the only way we might end up with the else case here
                         //  is if another stop has changed our route since this stop last
@@ -120,7 +126,8 @@ namespace Smart_Bus
                             // If this is an acceptable route to change to, 
                             //  then set our route and notify the stop
                             bus.route = other;
-                            replyPayload = new PayloadRouteChangeAckResponse(true, other);
+
+                            replyPayload = new PayloadRouteChangeAckResponse(true, bus.route);
                         }
                         else
                         {

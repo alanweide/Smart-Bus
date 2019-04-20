@@ -8,7 +8,7 @@ namespace Smart_Bus
     {
         public static DateTime SimStart;
 
-        public int ElapsedMillis()
+        public static int ElapsedMillis()
         {
             TimeSpan elapsedTime = DateTime.Now - SimStart;
             return (int)elapsedTime.Milliseconds;

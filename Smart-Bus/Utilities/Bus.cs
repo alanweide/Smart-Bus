@@ -1,5 +1,6 @@
 using System;
 using Microsoft.SPOT;
+using System.Collections;
 
 namespace Smart_Bus
 {
@@ -89,6 +90,22 @@ namespace Smart_Bus
             //int stopsUntilEncounter = this.StopsUntilEncounter(stopId);
             //return 0 <= stopsUntilEncounter && stopsUntilEncounter < NearbyThreshold;
             return true;
+        }
+
+        // Updates this Bus's route information by marking requests as "served" if their latestServingTime has passed.
+        // This is imprecise (it might take a while for a request to be marked served after it was actually served),
+        // but it will never mark an unserved request as served, and it is relatively fast.
+        public void UpdateServedRequests()
+        {
+            IList temp = new ArrayList();
+            while (this.route.RequestCount > 0)
+            {
+                Request earliest = this.route.RemoveEarliestRequest();
+                earliest.origin.served = (Utilities.ElapsedMillis() > earliest.origin.latestServingTime);
+                earliest.destination.served = (Utilities.ElapsedMillis() > earliest.destination.latestServingTime);
+                temp.Add(earliest);
+            }
+            this.route.SetRequests(temp);
         }
     }
 }

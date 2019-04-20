@@ -23,6 +23,13 @@ namespace Smart_Bus
             this.destination = new Request_v(earliestDeliveryTime, latestDeliveryTime, false, destStop, false);
         }
 
+        public Request(Request_v origin, Request_v destination)
+        {
+            this.requestSendTime = origin.earliestServingTime;
+            this.origin = origin;
+            this.destination = destination;
+        }
+
         public Request(string[] messageComponents, ref int startIdx)
         {
             // After the header, the array is organized as follows:
