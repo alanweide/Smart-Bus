@@ -136,7 +136,20 @@ min\{\sum_{k\in B}{T_k} + \alpha\sum_{v\in V}{max\{0, t_v - l_v\}} + \beta\sum_{
 $T_k$ denotes the total travel time of bus k. The weights $\alpha$ and $\beta$ define the relative importance of the different components.
 
 \section{Algorithm}
+\subsection{Route Flexibility}
+Since the goal is to minimize the objective function, whenever assigning requests from passenger, a serving bus stop needs to compare a metric of buses to select the best bus leading to the minimized result of objective function. Thus, we define a metric, route flexibility, to evaluate the flexibility to accommodate a new request into the current route. Let $f_{k,v}$ denote the flexible time of  bus k at location v, which is defined by $l_v – t_v$. That is to say, if the arrival time tv is much smaller than the latest served time $l_v$, then the bus has the higher flexibility to accept more requests. Hence, to calculate the route flexibility, we use $F_k$ to denote the accumulated flexible time of service locations in $R_k$.
+
+\begin{equation}
+F_k = \sum_{v\in R_k}{f_v} + (l_0 - te_k)
+\end{equation}
+
+$l_0 - te_k$, the flexible time at terminus, decreases or stays the same whenever a new request is added to $R_k$. Note that $\sum_{k\in B}{F_k}$ is inversely proportional to objective function. Hence, objective function can be minimized if the total route flexibility is maximized during request assigning for each bus stop.
+\subsection{Route Information Sharing}
+When assigning requests, the serving bus stop must know the current route information of buses and their current capacity. For example, if bus k picked up a passenger at location v, then the number of service location in $R_k$ decreased and the capacity $c_k$ decreased as well. At that time, bus k should update the information to bus stops.
 \subsection{Request Assignment Algorithm}
+With the route information of buses, a bus stop is able to compare the route flexibility of different buses after inserting a request to their routes. However, when receiving a new request, instead of immediately assigning it to a bus, the serving bus stop will wait for a certain to determine which request should be served first and which bus is the best one to serve the request. This is because all requests are dynamically launched by passengers, bus stops do not know requests in advance until receiving them. To maximize the total flexibility as possible, bus stops should serve requests according to the urgency rather than the receiving order since we know an urgent request can harm the route flexibility if it is not immediately assigned to a bus. On the other hand, the request, with larger latest arrival time, can be reasonably delayed for a certain time because buses may need to reserve space for the potentially future urgent request.
+
+Let $\delta$ denote the urgent threshold. For a request i, if $LA_i - \delta$ is smaller than the current time, we can say it is an urgent request. For assigning urgent requests, a serving bus stop assign the request to the bus with maximal route flexibility after inserting the request. All other requests will not be assigned until all urgent requests have been dispatched to the matched buses. Furthermore, for non-urgent requests, if there exists a request with $p_i^+$ and $p_i^-$ matching the service locations in current route $R_k$ of bus k, the serving bus stop will prioritize the request to be served first. The flexible time at terminus $(l_0 – te_k)$ remains the same after inserting this request. Thus, the flexibility will not be harmed.
 
 \section{Implementation}
 This in-situ bus scheduling algorithm was implemented in C\# using the .NET Microframework. It makes use of the Samraksh Emulator to simulate a (potentially large) network of buses and bus stops, as well as a sequence of passenger requests.
