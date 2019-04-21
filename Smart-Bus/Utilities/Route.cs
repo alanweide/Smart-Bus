@@ -119,6 +119,10 @@ namespace Smart_Bus
 
         public String BuildPayload()
         {
+            if (this.importantStops.Count == 0)
+            {
+                return " ";
+            }
             StringBuilder payload = new StringBuilder();
             int numServed = this.NumServed;
             for (int i = 0; i < this.importantStops.Count; i++)

@@ -62,66 +62,75 @@ namespace Smart_Bus
             Debug.Print("Received message: " + msgString);
             SBMessage.MessageType msgType = message.header.type;
             Bus bus = BusDriver.getInstance().myBus;
-            switch (msgType)
+            
+            // Only handle the message if it is meant for us
+            SBMessage.MessageEndpoint msgDest = message.header.destination;
+            if (msgDest.endptType == SBMessage.MessageEndpoint.EndpointType.BROADCAST ||
+                (msgDest.endptType == SBMessage.MessageEndpoint.EndpointType.BUS &&
+                    msgDest.endptId == bus.id))
             {
-                case SBMessage.MessageType.START_SIMULATION:
-                    {
-                        BusDriver.SimStart = ((PayloadSimStart)message.payload).date;
-                        Utilities.SimStart = BusDriver.SimStart;
-                        break;
-                    }
-                case SBMessage.MessageType.ROUTE_INFO_REQUEST:
-                    {
-                        int stopId = message.header.source.endptId;
-
-                        // Only reply if we're "nearby"
-                        //  *Note: IsNearbyStop simply returns true for this project;
-                        //  this is a necessary simplification due to the deadline.
-                        // A real system would reply only if the stop is in our immediate
-                        //  future along the route; the stops themselves would employ BFS
-                        //  to find all buses. See the implementation for details.
-                        if (bus.IsNearbyStop(stopId))
+                switch (msgType)
+                {
+                    case SBMessage.MessageType.START_SIMULATION:
                         {
-                            // A bus stop is asking for route information
-                            // from "nearby" buses, and we're one of them
+                            PayloadSimStart startPayload = (PayloadSimStart)message.payload;
+                            BusDriver.SimStart = startPayload.date;
+                            Utilities.SimStart = BusDriver.SimStart;
+                            break;
+                        }
+                    case SBMessage.MessageType.ROUTE_INFO_REQUEST:
+                        {
+                            int stopId = message.header.source.endptId;
 
-                            IMessagePayload replyPayload = bus.route;
+                            // Only reply if we're "nearby"
+                            //  *Note: IsNearbyStop simply returns true for this project;
+                            //  this is a necessary simplification due to the deadline.
+                            // A real system would reply only if the stop is in our immediate
+                            //  future along the route; the stops themselves would employ BFS
+                            //  to find all buses. See the implementation for details.
+                            if (bus.IsNearbyStop(stopId))
+                            {
+                                // A bus stop is asking for route information
+                                // from "nearby" buses, and we're one of them
+
+                                IMessagePayload replyPayload = bus.route;
+                                SBMessage reply = new SBMessage(
+                                    SBMessage.MessageType.ROUTE_INFO_RESPONSE,
+                                    message.header.destination,
+                                    message.header.source,
+                                    replyPayload);
+                                reply.Broadcast(BusDriver.getInstance().NetPort);
+                            }
+                            break;
+                        }
+                    case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
+                        {
+                            Route newRoute = message.payload as Route;
+                            bool confirm = false;
+
+                            // I believe the only way we this won't be true here is if
+                            //  another stop has changed our route since this stop last
+                            //  received info about our route.
+                            if (bus.route.IsRequestSubsetOf(newRoute))
+                            {
+                                // If this is an acceptable route to change to, 
+                                //  then update our route
+                                bus.route = newRoute;
+                                confirm = true;
+                            }
+
+                            IMessagePayload replyPayload = new PayloadRouteChangeAckResponse(confirm, bus.route);
+
+                            // Notify the stop one way or the other about whether we accepted the new route
                             SBMessage reply = new SBMessage(
-                                SBMessage.MessageType.ROUTE_INFO_RESPONSE,
+                                SBMessage.MessageType.ROUTE_CHANGE_ACK,
                                 message.header.destination,
                                 message.header.source,
                                 replyPayload);
                             reply.Broadcast(BusDriver.getInstance().NetPort);
                         }
                         break;
-                    }
-                case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
-                    {
-                        Route newRoute = message.payload as Route;
-                        bool confirm = false;
-
-                        // I believe the only way we this won't be true here is if
-                        //  another stop has changed our route since this stop last
-                        //  received info about our route.
-                        if (bus.route.IsRequestSubsetOf(newRoute))
-                        {
-                            // If this is an acceptable route to change to, 
-                            //  then update our route
-                            bus.route = newRoute;
-                            confirm = true;
-                        }
-
-                        IMessagePayload replyPayload = new PayloadRouteChangeAckResponse(confirm, bus.route);
-
-                        // Notify the stop one way or the other about whether we accepted the new route
-                        SBMessage reply = new SBMessage(
-                            SBMessage.MessageType.ROUTE_CHANGE_ACK,
-                            message.header.destination,
-                            message.header.source,
-                            replyPayload);
-                        reply.Broadcast(BusDriver.getInstance().NetPort);
-                        break;
-                    }
+                } 
             }
         }
 

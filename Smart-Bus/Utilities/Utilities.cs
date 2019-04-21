@@ -31,8 +31,9 @@ namespace Smart_Bus
             //Debug.Print("Milliseconds btwn " + SimStart.ToString(Constants.DATE_TIME_FORMAT) + " to " + DateTime.Now.ToString(Constants.DATE_TIME_FORMAT) + ": " + ElapsedMillis());
             //Thread.Sleep(Timeout.Infinite);
 
-            SBMessage message = new SBMessage("11 1 -1 2 1 1 1000 15000 1 2 ");
-            Debug.Print(message.header.type.ToString());
+            SBMessage message = new SBMessage("30 0 0 2 1 ");
+            Route r = (Route)message.payload;
+            Debug.Print("<" + r.BuildPayload() + ">");
         }
 
         public static byte[] StringToByteArray(String s)

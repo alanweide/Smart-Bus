@@ -103,6 +103,7 @@ namespace Smart_Bus
 
         public SBMessage(string msgString)
         {
+            msgString = msgString.TrimEnd();
             string[] components = msgString.Split();
 
             int mTypeInt = int.Parse(components[0]);

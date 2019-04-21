@@ -122,7 +122,7 @@ namespace Smart_Bus
                     {
                         //Update the route info
                         Bus_info element = new Bus_info();
-                        element.busId = message.header.origin.endptId;
+                        element.busId = message.header.source.endptId;
 
                         Route payload = (Route)message.payload;
                         element.NumServed = payload.NumServed;
