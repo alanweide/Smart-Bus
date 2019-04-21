@@ -12,6 +12,7 @@ namespace Smart_Bus
         public int terminusLocation;
         public int busStartTime; //ts_k: expected start time at terminus 
         public int busEndTime; //te_k: expected end time terminus
+        public int NumServed;
         public Request_v[] routeInfo;
         public Request_v[] pending_routeInfo;
     }
@@ -19,7 +20,7 @@ namespace Smart_Bus
     public enum BusStop_State
     {
         REQUEST_NULL = 0,
-        REQUEST_WITHOUT_ROUTE_INFO = 1,
+        REQUEST_WAIT_FOR_ROUTE_INFO = 1,
         REQUEST_READY_TO_BE_ASSIGNED = 2,
         REQUEST_WAIT_FOR_TIMER = 3,
         REQUEST_ASSIGNED_AND_SENDING_TO_BUS = 4
@@ -34,12 +35,16 @@ namespace Smart_Bus
         public int pending_request_index;
         public const int urgencyThreshold = 300000; //5 minutes
         public DateTime SimStart;
+        public int numBuses;
+        public int num_route_info_rsp_rcvd;
 
         public BusStop(int id)
         {
             this.id = id;
             this.stop_state = BusStop_State.REQUEST_NULL;
             this.pending_request_index = -1;
+            this.numBuses = 0;
+            this.num_route_info_rsp_rcvd = 0;
         }
 
         public void Receive_request(Request new_request)
@@ -485,43 +490,43 @@ namespace Smart_Bus
             return true;
         }
 
-        /*
-        public void Update_busRoute(Bus_route element)
+
+        public void Update_busRoute(Bus_info element)
         {
             bool find_element = false;
 
-            if (this.routeInfo_list == null)
+            if (this.bus_list == null)
             {
                 //create a new element
-                routeInfo_list = new Bus_route[1];
-                routeInfo_list[0] = element;
+                bus_list = new Bus_info[1];
+                bus_list[0] = element;
 
                 return;
             }
 
-            for (int i = 0; i < this.routeInfo_list.Length; i++)
+            for (int i = 0; i < this.bus_list.Length; i++)
             {
-                if (routeInfo_list[i].busId == element.busId)
+                if (bus_list[i].busId == element.busId)
                 {
                     //find an existing element, update the route
-                    routeInfo_list[i].route = element.route;
+                    bus_list[i].routeInfo = element.routeInfo;
                     find_element = true;
                 }
             }
 
             if (find_element == false)
             {
-                //append the element from the end of routeInfo_list
-                Bus_route[] new_list = new Bus_route[routeInfo_list.Length + 1];
-                for (int i = 0; i < this.routeInfo_list.Length; i++)
+                //append the element from the end of bus_list
+                Bus_info[] new_list = new Bus_info[bus_list.Length + 1];
+                for (int i = 0; i < this.bus_list.Length; i++)
                 {
-                    new_list[i] = routeInfo_list[i];
+                    new_list[i] = bus_list[i];
                 }
-                new_list[routeInfo_list.Length] = element;
-                routeInfo_list = new_list;
+                new_list[bus_list.Length] = element;
+                bus_list = new_list;
             }
         }
-         * /
+
 
         /*
         public Bus[] Remove_busInfo(int index)
