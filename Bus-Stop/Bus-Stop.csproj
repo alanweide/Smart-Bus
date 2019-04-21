@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Smart_Bus.BusStopTest</StartupObject>
+    <StartupObject>Smart_Bus.BusStopDriver</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BusStopDriver.cs" />
