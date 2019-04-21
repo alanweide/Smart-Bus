@@ -43,19 +43,6 @@ namespace Smart_Bus
             return BusDriver.instance;
         }
 
-        //private static string BuildRouteReply(int stopId)
-        //{
-        //    StringBuilder msg = new StringBuilder();
-        //    msg.Append(appId.ToString() + " ");
-        //    Bus bus = getInstance().myBus;
-        //    msg.Append(bus.id.ToString() + " ");
-        //    for (int i = 0; i < bus.route.StopCount; i++)
-        //    {
-        //        msg.Append(bus.route[i].stop.id + "," + bus.route[i].duration + " ");
-        //    }
-        //    return msg.ToString();
-        //}
-
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
             // Received message from network
@@ -79,7 +66,7 @@ namespace Smart_Bus
             {
                 case SBMessage.MessageType.START_SIMULATION:
                     {
-                        BusDriver.SimStart = ((PayloadDateTime)message.payload).date;
+                        BusDriver.SimStart = ((PayloadSimStart)message.payload).date;
                         Utilities.SimStart = BusDriver.SimStart;
                         break;
                     }
@@ -146,7 +133,7 @@ namespace Smart_Bus
             appId = driver.NetPort.GetID();
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
-            instance.myBus = new Bus(appId, 0, 0, 100000);
+            instance.myBus = new Bus(appId);
 
             Thread.Sleep(Timeout.Infinite);
         }

@@ -112,7 +112,7 @@ namespace Smart_Bus
             {
                     // Message from Passenger
                 case MessageType.START_SIMULATION:
-                    this._payload = new PayloadDateTime(components, ref headLength);
+                    this._payload = new PayloadSimStart(components, ref headLength);
                     break;
                 case MessageType.SEND_PASSENGER_REQUEST:
                     this._payload = new Request(components, ref headLength);
@@ -152,7 +152,7 @@ namespace Smart_Bus
 
         public void Broadcast(NetInst NetPort)
         {
-            Debug.Print("Sending message " + this.ToString());
+            Debug.Print(DateTime.Now.ToString("HH:mm:ss.fff") + ": Sending message " + this.ToString());
             byte[] msgBytes = Utilities.StringToByteArray(this.ToString());
             NetPort.Broadcast(msgBytes, msgBytes.Length);
         }

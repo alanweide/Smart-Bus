@@ -61,7 +61,7 @@ namespace Smart_Bus
             return requests.Length - currentRequest;
         }
 
-        public Request getNextRequest()
+        public Request NextRequest()
         {
             currentRequest++;
             return requests[currentRequest - 1];

@@ -9,27 +9,32 @@ namespace Smart_Bus
     {
         IList importantStops;
 
+        // NumServed marks served requests as such, in addition to
+        //  computing the number of served requests.
         public int NumServed
         {
             get
             {
-                int simElapsedMillis = Utilities.ElapsedMillis();
+                int simElapsedMillis = Utilities.ElapsedSimulationMillis();
                 int computeTime = Bus.START_TIME;
                 int i = 0;
-                while (i < this.importantStops.Count && computeTime < simElapsedMillis)
+                int servedCount = 0;
+                while (i < this.importantStops.Count - 1 && computeTime < simElapsedMillis)
                 {
                     Request_v stop = this[i];
                     computeTime = System.Math.Max(computeTime, stop.earliestServingTime) + Constants.STOP_DURATION;
-                    if (i < this.importantStops.Count - 1 && computeTime < simElapsedMillis)
+                    if (computeTime < simElapsedMillis)
                     {
                         // We still haven't gotten to the last request we've served, 
                         //  so compute how long it will take to get to the next stop
+                        servedCount++;
+                        stop.served = true;
                         Request_v nextStop = this[i + 1];
                         computeTime += Utilities.TravelTime(stop.stop, nextStop.stop);
                     }
                     i++;
                 }
-                return i - 1;
+                return servedCount;
             }
         }
 
@@ -50,7 +55,14 @@ namespace Smart_Bus
 
         public Route(string[] messageComponents, ref int startIdx)
         {
-            throw new NotImplementedException();
+            this.importantStops = new ArrayList();
+            while (startIdx < messageComponents.Length)
+            {
+                Request_v stop = new Request_v(messageComponents, ref startIdx);
+                this.importantStops.Add(stop);
+            }
+
+            int foo = this.NumServed;
         }
 
         public Request_v this[int i]
@@ -64,10 +76,10 @@ namespace Smart_Bus
             this.importantStops.Insert(idx, stop);
         }
 
-        public Request_v RemoveStopAt(int idx)
+        public Request_v RemoveStopAt(int i)
         {
-            Request_v removed = this[idx];
-            this.importantStops.RemoveAt(idx);
+            Request_v removed = this[i];
+            this.importantStops.RemoveAt(i);
             return removed;
         }
 
@@ -88,7 +100,18 @@ namespace Smart_Bus
 
         public String BuildPayload()
         {
-            throw new NotImplementedException();
+            StringBuilder payload = new StringBuilder();
+            int numServed = this.NumServed;
+            for (int i = 0; i < this.importantStops.Count; i++)
+            {
+                Request_v stop = this[i];
+                if (i < numServed)
+                {
+                    stop.served = true;
+                }
+                payload.Append(stop.BuildPayload());
+            }
+            return payload.ToString();
         }
     }
 }

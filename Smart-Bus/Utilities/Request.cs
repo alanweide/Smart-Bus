@@ -160,5 +160,10 @@ namespace Smart_Bus
                 throw new ArgumentException("obj is not a Request");
             }
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

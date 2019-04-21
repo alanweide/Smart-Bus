@@ -20,7 +20,7 @@ namespace Smart_Bus
 
         public string BuildPayload()
         {
-            return this.str;
+            return this.str + " ";
         }
     }
 }
