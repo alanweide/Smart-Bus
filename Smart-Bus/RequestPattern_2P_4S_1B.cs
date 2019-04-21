@@ -9,8 +9,8 @@ namespace Smart_Bus
 
         private Request[] requests = 
         { 
-            new Request(1, 5 * 1000, 15 * 1000, 1, 3), 
-            new Request(2, 5 * 1000, 15 * 1000, 2, 3)
+            new Request(1, 5 * 60 * 1000, 15 * 60 * 1000, 1, 3), 
+            new Request(2, 5 * 60 * 1000, 15 * 60 * 1000, 1, 2)
         };
         
         private int currentRequest = 0;
