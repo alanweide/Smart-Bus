@@ -7,6 +7,7 @@ namespace Smart_Bus
 {
     public class Request : IComparable, IMessagePayload
     {
+        public int requestId;
         public int requestSendTime;
         public Request_v origin;
         public Request_v destination;
@@ -19,6 +20,7 @@ namespace Smart_Bus
             int latestPickupTime = latestDeliveryTime - Utilities.TravelTime(originStop, destStop);
             int earliestDeliveryTime = earliestPickupTime + Utilities.TravelTime(originStop, destStop);
 
+            this.requestId = requestId;
             this.requestSendTime = earliestPickupTime;
             this.origin = new Request_v(
                 requestId,
@@ -38,6 +40,9 @@ namespace Smart_Bus
 
         public Request(Request_v origin, Request_v destination)
         {
+            Debug.Assert(origin.requestId == destination.requestId);
+
+            this.requestId = origin.requestId;
             this.requestSendTime = origin.earliestServingTime;
             this.origin = origin;
             this.destination = destination;
@@ -87,6 +92,7 @@ namespace Smart_Bus
             // where the times are in ms since simulation start
 
             StringBuilder payload = new StringBuilder();
+            payload.Append(this.requestId.ToString() + " ");
             payload.Append(this.origin.earliestServingTime.ToString() + " ");
             payload.Append(this.destination.latestServingTime.ToString() + " ");
             payload.Append(this.origin.stop.id.ToString() + " ");

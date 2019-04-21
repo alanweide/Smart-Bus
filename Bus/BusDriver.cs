@@ -72,7 +72,7 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.ROUTE_INFO_REQUEST:
                     {
-                        int stopId = message.header.origin.endptId;
+                        int stopId = message.header.source.endptId;
 
                         // Only reply if we're "nearby"
                         //  *Note: IsNearbyStop simply returns true for this project;
@@ -89,7 +89,7 @@ namespace Smart_Bus
                             SBMessage reply = new SBMessage(
                                 SBMessage.MessageType.ROUTE_INFO_RESPONSE,
                                 message.header.destination,
-                                message.header.origin,
+                                message.header.source,
                                 replyPayload);
                             reply.Broadcast(BusDriver.getInstance().NetPort);
                         }
@@ -117,7 +117,7 @@ namespace Smart_Bus
                         SBMessage reply = new SBMessage(
                             SBMessage.MessageType.ROUTE_CHANGE_ACK,
                             message.header.destination,
-                            message.header.origin,
+                            message.header.source,
                             replyPayload);
                         reply.Broadcast(BusDriver.getInstance().NetPort);
                         break;

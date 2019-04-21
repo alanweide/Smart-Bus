@@ -25,11 +25,14 @@ namespace Smart_Bus
         {
             Debug.Print("Use this for simple testing of Utilities methods");
 
-            SimStart = DateTime.Now;
-            Debug.Print(SimStart.ToString(Constants.DATE_TIME_FORMAT));
-            Thread.Sleep(1500);
-            Debug.Print("Milliseconds btwn " + SimStart.ToString(Constants.DATE_TIME_FORMAT) + " to " + DateTime.Now.ToString(Constants.DATE_TIME_FORMAT) + ": " + ElapsedMillis());
-            Thread.Sleep(Timeout.Infinite);
+            //SimStart = DateTime.Now;
+            //Debug.Print(SimStart.ToString(Constants.DATE_TIME_FORMAT));
+            //Thread.Sleep(1500);
+            //Debug.Print("Milliseconds btwn " + SimStart.ToString(Constants.DATE_TIME_FORMAT) + " to " + DateTime.Now.ToString(Constants.DATE_TIME_FORMAT) + ": " + ElapsedMillis());
+            //Thread.Sleep(Timeout.Infinite);
+
+            SBMessage message = new SBMessage("11 1 -1 2 1 1 1000 15000 1 2 ");
+            Debug.Print(message.header.type.ToString());
         }
 
         public static byte[] StringToByteArray(String s)

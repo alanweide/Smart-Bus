@@ -47,19 +47,19 @@ namespace Smart_Bus
             public const int Length = 5;
 
             public MessageType type;
-            public MessageEndpoint origin;
+            public MessageEndpoint source;
             public MessageEndpoint destination;
 
-            public MessageHeader(MessageType type, MessageEndpoint origin, MessageEndpoint destination)
+            public MessageHeader(MessageType type, MessageEndpoint source, MessageEndpoint destination)
             {
                 this.type = type;
-                this.origin = origin;
+                this.source = source;
                 this.destination = destination;
             }
 
             public override string ToString()
             {
-                return type.ToString() + " " + origin.ToString() + " " + destination.ToString();
+                return type.ToString() + " " + source.ToString() + " " + destination.ToString();
             }
         }
 
@@ -104,9 +104,12 @@ namespace Smart_Bus
         public SBMessage(string msgString)
         {
             string[] components = msgString.Split();
-            MessageType msgType = (MessageType)int.Parse(components[1]);
+
+            int mTypeInt = int.Parse(components[0]);
+            MessageType msgType = (MessageType)int.Parse(components[0]);
             MessageEndpoint source = new MessageEndpoint(components[1], components[2]);
             MessageEndpoint destination = new MessageEndpoint(components[3], components[4]);
+            this._header = new MessageHeader(msgType, source, destination);
             int headLength = MessageHeader.Length;
             switch (msgType)
             {
