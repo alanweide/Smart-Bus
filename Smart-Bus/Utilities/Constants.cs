@@ -16,6 +16,7 @@ namespace Smart_Bus
         // DateTime format string for all messages
         public static string DATE_TIME_FORMAT = "yyyy'-'MM'-'dd'T'H':'mm':'ss.fff";
         public static char[] DATE_FORMAT_SEPARATORS = new char[] { '-', 'T', ':', '.' };
+        public static int BUS_START_TIME;
         public enum DateComponentPositions
         {
             YEAR = 0,

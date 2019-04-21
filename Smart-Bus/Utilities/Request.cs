@@ -16,8 +16,8 @@ namespace Smart_Bus
         {
             BusStop originStop = new BusStop(origin);
             BusStop destStop = new BusStop(destination);
-            int latestPickupTime = latestDeliveryTime - TravelTime(originStop, destStop);
-            int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
+            int latestPickupTime = latestDeliveryTime - Utilities.TravelTime(originStop, destStop);
+            int earliestDeliveryTime = earliestPickupTime + Utilities.TravelTime(originStop, destStop);
 
             this.requestSendTime = earliestPickupTime;
             this.origin = new Request_v(
@@ -57,8 +57,8 @@ namespace Smart_Bus
 
             BusStop originStop = new BusStop(originId);
             BusStop destStop = new BusStop(destinationId);
-            int latestPickupTime = latestDeliveryTime - TravelTime(originStop, destStop);
-            int earliestDeliveryTime = earliestPickupTime + TravelTime(originStop, destStop);
+            int latestPickupTime = latestDeliveryTime - Utilities.TravelTime(originStop, destStop);
+            int earliestDeliveryTime = earliestPickupTime + Utilities.TravelTime(originStop, destStop);
 
             this.requestSendTime = earliestPickupTime;
             this.origin = new Request_v(requestId, earliestPickupTime, latestPickupTime, true, originStop, false);
@@ -80,14 +80,6 @@ namespace Smart_Bus
             }
         }
 
-        public int TravelTime(BusStop origin, BusStop destination)
-        {
-            // travel time = hopcount * Constants.HOP_DURATION (ms)
-            // TODO: compute this from graph topology -- BFS?
-
-            return System.Math.Abs(origin.id - destination.id) * Constants.HOP_DURATION;
-        }
-
         public string BuildPayload()
         {
             // After the header, the array is organized as follows:
@@ -103,7 +95,7 @@ namespace Smart_Bus
         }
     }
 
-    public struct Request_v : IMessagePayload
+    public class Request_v : IMessagePayload
     {
         public int requestId;
         public int earliestServingTime;
@@ -111,6 +103,11 @@ namespace Smart_Bus
         public bool is_origin;
         public BusStop stop;
         public bool served;
+
+        public Request_v()
+        {
+
+        }
 
         public Request_v(int id, int earliestServingTime, int latestServingTime, bool is_origin, BusStop stop, bool served)
         {
@@ -142,6 +139,26 @@ namespace Smart_Bus
             payload.Append(this.stop.id);
             payload.Append(this.served ? "1 " : "0 ");
             return payload.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+
+            Request_v other = obj as Request_v;
+            if (other != null)
+            {
+                return
+                    this.requestId == other.requestId &&
+                    this.earliestServingTime == other.earliestServingTime &&
+                    this.latestServingTime == other.latestServingTime &&
+                    this.is_origin == other.is_origin &&
+                    this.stop == other.stop;
+            }
+            else
+            {
+                throw new ArgumentException("obj is not a Request");
+            }
         }
     }
 }

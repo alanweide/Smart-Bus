@@ -43,18 +43,18 @@ namespace Smart_Bus
             return BusDriver.instance;
         }
 
-        private static string BuildRouteReply(int stopId)
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.Append(appId.ToString() + " ");
-            Bus bus = getInstance().myBus;
-            msg.Append(bus.id.ToString() + " ");
-            for (int i = 0; i < bus.route.StopCount; i++)
-            {
-                msg.Append(bus.route[i].stopId + "," + bus.route[i].duration + " ");
-            }
-            return msg.ToString();
-        }
+        //private static string BuildRouteReply(int stopId)
+        //{
+        //    StringBuilder msg = new StringBuilder();
+        //    msg.Append(appId.ToString() + " ");
+        //    Bus bus = getInstance().myBus;
+        //    msg.Append(bus.id.ToString() + " ");
+        //    for (int i = 0; i < bus.route.StopCount; i++)
+        //    {
+        //        msg.Append(bus.route[i].stop.id + "," + bus.route[i].duration + " ");
+        //    }
+        //    return msg.ToString();
+        //}
 
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
@@ -110,26 +110,7 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.ROUTE_CHANGE_REQUEST:
                     {
-                        string[] messageComponents = msgString.Split();
-                        IList requestList = new ArrayList();
-                        int i = SBMessage.MessageHeader.Length;
-                        while (i < messageComponents.Length)
-                        {
-                            requestList.Add(new Request_v(messageComponents, ref i));
-                        }
-
-                        Request_v[] requests = new Request_v[requestList.Count];
-                        i = 0;
-                        while (requestList.Count > 0)
-                        {
-                            requests[i] = (Request_v)requestList[0];
-                            requestList.RemoveAt(0);
-                            i++;
-                        }
-
-                        bus.UpdateServedRequests();
-
-                        Route newRoute = new Route(requests);
+                        Route newRoute = message.payload as Route;
                         bool confirm = false;
 
                         // I believe the only way we this won't be true here is if

@@ -42,6 +42,15 @@ namespace Smart_Bus
             return s.ToString();
         }
 
+        public static int TravelTime(BusStop origin, BusStop destination)
+        {
+            // travel time = hopcount * Constants.HOP_DURATION (ms)
+            // TODO: compute this from graph topology -- BFS?
+
+            return System.Math.Abs(origin.id - destination.id) * Constants.HOP_DURATION;
+        }
+
+
         public static DateTime ParseDateTime(string payload)
         {
             // Unfortunately there are no built-in parsers for DateTime in the MicroFramework, so I made my own.
