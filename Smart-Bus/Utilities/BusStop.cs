@@ -362,7 +362,7 @@ namespace Smart_Bus
             {
                 Request_v[] routeInfo_tmp_o = Append_route(null, new_origin);
                 Request_v[] routeInfo_tmp_o_d = Append_route(routeInfo_tmp_o, new_destination);
-                bus_list[bus_index].routeInfo = routeInfo_tmp_o_d;
+                bus_list[bus_index].pending_routeInfo = routeInfo_tmp_o_d;
                 return;
             }
             else
@@ -390,7 +390,7 @@ namespace Smart_Bus
                         if (flex > max_flex)
                         {
                             max_flex = flex;
-                            bus_list[bus_index].routeInfo = routeInfo_tmp_o_d;
+                            bus_list[bus_index].pending_routeInfo = routeInfo_tmp_o_d;
                         }
                     }
                 }
@@ -411,7 +411,7 @@ namespace Smart_Bus
                                 if (flex > max_flex)
                                 {
                                     max_flex = flex;
-                                    bus_list[bus_index].routeInfo = routeInfo_tmp_o_d;
+                                    bus_list[bus_index].pending_routeInfo = routeInfo_tmp_o_d;
                                 }
                             }
                         }
