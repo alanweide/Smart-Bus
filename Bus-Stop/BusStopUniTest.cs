@@ -8,6 +8,7 @@ namespace Smart_Bus
 
         public static void Main(string[] args)
         {
+            /*
             Request[] requests = 
             { 
                 new Request(0, 10, 1, 5), 
@@ -45,7 +46,7 @@ namespace Smart_Bus
             //update bus1 info to stop1
             stop_1.update_receive(bus[1], true);
             stop_1.request_receive(requests[1], false);
-            
+            */
         }
     }
 }
