@@ -60,7 +60,7 @@ namespace Smart_Bus
 
             string msgString = Utilities.ByteArrayToString(msg);
             SBMessage message = new SBMessage(msgString);
-            Debug.Print("Received message of type " + message.header.type.ToString() + ": " + msgString);
+            Debug.Print("Received message: " + msgString);
             SBMessage.MessageType msgType = message.header.type;
             BusStop stop = BusStopDriver.getInstance().myBusStop;
 
@@ -81,11 +81,10 @@ namespace Smart_Bus
                     }
                 case SBMessage.MessageType.SEND_PASSENGER_REQUEST:
                     {
-
                         //Send ROUTE_INFO_REQUEST to buses while receiving a request but the stop does not have route info
                         SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, instance.myBusStop.id);
                         SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint();
-                        SBMessage m = new SBMessage(SBMessage.MessageType.ROUTE_INFO_REQUEST, origin, destination, null);
+                        SBMessage m = new SBMessage(SBMessage.MessageType.ROUTE_INFO_REQUEST, origin, destination, new PayloadSimpleString());
                         m.Broadcast(BusStopDriver.getInstance().NetPort);
 
                         switch (instance.myBusStop.stop_state)
@@ -123,7 +122,7 @@ namespace Smart_Bus
                     {
                         //Update the route info
                         Bus_info element = new Bus_info();
-                        element.busId = message.header.source.endptId;
+                        element.busId = message.header.origin.endptId;
 
                         Route payload = (Route)message.payload;
                         element.NumServed = payload.NumServed;
