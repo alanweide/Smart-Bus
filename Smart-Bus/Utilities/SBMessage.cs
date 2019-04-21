@@ -103,8 +103,8 @@ namespace Smart_Bus
 
         public SBMessage(string msgString)
         {
-            msgString = msgString.TrimEnd();
-            string[] components = msgString.Split();
+            Debug.Print("Received Message: " + msgString);
+            string[] components = msgString.TrimEnd().Split();
 
             int mTypeInt = int.Parse(components[0]);
             MessageType msgType = (MessageType)int.Parse(components[0]);

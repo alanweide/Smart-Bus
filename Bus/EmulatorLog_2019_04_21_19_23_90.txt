@@ -1,0 +1,439 @@
+19:23:36.419 :: CORE :: Starting Emulation...
+19:23:36.419 :: CORE :: /******Samraksh NETMF4.3 Emulator, verion 2.0******/
+19:23:36.429 :: MFAPP :: 
+TinyCLR (Build 4.3.1.0)
+
+
+19:23:36.429 :: MFAPP :: Starting...
+
+19:23:36.434 :: MFAPP :: Created EE.
+
+19:23:36.437 :: MFAPP :: Started Hardware.
+
+19:23:36.454 :: MFAPP :: Found debugger!
+
+19:23:36.460 :: NETWORK :: Trying to connect to Network hub...
+19:23:36.476 :: NETWORK :: Got Something from neworkhub of length: 4
+19:23:36.476 :: NETWORK :: 1 3 0 0 0
+19:23:36.476 :: CORE :: Sending to APP: 4
+19:23:36.479 :: NETWORK :: Success.
+19:23:36.479 :: CORE :: Found Emulator ADC port : Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+19:23:36.479 :: CORE :: Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+19:23:36.479 :: CORE :: I can write to ADC
+19:23:36.479 :: CORE :: Found Emulator USART port : Usart2
+19:23:36.479 :: CORE :: Microsoft.SPOT.Emulator.Sample.EmulatorSerialPort
+19:23:36.479 :: CORE :: I can write to Emulator Serial Port
+19:23:38.044 :: MFAPP ::    Assembly: Microsoft.SPOT.Hardware.SerialPort (4.3.1.0)   (548 RAM - 3608 ROM - 1697 METADATA)
+
+
+19:23:38.107 :: MFAPP ::    AssemblyRef    =        8 bytes (       2 elements)
+
+19:23:38.110 :: MFAPP ::    TypeRef        =      100 bytes (      25 elements)
+
+19:23:38.132 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+19:23:38.140 :: MFAPP ::    MethodRef      =       88 bytes (      22 elements)
+
+19:23:38.161 :: MFAPP ::    TypeDef        =       16 bytes (       2 elements)
+
+19:23:38.169 :: MFAPP ::    FieldDef       =       32 bytes (      16 elements)
+
+19:23:38.181 :: MFAPP ::    MethodDef      =      108 bytes (      54 elements)
+
+19:23:38.187 :: MFAPP :: 
+
+19:23:38.200 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.274 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+19:23:38.280 :: MFAPP ::    Resources       =        0 bytes (       0 elements)
+
+19:23:38.365 :: MFAPP ::    Resources Files =        0 bytes (       0 elements)
+
+19:23:38.371 :: MFAPP ::    Resources Data  =        0 bytes
+
+19:23:38.401 :: MFAPP ::    Strings         =      667 bytes
+
+19:23:38.404 :: MFAPP ::    Signatures      =      257 bytes
+
+19:23:38.406 :: MFAPP ::    ByteCode        =     1114 bytes
+
+19:23:38.408 :: MFAPP :: 
+
+
+19:23:38.409 :: MFAPP ::    Assembly: Microsoft.SPOT.Hardware (4.3.1.0)   (1996 RAM - 14288 ROM - 8587 METADATA)
+
+
+19:23:38.413 :: MFAPP ::    AssemblyRef    =        8 bytes (       2 elements)
+
+19:23:38.416 :: MFAPP ::    TypeRef        =      132 bytes (      33 elements)
+
+19:23:38.418 :: MFAPP ::    FieldRef       =       24 bytes (       6 elements)
+
+19:23:38.420 :: MFAPP ::    MethodRef      =      132 bytes (      33 elements)
+
+19:23:38.421 :: MFAPP ::    TypeDef        =      536 bytes (      67 elements)
+
+19:23:38.423 :: MFAPP ::    FieldDef       =      208 bytes (     104 elements)
+
+19:23:38.425 :: MFAPP ::    MethodDef      =      544 bytes (     272 elements)
+
+19:23:38.427 :: MFAPP :: 
+
+19:23:38.428 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.430 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+19:23:38.434 :: MFAPP ::    Resources       =        0 bytes (       0 elements)
+
+19:23:38.436 :: MFAPP ::    Resources Files =        0 bytes (       0 elements)
+
+19:23:38.438 :: MFAPP ::    Resources Data  =        0 bytes
+
+19:23:38.446 :: MFAPP ::    Strings         =     2061 bytes
+
+19:23:38.448 :: MFAPP ::    Signatures      =     1195 bytes
+
+19:23:38.452 :: MFAPP ::    ByteCode        =     3511 bytes
+
+19:23:38.459 :: MFAPP :: 
+
+
+19:23:38.463 :: MFAPP ::    Assembly: Microsoft.SPOT.Native (4.3.1.0)   (1248 RAM - 7468 ROM - 4862 METADATA)
+
+
+19:23:38.467 :: MFAPP ::    AssemblyRef    =        4 bytes (       1 elements)
+
+19:23:38.474 :: MFAPP ::    TypeRef        =       88 bytes (      22 elements)
+
+19:23:38.483 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+19:23:38.487 :: MFAPP ::    MethodRef      =       60 bytes (      15 elements)
+
+19:23:38.490 :: MFAPP ::    TypeDef        =      368 bytes (      46 elements)
+
+19:23:38.506 :: MFAPP ::    FieldDef       =      220 bytes (     110 elements)
+
+19:23:38.508 :: MFAPP ::    MethodDef      =      244 bytes (     122 elements)
+
+19:23:38.510 :: MFAPP :: 
+
+19:23:38.511 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.513 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+19:23:38.514 :: MFAPP ::    Resources       =       72 bytes (       9 elements)
+
+19:23:38.515 :: MFAPP ::    Resources Files =        8 bytes (       1 elements)
+
+19:23:38.516 :: MFAPP ::    Resources Data  =      747 bytes
+
+19:23:38.518 :: MFAPP ::    Strings         =     1099 bytes
+
+19:23:38.519 :: MFAPP ::    Signatures      =      618 bytes
+
+19:23:38.520 :: MFAPP ::    ByteCode        =      535 bytes
+
+19:23:38.521 :: MFAPP :: 
+
+
+19:23:38.522 :: MFAPP ::    Assembly: mscorlib (4.3.1.0)   (4344 RAM - 42076 ROM - 22412 METADATA)
+
+
+19:23:38.524 :: MFAPP ::    AssemblyRef    =        0 bytes (       0 elements)
+
+19:23:38.525 :: MFAPP ::    TypeRef        =        0 bytes (       0 elements)
+
+19:23:38.526 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+19:23:38.527 :: MFAPP ::    MethodRef      =        0 bytes (       0 elements)
+
+19:23:38.529 :: MFAPP ::    TypeDef        =     1160 bytes (     145 elements)
+
+19:23:38.530 :: MFAPP ::    FieldDef       =      300 bytes (     149 elements)
+
+19:23:38.532 :: MFAPP ::    MethodDef      =     1828 bytes (     914 elements)
+
+19:23:38.533 :: MFAPP :: 
+
+19:23:38.534 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.535 :: MFAPP ::    TypeSpec        =       16 bytes (       4 elements)
+
+19:23:38.583 :: MFAPP ::    Resources       =      232 bytes (      29 elements)
+
+19:23:38.586 :: MFAPP ::    Resources Files =       16 bytes (       2 elements)
+
+19:23:38.592 :: MFAPP ::    Resources Data  =      437 bytes
+
+19:23:38.594 :: MFAPP ::    Strings         =     2774 bytes
+
+19:23:38.596 :: MFAPP ::    Signatures      =     3100 bytes
+
+19:23:38.598 :: MFAPP ::    ByteCode        =    16043 bytes
+
+19:23:38.600 :: MFAPP :: 
+
+
+19:23:38.603 :: MFAPP ::    Assembly: Bus (1.0.0.0)   (472 RAM - 2440 ROM - 1017 METADATA)
+
+
+19:23:38.605 :: MFAPP ::    AssemblyRef    =       16 bytes (       4 elements)
+
+19:23:38.607 :: MFAPP ::    TypeRef        =      108 bytes (      27 elements)
+
+19:23:38.609 :: MFAPP ::    FieldRef       =       40 bytes (      10 elements)
+
+19:23:38.612 :: MFAPP ::    MethodRef      =      100 bytes (      25 elements)
+
+19:23:38.631 :: MFAPP ::    TypeDef        =       24 bytes (       3 elements)
+
+19:23:38.642 :: MFAPP ::    FieldDef       =       20 bytes (       9 elements)
+
+19:23:38.653 :: MFAPP ::    MethodDef      =       16 bytes (       8 elements)
+
+19:23:38.659 :: MFAPP :: 
+
+19:23:38.660 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.663 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+19:23:38.664 :: MFAPP ::    Resources       =       16 bytes (       2 elements)
+
+19:23:38.666 :: MFAPP ::    Resources Files =        8 bytes (       1 elements)
+
+19:23:38.669 :: MFAPP ::    Resources Data  =       13 bytes
+
+19:23:38.671 :: MFAPP ::    Strings         =      702 bytes
+
+19:23:38.675 :: MFAPP ::    Signatures      =      201 bytes
+
+19:23:38.687 :: MFAPP ::    ByteCode        =      534 bytes
+
+19:23:38.689 :: MFAPP :: 
+
+
+19:23:38.702 :: MFAPP ::    Assembly: Utilities_and_Classes (1.0.0.0)   (1032 RAM - 11572 ROM - 3773 METADATA)
+
+
+19:23:38.708 :: MFAPP ::    AssemblyRef    =       12 bytes (       3 elements)
+
+19:23:38.709 :: MFAPP ::    TypeRef        =      116 bytes (      29 elements)
+
+19:23:38.711 :: MFAPP ::    FieldRef       =        0 bytes (       0 elements)
+
+19:23:38.713 :: MFAPP ::    MethodRef      =      188 bytes (      47 elements)
+
+19:23:38.715 :: MFAPP ::    TypeDef        =      192 bytes (      24 elements)
+
+19:23:38.717 :: MFAPP ::    FieldDef       =      136 bytes (      67 elements)
+
+19:23:38.719 :: MFAPP ::    MethodDef      =      164 bytes (      81 elements)
+
+19:23:38.721 :: MFAPP :: 
+
+19:23:38.722 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.724 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+19:23:38.726 :: MFAPP ::    Resources       =       16 bytes (       2 elements)
+
+19:23:38.728 :: MFAPP ::    Resources Files =        8 bytes (       1 elements)
+
+19:23:38.729 :: MFAPP ::    Resources Data  =       13 bytes
+
+19:23:38.731 :: MFAPP ::    Strings         =     2106 bytes
+
+19:23:38.733 :: MFAPP ::    Signatures      =      721 bytes
+
+19:23:38.734 :: MFAPP ::    ByteCode        =     5505 bytes
+
+19:23:38.736 :: MFAPP :: 
+
+
+19:23:38.737 :: MFAPP ::    Assembly: Samraksh.SPOT.Emulator (4.3.0.0)   (552 RAM - 3952 ROM - 1546 METADATA)
+
+
+19:23:38.739 :: MFAPP ::    AssemblyRef    =       12 bytes (       3 elements)
+
+19:23:38.741 :: MFAPP ::    TypeRef        =       68 bytes (      17 elements)
+
+19:23:38.743 :: MFAPP ::    FieldRef       =        4 bytes (       1 elements)
+
+19:23:38.745 :: MFAPP ::    MethodRef      =      104 bytes (      26 elements)
+
+19:23:38.786 :: MFAPP ::    TypeDef        =       80 bytes (      10 elements)
+
+19:23:38.788 :: MFAPP ::    FieldDef       =       52 bytes (      25 elements)
+
+19:23:38.794 :: MFAPP ::    MethodDef      =       60 bytes (      29 elements)
+
+19:23:38.809 :: MFAPP :: 
+
+19:23:38.815 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.816 :: MFAPP ::    TypeSpec        =        0 bytes (       0 elements)
+
+19:23:38.817 :: MFAPP ::    Resources       =        0 bytes (       0 elements)
+
+19:23:38.819 :: MFAPP ::    Resources Files =        0 bytes (       0 elements)
+
+19:23:38.820 :: MFAPP ::    Resources Data  =        0 bytes
+
+19:23:38.822 :: MFAPP ::    Strings         =      806 bytes
+
+19:23:38.823 :: MFAPP ::    Signatures      =      254 bytes
+
+19:23:38.824 :: MFAPP ::    ByteCode        =     1472 bytes
+
+19:23:38.826 :: MFAPP :: 
+
+
+19:23:38.827 :: MFAPP :: Loading Deployment Assemblies.
+
+19:23:38.828 :: MFAPP :: ERROR: Could not find device for DEPLOYMENT usage
+
+19:23:38.829 :: MFAPP :: Resolving.
+
+19:23:38.831 :: MFAPP :: 
+Total: (8700 RAM - 85404 ROM - 43894 METADATA)
+
+
+19:23:38.834 :: MFAPP ::    AssemblyRef    =       60 bytes (      15 elements)
+
+19:23:38.836 :: MFAPP ::    TypeRef        =      612 bytes (     153 elements)
+
+19:23:38.837 :: MFAPP ::    FieldRef       =       68 bytes (      17 elements)
+
+19:23:38.838 :: MFAPP ::    MethodRef      =      672 bytes (     168 elements)
+
+19:23:38.840 :: MFAPP ::    TypeDef        =     2376 bytes (     297 elements)
+
+19:23:38.841 :: MFAPP ::    FieldDef       =      968 bytes (     480 elements)
+
+19:23:38.842 :: MFAPP ::    MethodDef      =     2964 bytes (    1480 elements)
+
+19:23:38.843 :: MFAPP :: 
+
+19:23:38.844 :: MFAPP ::    DebuggingInfo  =     1492 bytes
+
+19:23:38.845 :: MFAPP :: 
+
+19:23:38.846 :: MFAPP ::    Attributes      =        0 bytes (       0 elements)
+
+19:23:38.848 :: MFAPP ::    TypeSpec        =       16 bytes (       4 elements)
+
+19:23:38.888 :: MFAPP ::    Resources Files =      120 bytes (       5 elements)
+
+19:23:38.889 :: MFAPP ::    Resources       =      336 bytes (      42 elements)
+
+19:23:38.890 :: MFAPP ::    Resources Data  =     1210 bytes
+
+19:23:38.892 :: MFAPP ::    Strings         =    10215 bytes
+
+19:23:38.893 :: MFAPP ::    Signatures      =     6346 bytes
+
+19:23:38.894 :: MFAPP ::    ByteCode        =    28714 bytes
+
+19:23:38.895 :: MFAPP :: 
+
+
+19:23:38.896 :: MFAPP :: Ready.
+
+19:23:44.885 :: MFAPP :: Emulator gave me an ID of3
+
+19:23:45.006 :: MFAPP :: Successfully got ID from the Hub: 3
+
+19:25:30.938 :: NETWORK :: Got Something from neworkhub of length: 38
+19:25:30.940 :: NETWORK :: 1 49 48 32 49
+19:25:30.943 :: CORE :: Sending to APP: 38
+19:25:30.997 :: MFAPP :: Received message: 10 1 -1 0 0 2019-04-21T18:25:30.753 4 
+
+19:25:31.954 :: NETWORK :: Got Something from neworkhub of length: 29
+19:25:31.958 :: NETWORK :: 1 49 49 32 49
+19:25:31.961 :: CORE :: Sending to APP: 29
+19:25:31.996 :: MFAPP :: Received message: 11 1 -1 2 1 1 1000 11000 1 5 
+
+19:25:32.963 :: NETWORK :: Got Something from neworkhub of length: 157
+19:25:32.967 :: NETWORK :: 1 50 48 32 50
+19:25:32.970 :: CORE :: Sending to APP: 157
+19:25:33.005 :: MFAPP :: Received message: 20 2 1 0 0  11 1 -1 2 1 2 2000 12000 1 8 11 1 -1 2 1 3 3000 13000 1 2 11 1 -1 2 1 4 4000 14000 1 6 11 1 -1 2 
+19:25:33.039 :: MFAPP :: 1 5 5000 15000 1 5 
+
+19:25:33.054 :: MFAPP :: 18:25:33.051: Sending message 30 3 3 2 1 
+
+19:25:33.183 :: MFAPP :: Received message: 11 1 -1 2 1 6 6000 16000 1 4 
+
+19:25:33.204 :: PHYCOMM :: Writting bytes to hub: 11
+19:25:33.204 :: CORE :: Sent to model packet of length : 12
+19:25:33.973 :: NETWORK :: Got Something from neworkhub of length: 103
+19:25:33.976 :: NETWORK :: 1 49 49 32 49
+19:25:33.980 :: CORE :: Sending to APP: 103
+19:25:33.998 :: MFAPP :: Received message: 11 1 -1 2 1 7 7000 17000 1 2 11 1 -1 2 1 8 8000 18000 1 7 20 2 1 0 0  30 3 2 2 1 30 3 4 2 1 30 3 5 2 1 
+19:25:34.001 :: MFAPP :: 
+
+19:25:34.984 :: NETWORK :: Got Something from neworkhub of length: 12
+19:25:34.985 :: NETWORK :: 1 50 48 32 50
+19:25:34.987 :: CORE :: Sending to APP: 12
+19:25:35.005 :: MFAPP :: Received message: 20 2 1 0 0  
+
+19:25:35.016 :: MFAPP :: 18:25:35.010: Sending message 30 3 3 2 1 
+
+19:25:35.152 :: PHYCOMM :: Writting bytes to hub: 11
+19:25:35.152 :: CORE :: Sent to model packet of length : 12
+19:25:35.990 :: NETWORK :: Got Something from neworkhub of length: 33
+19:25:35.993 :: NETWORK :: 1 51 48 32 51
+19:25:35.996 :: CORE :: Sending to APP: 33
+19:25:36.015 :: MFAPP ::     #### Exception System.IndexOutOfRangeException - 0xa9000000 (3) ####
+
+19:25:36.018 :: MFAPP ::     #### Message: 
+
+19:25:36.019 :: MFAPP ::     #### Smart_Bus.Request_v::.ctor [IP: 0060] ####
+
+19:25:36.045 :: MFAPP ::     #### Smart_Bus.Route::.ctor [IP: 0015] ####
+
+19:25:36.080 :: MFAPP ::     #### Smart_Bus.SBMessage::.ctor [IP: 00c7] ####
+
+19:25:36.084 :: MFAPP ::     #### Smart_Bus.BusDriver::ReadNetworkPkt [IP: 000a] ####
+
+19:25:36.088 :: MFAPP ::     #### Samraksh.SPOT.Emulator.Network.NetInst::ReadEmulatorPkt [IP: 0057] ####
+
+19:40:31.378 :: NETWORK :: System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at SamrakshEmulator.PhysicalModelVirtCom.ReadHubAndPassToEmulator() in c:\Users\Kayla\Downloads\SamrakshEmulator\Release\Release_2_0\Src\Emulator\SamrakshEmulator\PhysicalModelVirtCom.cs:line 154
+19:40:32.404 :: NETWORK :: System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at SamrakshEmulator.PhysicalModelVirtCom.ReadHubAndPassToEmulator() in c:\Users\Kayla\Downloads\SamrakshEmulator\Release\Release_2_0\Src\Emulator\SamrakshEmulator\PhysicalModelVirtCom.cs:line 154
+19:40:33.408 :: NETWORK :: System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at SamrakshEmulator.PhysicalModelVirtCom.ReadHubAndPassToEmulator() in c:\Users\Kayla\Downloads\SamrakshEmulator\Release\Release_2_0\Src\Emulator\SamrakshEmulator\PhysicalModelVirtCom.cs:line 154
+19:40:34.440 :: NETWORK :: System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at SamrakshEmulator.PhysicalModelVirtCom.ReadHubAndPassToEmulator() in c:\Users\Kayla\Downloads\SamrakshEmulator\Release\Release_2_0\Src\Emulator\SamrakshEmulator\PhysicalModelVirtCom.cs:line 154
+19:40:35.482 :: NETWORK :: System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at SamrakshEmulator.PhysicalModelVirtCom.ReadHubAndPassToEmulator() in c:\Users\Kayla\Downloads\SamrakshEmulator\Release\Release_2_0\Src\Emulator\SamrakshEmulator\PhysicalModelVirtCom.cs:line 154
+19:40:36.597 :: NETWORK :: System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host. ---> System.Net.Sockets.SocketException: An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at SamrakshEmulator.PhysicalModelVirtCom.ReadHubAndPassToEmulator() in c:\Users\Kayla\Downloads\SamrakshEmulator\Release\Release_2_0\Src\Emulator\SamrakshEmulator\PhysicalModelVirtCom.cs:line 154
+19:40:37.451 :: CORE :: Emulation Ended
+19:40:37.461 :: MFAPP :: Done.
+

@@ -72,7 +72,7 @@ namespace Smart_Bus
         public static void Main()
         {
             RequestDriver driver = RequestDriver.getInstance();
-            driver.pattern = new RequestPattern_2P_2S_1B();
+            driver.pattern = new RequestPattern_1P_2S_1B();
             driver.NetPort.Init();
             Thread.Sleep(100);
             appId = driver.NetPort.GetID();
