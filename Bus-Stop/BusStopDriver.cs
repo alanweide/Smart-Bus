@@ -6,6 +6,8 @@ using Microsoft.SPOT.Hardware;
 using Microsoft.SPOT.Messaging;
 using System.IO.Ports;
 using Samraksh.SPOT.Emulator.Network;
+using System.Collections;
+
 
 namespace Smart_Bus
 {
@@ -45,13 +47,11 @@ namespace Smart_Bus
 
         private static void SendRouteChangeRequest(int bus_index)
         {
-            /*
             SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, instance.myBusStop.id);
             SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS, instance.myBusStop.bus_list[bus_index].busId);
-            IMessagePayload payload = instance.myBusStop.bus_list[bus_index].routeInfo;
+            IMessagePayload payload = new Route(instance.myBusStop.bus_list[bus_index].routeInfo);
             SBMessage message = new SBMessage(SBMessage.MessageType.ROUTE_CHANGE_REQUEST, origin, destination, payload);
             message.Broadcast(BusStopDriver.getInstance().NetPort);
-            */
 
         }
 
@@ -68,9 +68,15 @@ namespace Smart_Bus
             {
                 case SBMessage.MessageType.START_SIMULATION:
                     {
-                        BusStopDriver.SimStart = ((PayloadDateTime)message.payload).date;
+                        BusStopDriver.SimStart = ((PayloadSimStart)message.payload).date;
                         Utilities.SimStart = BusStopDriver.SimStart;
                         instance.myBusStop.SimStart = BusStopDriver.SimStart;
+
+                        //here we know the number of buses in the network, 
+                        //so we can know how many messages of ROUTE_INFO_RESPONSE the stop has to wait after sending ROUTE_INFO_REQUEST
+                        PayloadSimStart payload = (PayloadSimStart)message.payload;
+                        instance.myBusStop.numBuses = payload.numBuses;
+
                         break;
                     }
                 case SBMessage.MessageType.SEND_PASSENGER_REQUEST:
@@ -78,18 +84,24 @@ namespace Smart_Bus
                         switch (instance.myBusStop.stop_state)
                         {
                             case BusStop_State.REQUEST_NULL:
-                                instance.myBusStop.stop_state = BusStop_State.REQUEST_WITHOUT_ROUTE_INFO;
+                            case BusStop_State.REQUEST_READY_TO_BE_ASSIGNED:
+                                instance.myBusStop.stop_state = BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO;
 
+                                goto case BusStop_State.REQUEST_WAIT_FOR_TIMER;
+
+                            case BusStop_State.REQUEST_WAIT_FOR_TIMER:
                                 //Send ROUTE_INFO_REQUEST to buses while receiving a request but the stop does not have route info
                                 SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, instance.myBusStop.id);
                                 SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint();
                                 SBMessage m = new SBMessage(SBMessage.MessageType.ROUTE_INFO_REQUEST, origin, destination, null);
                                 message.Broadcast(BusStopDriver.getInstance().NetPort);
+
+                                //reset the counter for collecting ROUTE_INFO_RESPONSE
+                                instance.myBusStop.num_route_info_rsp_rcvd = 0;
+
                                 break;
-                            
-                            case BusStop_State.REQUEST_WITHOUT_ROUTE_INFO:
-                            case BusStop_State.REQUEST_READY_TO_BE_ASSIGNED:
-                            case BusStop_State.REQUEST_WAIT_FOR_TIMER:
+
+                            case BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO:
                             case BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS:
                                 //do nothing
                                 break;
@@ -106,22 +118,33 @@ namespace Smart_Bus
                 case SBMessage.MessageType.ROUTE_INFO_RESPONSE:
                     {
                         //Update the route info
-                        //Bus_info element;
-                        //element.busId = message.header.origin.endptId;
-                        //element.routeInfo = (Request_v[])message.payload;
+                        Bus_info element = new Bus_info();
+                        element.busId = message.header.origin.endptId;
 
-                        //instance.myBusStop.Update_busRoute(element);
+                        Route payload = (Route)message.payload;
+                        element.NumServed = payload.NumServed;
+                        element.routeInfo = payload.ToArray();
+                        element.busStartTime = Bus.START_TIME;
+                        element.busEndTime = Bus.END_TIME;
+                        element.terminusLocation = Bus.TERMINUS;
+
+                        instance.myBusStop.Update_busRoute(element);
 
                         switch (instance.myBusStop.stop_state)
                         {
-                            case BusStop_State.REQUEST_WITHOUT_ROUTE_INFO:
-                                instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
-                                //Start to assign request
-                                int bus_index = instance.myBusStop.Lookup_request();
-                                if (bus_index != -1)
+                            case BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO:
+                                instance.myBusStop.num_route_info_rsp_rcvd++;
+
+                                if (instance.myBusStop.num_route_info_rsp_rcvd == instance.myBusStop.numBuses)
                                 {
-                                    SendRouteChangeRequest(bus_index);
-                                    instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                    instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+                                    //Start to assign request
+                                    int bus_index = instance.myBusStop.Lookup_request();
+                                    if (bus_index != -1)
+                                    {
+                                        SendRouteChangeRequest(bus_index);
+                                        instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                    }
                                 }
                                 break;
 
@@ -181,7 +204,7 @@ namespace Smart_Bus
                                 break;
 
                             case BusStop_State.REQUEST_NULL:
-                            case BusStop_State.REQUEST_WITHOUT_ROUTE_INFO:
+                            case BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO:
                             case BusStop_State.REQUEST_WAIT_FOR_TIMER:
                             case BusStop_State.REQUEST_READY_TO_BE_ASSIGNED:
                                 //do nothing
