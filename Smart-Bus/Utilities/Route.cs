@@ -53,6 +53,15 @@ namespace Smart_Bus
             this.importantStops.Add(terminusEnd);
         }
 
+        public Route(Request_v[] arr)
+        {
+            this.importantStops = new ArrayList();
+            foreach(Request_v stop in arr)
+            {
+                this.importantStops.Add(stop);
+            }
+        }
+
         public Route(string[] messageComponents, ref int startIdx)
         {
             this.importantStops = new ArrayList();
@@ -69,6 +78,16 @@ namespace Smart_Bus
         {
             get { return (Request_v)this.importantStops[i]; }
             set { this.importantStops[i] = value; }
+        }
+
+        public Request_v[] ToArray()
+        {
+            Request_v[] arr = new Request_v[this.importantStops.Count];
+            for (int i = 0; i < this.importantStops.Count; i++)
+            {
+                arr[i] = this[i];
+            }
+            return arr;
         }
 
         public void InsertStop(int idx, Request_v stop)
