@@ -119,10 +119,6 @@ namespace Smart_Bus
 
         public String BuildPayload()
         {
-            if (this.importantStops.Count == 0)
-            {
-                return " ";
-            }
             StringBuilder payload = new StringBuilder();
             int numServed = this.NumServed;
             for (int i = 0; i < this.importantStops.Count; i++)
@@ -135,6 +131,26 @@ namespace Smart_Bus
                 payload.Append(stop.BuildPayload());
             }
             return payload.ToString();
+        }
+
+        internal int CurrentCapacity()
+        {
+            int elapsedSimulationMillis = Utilities.ElapsedSimulationMillis();
+            int currCap = Bus.CAPACITY;
+            int numServed = this.NumServed;
+            for (int i = 0; i < numServed; i++)
+            {
+                Request_v stop = this[i];
+                if (stop.is_origin)
+                {
+                    currCap--;
+                }
+                else
+                {
+                    currCap++;
+                }
+            }
+            return currCap;
         }
     }
 }

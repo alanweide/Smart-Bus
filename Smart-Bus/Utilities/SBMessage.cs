@@ -158,6 +158,7 @@ namespace Smart_Bus
         {
             Debug.Print(DateTime.Now.ToString("HH:mm:ss.fff") + ": Sending message " + this.ToString());
             byte[] msgBytes = Utilities.StringToByteArray(this.ToString());
+            Thread.Sleep(100);
             NetPort.Broadcast(msgBytes, msgBytes.Length);
         }
     }

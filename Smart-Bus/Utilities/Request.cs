@@ -142,7 +142,7 @@ namespace Smart_Bus
             payload.Append(this.earliestServingTime.ToString() + " ");
             payload.Append(this.latestServingTime.ToString() + " ");
             payload.Append(this.is_origin ? "1 " : "0 ");
-            payload.Append(this.stop.id);
+            payload.Append(this.stop.id.ToString() + " ");
             payload.Append(this.served ? "1 " : "0 ");
             return payload.ToString();
         }

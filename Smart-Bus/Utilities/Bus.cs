@@ -38,5 +38,10 @@ namespace Smart_Bus
             //return 0 <= stopsUntilEncounter && stopsUntilEncounter < NearbyThreshold;
             return true;
         }
+
+        public bool HasCapacityNow()
+        {
+            return this.route.CurrentCapacity() > 0;
+        }
     }
 }

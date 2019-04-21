@@ -42,7 +42,7 @@
     <Compile Include="RequestPattern_4P_4S_2B.cs" />
     <Compile Include="RequestPattern_8P_2S_2B.cs" />
     <Compile Include="RequestPattern_4P_2S_2B.cs" />
-    <Compile Include="RequestPattern_2P_2S_2B.cs" />
+    <Compile Include="RequestPattern_2P_2S_1B.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

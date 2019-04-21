@@ -4,20 +4,20 @@ using Smart_Bus;
 
 namespace Smart_Bus
 {
-    class RequestPattern_2P_2S_2B: IRequestPattern
+    class RequestPattern_2P_2S_1B: IRequestPattern
     {
 
         private Request[] requests = 
         { 
-            new Request(1, 5 * 1000, 15 * 1000, 1, 2), 
-            new Request(2, 10 * 1000, 20 * 1000, 2, 1)
+            new Request(1, 5 * 1000, 25 * 1000, 1, 2), 
+            new Request(2, 10 * 1000, 30 * 1000, 1, 2)
         };
         
         private int currentRequest = 0;
         private int numStops = 2;
-        private int numBuses = 2;
+        private int numBuses = 1;
 
-        public RequestPattern_2P_2S_2B()
+        public RequestPattern_2P_2S_1B()
         {
             // Sort the requests array in order of earliestServingTime on startup
             // This is in-place selection sort so it's inefficient, but there 

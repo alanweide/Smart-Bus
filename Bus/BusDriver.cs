@@ -27,6 +27,7 @@ namespace Smart_Bus
 
         private static UInt16 appId;
         private static DateTime SimStart;
+        private SBMessage.MessageEndpoint messageSource;
 
         private BusDriver()
         {
@@ -96,7 +97,7 @@ namespace Smart_Bus
                                 IMessagePayload replyPayload = bus.route;
                                 SBMessage reply = new SBMessage(
                                     SBMessage.MessageType.ROUTE_INFO_RESPONSE,
-                                    message.header.destination,
+                                    BusDriver.getInstance().messageSource,
                                     message.header.source,
                                     replyPayload);
                                 reply.Broadcast(BusDriver.getInstance().NetPort);
@@ -111,7 +112,7 @@ namespace Smart_Bus
                             // I believe the only way we this won't be true here is if
                             //  another stop has changed our route since this stop last
                             //  received info about our route.
-                            if (bus.route.IsRequestSubsetOf(newRoute))
+                            if (bus.HasCapacityNow())
                             {
                                 // If this is an acceptable route to change to, 
                                 //  then update our route
@@ -121,10 +122,12 @@ namespace Smart_Bus
 
                             IMessagePayload replyPayload = new PayloadRouteChangeAckResponse(confirm, bus.route);
 
+                            Debug.Print("Acknowledging ROUTE_CHANGE_REQUEST with " + confirm.ToString());
+
                             // Notify the stop one way or the other about whether we accepted the new route
                             SBMessage reply = new SBMessage(
                                 SBMessage.MessageType.ROUTE_CHANGE_ACK,
-                                message.header.destination,
+                                BusDriver.getInstance().messageSource,
                                 message.header.source,
                                 replyPayload);
                             reply.Broadcast(BusDriver.getInstance().NetPort);
@@ -143,6 +146,7 @@ namespace Smart_Bus
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
             instance.myBus = new Bus(appId);
+            instance.messageSource = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS, appId);
 
             Thread.Sleep(Timeout.Infinite);
         }

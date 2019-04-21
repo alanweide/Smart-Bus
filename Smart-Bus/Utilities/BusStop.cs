@@ -583,6 +583,7 @@ namespace Smart_Bus
             if (this.request_list.Length == 1 && index == 0)
             {
                 request_list = null;
+                return;
             }
 
             Request[] new_list = new Request[this.request_list.Length - 1];
