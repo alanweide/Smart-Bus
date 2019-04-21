@@ -42,12 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Graphics" />
-    <Reference Include="Microsoft.SPOT.Hardware" />
     <Reference Include="Microsoft.SPOT.Native" />
-    <Reference Include="Samraksh.SPOT.Emulator, Version=4.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Visual Studio 2013\Projects\6333 HW2\EmuPingPong\bin\Debug\Samraksh.SPOT.Emulator.dll</HintPath>
-    </Reference>
+    <Reference Include="System.IO" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

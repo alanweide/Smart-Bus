@@ -9,14 +9,14 @@ namespace Smart_Bus
 
         private Request[] requests = 
         {
-            new Request(1, 1 * 1000, 12 * 1000, 0, 1), 
-            new Request(2, 2 * 1000, 13 * 1000, 1, 0),
-            new Request(3, 3 * 1000, 14 * 1000, 0, 1), 
-            new Request(4, 4 * 1000, 15 * 1000, 1, 0),
-            new Request(5, 1 * 1000, 11 * 1000, 0, 1), 
-            new Request(6, 2 * 1000, 12 * 1000, 1, 0),
-            new Request(7, 3 * 1000, 13 * 1000, 0, 1), 
-            new Request(8, 4 * 1000, 14 * 1000, 1, 0) 
+            new Request(1, 1 * 1000, 12 * 1000, 1, 2), 
+            new Request(2, 2 * 1000, 13 * 1000, 2 ,1),
+            new Request(3, 3 * 1000, 14 * 1000, 1, 2), 
+            new Request(4, 4 * 1000, 15 * 1000, 2, 1),
+            new Request(5, 1 * 1000, 11 * 1000, 2, 1), 
+            new Request(6, 2 * 1000, 12 * 1000, 1, 2),
+            new Request(7, 3 * 1000, 13 * 1000, 2, 1), 
+            new Request(8, 4 * 1000, 14 * 1000, 1, 2) 
         };
         
         private int currentRequest = 0;

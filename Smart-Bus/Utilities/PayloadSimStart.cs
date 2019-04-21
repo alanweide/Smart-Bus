@@ -6,7 +6,7 @@ namespace Smart_Bus
     public class PayloadSimStart : IMessagePayload
     {
         public DateTime date;
-        public int numBuses;
+        int numBuses;
 
         public PayloadSimStart(DateTime date, int numBuses)
         {
