@@ -46,11 +46,11 @@ namespace Smart_Bus
         public Route()
         {
             this.importantStops = new ArrayList();
-            BusStop terminusStop = new BusStop(Bus.TERMINUS);
-            Request_v terminusStart = new Request_v(-1, Bus.START_TIME, Bus.START_TIME, true, terminusStop, false);
-            Request_v terminusEnd = new Request_v(-1, Bus.END_TIME, Bus.END_TIME, false, terminusStop, false);
-            this.importantStops.Add(terminusStart);
-            this.importantStops.Add(terminusEnd);
+            //BusStop terminusStop = new BusStop(Bus.TERMINUS);
+            //Request_v terminusStart = new Request_v(-1, Bus.START_TIME, Bus.END_TIME, true, terminusStop, false);
+            //Request_v terminusEnd = new Request_v(-1, Bus.START_TIME, Bus.END_TIME, false, terminusStop, false);
+            //this.importantStops.Add(terminusStart);
+            //this.importantStops.Add(terminusEnd);
         }
 
         public Route(Request_v[] arr)
