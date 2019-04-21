@@ -5,9 +5,9 @@ namespace Smart_Bus
 {
     public class Constants
     {
-        // Every hop between bus stops is constant; for this demo, it takes 10 simulated seconds
-        public static readonly int HOP_DURATION = 10 * 1000;
-        public static readonly int STOP_DURATION = 2 * 1000;
+        // Every hop between bus stops is constant; for this demo, it takes 3 simulated minutes
+        public static readonly int HOP_DURATION = 3 * 60 * 1000;
+        public static readonly int STOP_DURATION = 30 * 1000;
 
         // 1 is Real Time (i.e., one second of wall time per second of simulation time)
         // Suggested values are on the order of 100 (every 10 milliseconds of wall time is one second of simulation time)
