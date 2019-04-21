@@ -192,7 +192,7 @@ namespace Smart_Bus
                     Debug.Print("Assign the request to bus: " + matched_bus_index);
                     
                     //assign the request to the mateched available bus
-                    route_reschedule(bus_list[matched_bus_index], bus_list[matched_bus_index].routeInfo, request);
+                    insert_request_to_route(bus_list[matched_bus_index], matched_bus_index, bus_list[matched_bus_index].routeInfo, request);
                     bus_list[matched_bus_index].routeInfo = bus_list[matched_bus_index].pending_routeInfo;
 
                     return matched_bus_index;
@@ -337,7 +337,7 @@ namespace Smart_Bus
             return max_flex;
         }
 
-        public void insert_request_to_route(Bus_info bus, Request_v[] routeInfo, Request new_request)
+        public void insert_request_to_route(Bus_info bus, int bus_index, Request_v[] routeInfo, Request new_request)
         {
             Request_v[] routeInfo_tmp;
 
@@ -362,7 +362,7 @@ namespace Smart_Bus
             {
                 Request_v[] routeInfo_tmp_o = Append_route(null, new_origin);
                 Request_v[] routeInfo_tmp_o_d = Append_route(routeInfo_tmp_o, new_destination);
-                bus.pending_routeInfo = routeInfo_tmp_o_d;
+                bus_list[bus_index].routeInfo = routeInfo_tmp_o_d;
                 return;
             }
             else
@@ -390,7 +390,7 @@ namespace Smart_Bus
                         if (flex > max_flex)
                         {
                             max_flex = flex;
-                            bus.pending_routeInfo = routeInfo_tmp_o_d;
+                            bus_list[bus_index].routeInfo = routeInfo_tmp_o_d;
                         }
                     }
                 }
@@ -411,7 +411,7 @@ namespace Smart_Bus
                                 if (flex > max_flex)
                                 {
                                     max_flex = flex;
-                                    bus.pending_routeInfo = routeInfo_tmp_o_d;
+                                    bus_list[bus_index].routeInfo = routeInfo_tmp_o_d;
                                 }
                             }
                         }
@@ -460,11 +460,6 @@ namespace Smart_Bus
             Debug.Print("Flexibility: " +F);
             */
             return F;
-        }
-
-        public int travel_time(int origin, int destination)
-        {
-            return 0;
         }
 
         public bool bus_capacity_check(Request_v[] routeInfo, int capacity)
