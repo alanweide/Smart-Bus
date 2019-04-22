@@ -33,6 +33,8 @@
 \usepackage{epsfig}
 \usepackage{pdflscape}
 
+\usepackage{hyperref}
+
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e}
 
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
@@ -85,23 +87,6 @@
 \renewcommand\thelstlisting{\arabic{lstlisting}}
 
 % Sections
-% \section{Assignment Description}
-% Your final project report should include:
-% \begin{itemize}
-% 	\item A write-up describing
-% 	\begin{itemize}
-% 		\item The design rationale of the module(s) you developed, along with the algorithm you have designed/used and a detailed API
-% 		\item Instructions and illustration of use, in terms of a README file and/or user guide,
-% 		\item How your implementation has been tested,
-% 		\item Performance of your implementation,
-% 		\item Assumptions or limitations of your design,
-% 		\item Any omissions or errors in your implementation, and
-% 		\item Any bugs or weaknesses you have found in the algorithm/protocol. (Only if some of these do not apply to your project should you omit them.)
-% 	\end{itemize}
-% 	\item Program sources and executable (including any test programs). Credit will be reserved for the quality of documentation of your programs.
-% 	\item Script of a session showing the program under test.
-% \end{itemize}
-
 \section{Introduction}
 Internet of Things (IoT) has been an innovative technology connecting heterogeneous devices to form a practical network for facilitation of human work. In IoT, mobile ad‐hoc network (MANET) is a key point to give the greater mobility for users and reduce deployment costs of the network. Typically, Wi-Fi and IEEE 802.15.4 are the popular communication technologies for different application requirements. Wi-Fi technique provides good throughput in wireless communication but limited transmission range. On the other hand, although IEEE 802.15.4 supports low data rate with available range of dozens of meters, it has the property of low cost and low power consumption. However, there are applications requiring data traffic routing in a wide area of a few kilometers. For example, in fleeting tracking system, each car is regarded as a mobile node in a MANET. The average hop distance between two adjacent nodes could be in kilometers. Thus, it is infeasible to adopt Wi-Fi or IEEE 802.15.4 techniques to guarantee the connectivity of network in such application. Thus, several transmission technologies have been introduced to satisfy the requirement of long transmission range. Low-Power Wide-Area Network (LPWAN) is a type of wireless telecommunication wide area network designed to allow long range communications at a low bit rate among connected objects with battery power. Like Long-Range (LoRa) technology, it is a LPWAN specification intended for wireless battery-operated objects and suitable for these applications.
 
@@ -279,9 +264,13 @@ Adapting to the real time passenger requests, the dynamic route scheduling probl
 
 Our implementation aims to demonstrate the generation of request as passengers at different locations launch request at different time, the process of assigning requests from bus stops to the matched buses, and the route information updating for buses to sharing the current route and served passenger information to necessary bus stop. The Samraksh Emulator is feasible to implement the relevant features and easy to show all passenger, bus, and bus stop activities within a short time. The implementation is composed by three different kinds of nodes, request driver, bus driver, and bus stop driver, which simulate how passenger requests are served and how bus routes are optimized by maximizing the route flexibility in a smart bus system.
 
-The simulation results show that the bus scheduling algorithm acts with less bus travel time and less lateness over service locations compared to the scenario of the traditional fixed route buses. Also, the simulated system can resolve the problem of inconsistency. (For example, a request is served by more than one buses.) Last but not the least, we encounter some message errors when increasing the number of bus stops. The system might stop since one of the bus stops received an unexpected message from network. Otherwise, the functionalities of request driver, bus driver, and bus stop driver work well with different scenario combinations.
+The simulation results show that the bus scheduling algorithm acts with less bus travel time and less lateness over service locations compared to the scenario of the traditional fixed route buses. Also, the simulated system can resolve the problem of redundancy. (For example, a request is served by more than one buses.) Last but not the least, we encounter some message errors when increasing the number of bus stops. The system might stop since one of the bus stops received an unexpected message from network. Otherwise, the functionalities of request driver, bus driver, and bus stop driver work well with different scenario combinations.
 
-% \bibliographystyle{abbrv}
-% \bibliography{merged-bibliography,siv-bibliography,bibliography_3,bibliography_lastminute,Xiong2017Abstract} % ,weide-bibliography}
+\newpage
+\appendix
+\section{Source Code}
+The source code (including the \LaTeX\ source for this report) is available at \url{https://github.com/alanweide/Smart-Bus.git}. If there is any trouble accessing the Git repository, please contact Alan Weide (\href{mailto:weide.3@osu.edu}{weide.3@osu.edu}).
+
+This project was implemented in C\# using the \href{https://marketplace.visualstudio.com/items?itemName=SteveMaillet.NETMicroFrameworkSDK43QFE2}{.NET Microframework 4.3 (QEF2)}. The easiest way to navigate the project is to use \href{https://visualstudio.microsoft.com/vs/older-downloads/}{Visual Studio 2013}. To run the program, you must have the \href{https://www.dropbox.com/sh/dtcgec1pe3mpkim/AAC318cuhoLaw4AtoL7dYDmYa?dl=0}{Samraksh Emulator} installed and registered.
 
 \end{document}
