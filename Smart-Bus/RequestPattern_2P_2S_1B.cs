@@ -4,13 +4,14 @@ using Smart_Bus;
 
 namespace Smart_Bus
 {
-    class RequestPattern_2P_2S_1B: IRequestPattern
+    // Request Pattern with 2 passenger, 2 stops, and 1 bus
+    class RequestPattern_2P_2S_1B : IRequestPattern
     {
 
         private Request[] requests = 
         { 
-            new Request(1, 1 * 60 * 1000, 25 * 60 * 1000, 1, 2), 
-            new Request(2, 1 * 60 * 1000, 30 * 60 * 1000, 1, 2)
+            new Request(1, 5 * 60 * 1000, 12 * 60 * 1000, 1, 2), 
+            new Request(2, 10 * 60 * 1000, 17 * 60 * 1000, 2, 1)
         };
         
         private int currentRequest = 0;

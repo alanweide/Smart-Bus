@@ -3,6 +3,7 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
+    // The payload class for ROUTE_CHANGE_ACK messages
     public class PayloadRouteChangeAckResponse: IMessagePayload
     {
         public bool didAcceptRouteChange;

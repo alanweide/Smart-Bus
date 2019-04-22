@@ -13,6 +13,9 @@ namespace Smart_Bus
         //  PayloadSimpleString
         //  PayloadRouteRequestForward
         //  PayloadRouteChangeAckResponse
+        // This interface provides a way to store (semi)arbitrary
+        //  data types in a message, and to standardize message
+        //  formats without specifying it explicitly.
 
         string BuildPayload();
     }

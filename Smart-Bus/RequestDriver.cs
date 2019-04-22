@@ -11,12 +11,6 @@ namespace Smart_Bus
 {
     public class RequestDriver
     {
-
-        private static int GetRealSendTime(int simulationMillis)
-        {
-            return simulationMillis / Constants.TIME_MULTIPLIER;
-        }
-
         private static RequestDriver instance;
 
         NetInst NetPort;
@@ -33,8 +27,11 @@ namespace Smart_Bus
 
         private static void BuildAndSendStartSimBroadcast(DateTime startTime)
         {
+            // Broadcast the simulation start time; this ensures that all nodes stay in sync
+
             RequestDriver driver = RequestDriver.getInstance();
-            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
+            SBMessage.MessageEndpoint origin = 
+                new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
             SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint();
             IMessagePayload payload = new PayloadSimStart(startTime, driver.pattern.numberOfBuses());
             SBMessage message = new SBMessage(SBMessage.MessageType.START_SIMULATION, origin, destination, payload);
@@ -43,6 +40,8 @@ namespace Smart_Bus
 
         private static void BuildAndSendPassengerRequest(object obj)
         {
+            // Send a Passenger Request to the request's origin bus stop
+
             Request req = obj as Request;
             SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
             SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, req.origin.stop.id);
@@ -72,7 +71,7 @@ namespace Smart_Bus
         public static void Main()
         {
             RequestDriver driver = RequestDriver.getInstance();
-            driver.pattern = new RequestPattern_1P_2S_1B();
+            driver.pattern = new RequestPattern_2P_2S_1B();
             driver.NetPort.Init();
             Thread.Sleep(100);
             appId = driver.NetPort.GetID();
@@ -82,13 +81,15 @@ namespace Smart_Bus
             Utilities.SimStart = startTime;
             BuildAndSendStartSimBroadcast(startTime);
             Debug.Print("startTime = " + startTime.ToString("HH:mm:ss.fff"));
-            int i = 0;
+            
+            // Schedule each request in RequestPattern, with delays informed by Constants.TIME_MULTIPLIER
 
+            int i = 0;
             while (driver.pattern.remainingRequests() > 0)
             {
                 Request request = driver.pattern.NextRequest();
                 int elapsedMillis = Utilities.ElapsedMillis();
-                int delayTilSend = System.Math.Max(0, GetRealSendTime(request.origin.earliestServingTime) - elapsedMillis);
+                int delayTilSend = System.Math.Max(0, Utilities.GetRealTimeEquivalent(request.origin.earliestServingTime) - elapsedMillis);
                 new Timer(new TimerCallback(BuildAndSendPassengerRequest), request, delayTilSend, 0);
                 Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms");
             }

@@ -11,9 +11,9 @@ namespace Smart_Bus
 
         // 1 is Real Time (i.e., one second of wall time per second of simulation time)
         // Suggested values are on the order of 100 (every 10 milliseconds of wall time is one second of simulation time)
-        public static readonly int TIME_MULTIPLIER = 100;
+        public static readonly int TIME_MULTIPLIER = 60;
 
-        // DateTime format string for all messages
+        // DateTime format stuff for all messages
         public static string DATE_TIME_FORMAT = "yyyy'-'MM'-'dd'T'H':'mm':'ss.fff";
         public static char[] DATE_FORMAT_SEPARATORS = new char[] { '-', 'T', ':', '.' };
         public static int BUS_START_TIME;

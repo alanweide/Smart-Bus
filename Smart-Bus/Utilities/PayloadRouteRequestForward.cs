@@ -3,6 +3,8 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
+    // Not used. Payload class for ROUTE_REQUEST_FORWARD messages,
+    //  to be used in the future as part of the BFS operation.
     public class PayloadRouteRequestForward: IMessagePayload
     {
         int originalSource;

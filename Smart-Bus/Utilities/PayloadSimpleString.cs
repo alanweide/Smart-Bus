@@ -3,6 +3,7 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
+    // Used primarily to mimic an "empty" payload.
     public class PayloadSimpleString: IMessagePayload
     {
 

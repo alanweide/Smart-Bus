@@ -5,8 +5,14 @@ using System.Text;
 
 namespace Smart_Bus
 {
+    // Payload class for PASSENGER_REQUEST messages
     public class Request : IComparable, IMessagePayload
     {
+        // A Request consists primarily of two Request_v's, origin and destination.
+        //  Additionally, a Request contains its requestId and the time at which the
+        //  passenger sent this request, as well as a boolean indicating whether
+        //  this request has been delayed.
+
         public int requestId;
         public int requestSendTime;
         public Request_v origin;
@@ -52,7 +58,9 @@ namespace Smart_Bus
         {
             // After the header, the array is organized as follows:
             //  [earliestPickupTime, latestDeliveryTime, origin, destination]
-            // where the times are in ms since simulation start
+            // where the times are in ms since simulation start.
+
+            // This method *changes the value of startIdx*!!
 
             int requestId = int.Parse(messageComponents[startIdx++]);
             int earliestPickupTime = int.Parse(messageComponents[startIdx++]);
@@ -101,6 +109,9 @@ namespace Smart_Bus
         }
     }
 
+    // Used as part of a payload made up of a Route; not used directly in Payloads.
+    // However this class is used extensively in BusStop and BusStopDriver. It
+    //  represents one "end" of a request. A sequence of Request_v makes up a Route.
     public class Request_v : IMessagePayload
     {
         public int requestId;

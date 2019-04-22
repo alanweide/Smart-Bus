@@ -12,11 +12,6 @@ namespace Smart_Bus
 {
     public class BusDriver
     {
-        private static int getRealSendTime(int simulationMillis)
-        {
-            return simulationMillis / Constants.TIME_MULTIPLIER;
-        }
-
         private static BusDriver instance;
 
         // Requires an id, which is equivalent to appId, so do not create bus until after appId is initialized
@@ -59,8 +54,8 @@ namespace Smart_Bus
             //     reply, then ignore it.
 
             string msgString = Utilities.ByteArrayToString(msg);
-            SBMessage message = new SBMessage(msgString);
             Debug.Print("Received message: " + msgString);
+            SBMessage message = new SBMessage(msgString);
             SBMessage.MessageType msgType = message.header.type;
             Bus bus = BusDriver.getInstance().myBus;
             
@@ -93,7 +88,6 @@ namespace Smart_Bus
                             {
                                 // A bus stop is asking for route information
                                 // from "nearby" buses, and we're one of them
-
                                 IMessagePayload replyPayload = bus.route;
                                 SBMessage reply = new SBMessage(
                                     SBMessage.MessageType.ROUTE_INFO_RESPONSE,
@@ -109,8 +103,8 @@ namespace Smart_Bus
                             Route newRoute = message.payload as Route;
                             bool confirm = false;
 
-                            // I believe the only way we this won't be true here is if
-                            //  another stop has changed our route since this stop last
+                            // The only way we this won't be true here is if another
+                            //  stop has changed our route since this stop last
                             //  received info about our route.
                             if (bus.HasCapacityNow())
                             {
@@ -146,7 +140,10 @@ namespace Smart_Bus
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
             instance.myBus = new Bus(appId);
-            instance.messageSource = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS, appId);
+            
+            // Keep the message source around so we don't have to write this monstrosity all the time
+            instance.messageSource = 
+                new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS, appId);
 
             Thread.Sleep(Timeout.Infinite);
         }

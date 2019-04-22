@@ -37,7 +37,6 @@
     <Compile Include="RequestPattern_1P_2S_1B.cs" />
     <Compile Include="RequestPattern_2P_4S_1B.cs" />
     <Compile Include="RequestPattern_8P_8S_4B.cs" />
-    <Compile Include="Request_OLD.cs" />
     <Compile Include="RequestPattern.cs" />
     <Compile Include="RequestPattern_4P_4S_2B.cs" />
     <Compile Include="RequestPattern_8P_2S_2B.cs" />

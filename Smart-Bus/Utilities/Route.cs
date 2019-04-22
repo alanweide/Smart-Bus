@@ -5,8 +5,13 @@ using System.Text;
 
 namespace Smart_Bus
 {
+    // Payload class for ROUTE_INFO_RESPONSE, ROUTE_CHANGE_REQUEST, and as
+    //  a component in PayloadRouteChangeAckResponse
     public class Route : IMessagePayload
     {
+        // A route consists of a sequence of "important stops", that is, those
+        //  at which we are eiter picking up or dropping off a passenger.
+
         IList importantStops;
 
         // NumServed marks served requests as such, in addition to
@@ -46,6 +51,10 @@ namespace Smart_Bus
         public Route()
         {
             this.importantStops = new ArrayList();
+
+            // These lines of code are commented out due to a (arbitrary) design decision
+            //  to exclude from a route the Terminus and Bus start/end times, opting instead
+            //  to keep these uniform for all buses and thus accessible from anywhere.
             //BusStop terminusStop = new BusStop(Bus.TERMINUS);
             //Request_v terminusStart = new Request_v(-1, Bus.START_TIME, Bus.END_TIME, true, terminusStop, false);
             //Request_v terminusEnd = new Request_v(-1, Bus.START_TIME, Bus.END_TIME, false, terminusStop, false);
@@ -64,6 +73,8 @@ namespace Smart_Bus
 
         public Route(string[] messageComponents, ref int startIdx)
         {
+            // This method *changes the value of startIdx*!!
+
             this.importantStops = new ArrayList();
             while (startIdx < messageComponents.Length)
             {
@@ -102,6 +113,8 @@ namespace Smart_Bus
             return removed;
         }
 
+        // Returns true if Route other serves at least the requests this route
+        //  is already serving.
         public bool IsRequestSubsetOf(Route other)
         {
             bool requestsMatch = true;
@@ -133,6 +146,7 @@ namespace Smart_Bus
             return payload.ToString();
         }
 
+        // Returns the capacity of this bus at the current time.
         internal int CurrentCapacity()
         {
             int elapsedSimulationMillis = Utilities.ElapsedSimulationMillis();

@@ -33,7 +33,7 @@ namespace Smart_Bus
         public Bus_info[] bus_list;
         public Request[] request_list;
         public int pending_request_index;
-        public const int urgencyThreshold = 300000; //5 minutes
+        public const int urgencyThreshold = int.MaxValue; // Requests are always "urgent"
         public DateTime SimStart;
         public int numBuses;
         public int num_route_info_rsp_rcvd;
@@ -98,8 +98,7 @@ namespace Smart_Bus
 
         public int Lookup_request()
         {
-            TimeSpan elapsedTime = DateTime.Now - SimStart;
-            int simulationMillis = (int)elapsedTime.Milliseconds;
+            int simulationMillis = Utilities.ElapsedSimulationMillis();
             int min_latestServingTime = 10000000;
             int served_request_index = -1;
 
@@ -137,7 +136,8 @@ namespace Smart_Bus
             {
                 //There is no urgent request, start a timer to assign requests later
                 stop_state = BusStop_State.REQUEST_WAIT_FOR_TIMER;
-                new Timer(new TimerCallback(request_lookup_timer_handler), null, request_list[served_request_index].destination.latestServingTime - (simulationMillis + urgencyThreshold), 0);
+                int timerDuration = (request_list[served_request_index].destination.latestServingTime - (simulationMillis + urgencyThreshold)) / Constants.TIME_MULTIPLIER;
+                new Timer(new TimerCallback(request_lookup_timer_handler), null, timerDuration, 0);
             }
 
             return -1;

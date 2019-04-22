@@ -11,6 +11,10 @@ namespace Smart_Bus
 {
     public class SBMessage
     {
+        // Used to standardize message formats without explicitly agreeing upon a particular one.
+
+        // Used for emulating directed messages in the all-broadcast network of the
+        //  Samraksh Emulator
         public struct MessageEndpoint
         {
             public enum EndpointType
@@ -42,6 +46,7 @@ namespace Smart_Bus
             }
         }
 
+        // The header of a message; includes the message type, originating node, and destination node
         public struct MessageHeader
         {
             public const int Length = 5;
@@ -101,9 +106,9 @@ namespace Smart_Bus
             this._payload = payload;
         }
 
+        // Parses a string into a message
         public SBMessage(string msgString)
         {
-            Debug.Print("Received Message: " + msgString);
             string[] components = msgString.TrimEnd().Split();
 
             int mTypeInt = int.Parse(components[0]);
@@ -154,11 +159,11 @@ namespace Smart_Bus
             return msg.ToString();
         }
 
+        // Broadcasts a message over NetPort, and prints a Debug statement.
         public void Broadcast(NetInst NetPort)
         {
             Debug.Print(DateTime.Now.ToString("HH:mm:ss.fff") + ": Sending message " + this.ToString());
             byte[] msgBytes = Utilities.StringToByteArray(this.ToString());
-            Thread.Sleep(100);
             NetPort.Broadcast(msgBytes, msgBytes.Length);
         }
     }

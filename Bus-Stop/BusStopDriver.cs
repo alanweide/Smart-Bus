@@ -59,8 +59,8 @@ namespace Smart_Bus
         {
 
             string msgString = Utilities.ByteArrayToString(msg);
-            SBMessage message = new SBMessage(msgString);
             Debug.Print("Received message: " + msgString);
+            SBMessage message = new SBMessage(msgString);
             SBMessage.MessageType msgType = message.header.type;
             BusStop stop = BusStopDriver.getInstance().myBusStop;
 

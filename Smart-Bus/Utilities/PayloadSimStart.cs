@@ -3,6 +3,7 @@ using Microsoft.SPOT;
 
 namespace Smart_Bus
 {
+    // Payload class for SIMULATION_START messages
     public class PayloadSimStart : IMessagePayload
     {
         public DateTime date;

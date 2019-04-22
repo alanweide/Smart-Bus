@@ -20,7 +20,6 @@ namespace Smart_Bus
         public const int END_TIME = 100000;
         public const int CAPACITY = 5;
         public const int TERMINUS = -1;
-        //public Request_v[] routeInfo;
 
         public Bus(int id)
         {
@@ -34,6 +33,11 @@ namespace Smart_Bus
 
         public bool IsNearbyStop(int stopId)
         {
+            // Return true now as a simplification. A real system would use something
+            //  like the commented lines, in conjunction with BFS, to find all nearby
+            //  buses in the network. StopsUntilEncounter computes the number of hops
+            //  this bus must make before it arrives at stop stopId in its route.
+
             //int stopsUntilEncounter = this.StopsUntilEncounter(stopId);
             //return 0 <= stopsUntilEncounter && stopsUntilEncounter < NearbyThreshold;
             return true;
@@ -41,6 +45,8 @@ namespace Smart_Bus
 
         public bool HasCapacityNow()
         {
+            // Returns true when this bus has a non-zero actual capacity at this point
+            //  in its route.
             return this.route.CurrentCapacity() > 0;
         }
     }

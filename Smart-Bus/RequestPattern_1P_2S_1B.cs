@@ -4,6 +4,7 @@ using Smart_Bus;
 
 namespace Smart_Bus
 {
+    // Request Pattern with 1 passenger, 2 stops, and 1 bus
     class RequestPattern_1P_2S_1B: IRequestPattern
     {
 

@@ -9,16 +9,23 @@ namespace Smart_Bus
     {
         public static DateTime SimStart;
 
+        // Returns the number of (real) milliseconds since the simulation began.
         public static int ElapsedMillis()
         {
             return (int)((DateTime.Now.Ticks - SimStart.Ticks) / TimeSpan.TicksPerMillisecond);
-            //TimeSpan elapsedTime = DateTime.Now - SimStart;
-            //return (int)elapsedTime.TotalMilliseconds;
         }
 
+        // Returns the number of (simulated) milliseconds since the simulation begain.
         public static int ElapsedSimulationMillis()
         {
             return ElapsedMillis() * Constants.TIME_MULTIPLIER;
+        }
+
+        // Returns the real-time equivalent of simulationMillis ms, given the
+        //  time multiplier in Constants.
+        public  static int GetRealTimeEquivalent(int simulationMillis)
+        {
+            return simulationMillis / Constants.TIME_MULTIPLIER;
         }
 
         public static void Main(String[] args)
