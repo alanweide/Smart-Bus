@@ -85,22 +85,22 @@
 \renewcommand\thelstlisting{\arabic{lstlisting}}
 
 % Sections
-\section{Assignment Description}
-Your final project report should include:
-\begin{itemize}
-	\item A write-up describing
-	\begin{itemize}
-		\item The design rationale of the module(s) you developed, along with the algorithm you have designed/used and a detailed API
-		\item Instructions and illustration of use, in terms of a README file and/or user guide,
-		\item How your implementation has been tested,
-		\item Performance of your implementation,
-		\item Assumptions or limitations of your design,
-		\item Any omissions or errors in your implementation, and
-		\item Any bugs or weaknesses you have found in the algorithm/protocol. (Only if some of these do not apply to your project should you omit them.)
-	\end{itemize}
-	\item Program sources and executable (including any test programs). Credit will be reserved for the quality of documentation of your programs.
-	\item Script of a session showing the program under test.
-\end{itemize}
+% \section{Assignment Description}
+% Your final project report should include:
+% \begin{itemize}
+% 	\item A write-up describing
+% 	\begin{itemize}
+% 		\item The design rationale of the module(s) you developed, along with the algorithm you have designed/used and a detailed API
+% 		\item Instructions and illustration of use, in terms of a README file and/or user guide,
+% 		\item How your implementation has been tested,
+% 		\item Performance of your implementation,
+% 		\item Assumptions or limitations of your design,
+% 		\item Any omissions or errors in your implementation, and
+% 		\item Any bugs or weaknesses you have found in the algorithm/protocol. (Only if some of these do not apply to your project should you omit them.)
+% 	\end{itemize}
+% 	\item Program sources and executable (including any test programs). Credit will be reserved for the quality of documentation of your programs.
+% 	\item Script of a session showing the program under test.
+% \end{itemize}
 
 \section{Introduction}
 Internet of Things (IoT) has been an innovative technology connecting heterogeneous devices to form a practical network for facilitation of human work. In IoT, mobile ad‐hoc network (MANET) is a key point to give the greater mobility for users and reduce deployment costs of the network. Typically, Wi-Fi and IEEE 802.15.4 are the popular communication technologies for different application requirements. Wi-Fi technique provides good throughput in wireless communication but limited transmission range. On the other hand, although IEEE 802.15.4 supports low data rate with available range of dozens of meters, it has the property of low cost and low power consumption. However, there are applications requiring data traffic routing in a wide area of a few kilometers. For example, in fleeting tracking system, each car is regarded as a mobile node in a MANET. The average hop distance between two adjacent nodes could be in kilometers. Thus, it is infeasible to adopt Wi-Fi or IEEE 802.15.4 techniques to guarantee the connectivity of network in such application. Thus, several transmission technologies have been introduced to satisfy the requirement of long transmission range. Low-Power Wide-Area Network (LPWAN) is a type of wireless telecommunication wide area network designed to allow long range communications at a low bit rate among connected objects with battery power. Like Long-Range (LoRa) technology, it is a LPWAN specification intended for wireless battery-operated objects and suitable for these applications.
@@ -209,40 +209,57 @@ Evaluation metrics include
 \end{itemize}
 
 \subsubsection{Request Patterns}
-A variety of request patterns were used for evaluation. The scale of these patterns range from two passengers to ???, from two bus stops to ???, and from two buses to ???.
+A variety of request patterns were used for evaluation. The scale of these patterns range from two passengers to eight, from two bus stops to eight, and from one bus to four. The naming scheme depicts the number of passengers (\lstinline{P}), the number of bus stops (\lstinline{S}), and the number of buses it expects (\lstinline{B}). For example, a request pattern wihch produces requests for 6 passengers, in a network with 4 bus stops and 3 buses would have the name 6P\_4S\_3B.
+
+Table~\ref{tbl:smart-bus} summarizes the results for those Request Patterns in which the Emulator network bug did not manifest, or if it did, those patterns for which we could manually compute the lateness and minimum number of buses required.\footnote{Minimum No. of Buses is the smallest number of buses for which the lateness $\ell \leq 0$, or the number of buses which gives the lowest total lateness if it it not possible to serve all requests on time.}
+
+\setlength{\tabcolsep}{1em}
+\begin{table}[htbp]
+\centering
+\caption{Evaluating the Smart Bus Approach.}
+\begin{tabular}{c c c}
+Request Pattern & Total Lateness & Minimum No. of Buses \\ \hline
+1P\_2S\_1B & $-3$ & $1$ \\
+2P\_2S\_1B & $-7$ & $1$ \\
+2P\_4S\_1B & $2$  & $2$ \\
+\end{tabular}
+\label{tbl:smart-bus}
+\end{table}
 
 \subsubsection{Specification and Evaluation of Static Approach}
 The control for this experiment was a static, ``dummy'' approach (which we call the \emph{Traversal} approach) in which $N$ buses traverse the line of stops from one end to the other, and then back again. Its efficacy was evaluated from a purely theoretical standpoint; there is no implementation of the static algorithm.
 
 The method for computing the minimunm number of buses and total lateness using the traversal approach is quite simple, given the assumptions made about the toplogy and travel time between stops. For a traversing bus $B_i$, its route $R = \langle 0, 1, 2, \dots, N-1, N, N-1, N-2, \dots, 1, 0, 1, 2, \dots \rangle$, repeated until the total travel time is greater than its operating window: $T_{B_i} > (l_0 - e_0)$. Thus, given a system with hop duration $H$ and stop duration $S$, the number of stops along a bus's route is $B_S = \frac{l_0 - e_0}{H + S} + 1$ and the number of traversals made by a bus is $B_T = \frac{B_S}{N}$, and the time it takes for a traversal in a system with $N$ stops is $T_N = N (H + S) + S$. In this model, buses start at a passenger stop, not a terminus. As an example, in a traversal system using two buses, each will start the the opposite end of the line, and travel towards each other to start.
 
-Since a bus will never change its route, it is trivial to predict exactly where it will be along its route at a given point in time. This information can then be used to determine, at the time a request is made, when the next bus to that stop will arrive and how long it will take to arrive at the request's destination. If any request cannot be served in time, an extra bus must be placed in the network. By repeatedly applying these calculations, we compute the minimum number of buses required to serve all requests in time.
+Since a bus will never change its route, it is trivial to predict exactly where it will be along its route at a given point in time. This information can then be used to determine, at the time a request is made, when the next bus to that stop will arrive and how long it will take to arrive at the request's destination. If any request cannot be served in time, an extra bus must be placed in the network. By repeatedly applying these calculations, we compute the minimum number of buses required to serve all requests in time. The results are summarized in Table~\ref{tbl:traversal}.
 
 \setlength{\tabcolsep}{1em}
 \begin{table}[htbp]
 \centering
 \caption{Evaluating the Traversal Approach.}
 \begin{tabular}{c c c}
-Request Pattern & Min \# of Buses & Total Lateness \\ \hline
-1P\_2S\_1B & $1$ & $-8$ \\
-2P\_2S\_1B & $1$ & $-1$ \\
-2P\_4S\_1B & $2$ & $5$ \\
-\hline
+Request Pattern & Total Lateness & Minimum No. of Buses \\ \hline
+1P\_2S\_1B & $-6$ & $1$ \\
+2P\_2S\_1B & $-1$ & $1$ \\
+2P\_4S\_1B & $5$  & $2$ \\
 \end{tabular}
 \label{tbl:traversal}
 \end{table}
 
-Care was taken when devising the Request Patterns not to intentionally disadvantage the static approach. Considerations made include accounting for the fact that, in the real world, passengers will be aware of the schedule and will appear at stops approximately when a bus would be there. However, the results to point to the fact that the Smart Bus algorithm improves on the traversal approach for these patterns.
+Care was taken when devising the Request Patterns not to intentionally disadvantage the static approach. Considerations made include accounting for the fact that, in the real world, passengers will be aware of the schedule and will appear at stops approximately when a bus would be there. However, the results point to the fact that the Smart Bus algorithm improves on the traversal approach for these patterns.
 
 \section{Using the Smart-Bus Application}
-There are several steps to running the application:
+There are several steps to running the application, which must be done in order:
 \begin{itemize}
-	\item Launch $n$ instances of \lstinline{Bus-Driver}
-	\item Launch $m$ instances of \lstinline{Bus-Stop-Driver}
+  \item Launch a \emph{fresh} instance of the Samraksh Emulator NetworkHub
+	\item Launch $n$ instances of \lstinline{Bus-Stop-Driver}
+	\item Launch $m$ instances of \lstinline{Bus-Driver}
 	\item Ensure the simulation parameters of \lstinline{Request-Driver} match the number of buses and stops that have been launched
-	\item Launch an instance of \lstinline{Request-Driver} with the requisite simulation parameters (i.e., Request Pattern and Time Multiplier)
+	\item Launch a single instance of \lstinline{Request-Driver} with the requisite simulation parameters (i.e., Request Pattern and Time Multiplier)
 	\item Wait for simulation to conclude
-\end{itemize} 
+\end{itemize}
+
+The order of these steps is imperative because the Request Driver relies on predictable Bus Stop IDs, which are assigned based on the \lstinline{appId} given to the node from the network. Specifically, the Request Driver expects that Bus Stop nodes have consecutive IDs in $[1, n]$.
 
 \subsection{Extending the Smart-Bus Application}
 It is, of course, possible to extend or improve the functionality of this application in many ways.
@@ -263,10 +280,6 @@ Adapting to the real time passenger requests, the dynamic route scheduling probl
 Our implementation aims to demonstrate the generation of request as passengers at different locations launch request at different time, the process of assigning requests from bus stops to the matched buses, and the route information updating for buses to sharing the current route and served passenger information to necessary bus stop. The Samraksh Emulator is feasible to implement the relevant features and easy to show all passenger, bus, and bus stop activities within a short time. The implementation is composed by three different kinds of nodes, request driver, bus driver, and bus stop driver, which simulate how passenger requests are served and how bus routes are optimized by maximizing the route flexibility in a smart bus system.
 
 The simulation results show that the bus scheduling algorithm acts with less bus travel time and less lateness over service locations compared to the scenario of the traditional fixed route buses. Also, the simulated system can resolve the problem of inconsistency. (For example, a request is served by more than one buses.) Last but not the least, we encounter some message errors when increasing the number of bus stops. The system might stop since one of the bus stops received an unexpected message from network. Otherwise, the functionalities of request driver, bus driver, and bus stop driver work well with different scenario combinations.
-
-\newpage
-\appendix
-\section{Source Code}
 
 % \bibliographystyle{abbrv}
 % \bibliography{merged-bibliography,siv-bibliography,bibliography_3,bibliography_lastminute,Xiong2017Abstract} % ,weide-bibliography}
