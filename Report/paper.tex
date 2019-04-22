@@ -193,6 +193,12 @@ Initially, the plan for simulating passengers was to randomly generate requests 
 
 In lieu of dynamic passenger requests, a \lstinline{RequestPattern} interface was devised which permits the arbitrary, static instantiation of passenger requests, to be processed in real-time by the \lstinline{RequestDriver} Emulator instance. For each request in the pattern, the driver schedules a timer to fire at the time when that passenger is intended to dispatch the request. However, the \lstinline{RequestPattern} interface is general enough that an implementation could, theoretically, generate random requests on the fly, though that implementation does not appear in this project.
 
+\subsubsection{Emulator Networking Bugs}
+It was discovered near the end of our validation process that there is a bug in the Samraksh Emulator's networking protocol: if two messages arrive to the hub at approximately the same time, there seems to be a high likelihood that they will be merged into a single message, sent to some or all nodes. This, of course, poses a huge difficulty to reliably testing the application (or even running it at all). It is for this reason that we are unable to produce a demonstration of a complex network of buses and bus stops.
+
+\subsubsection{Software Design Decisions}
+There were some decisions made during the design process which were, in hindsight, ill-advised. Specifically, the handling of non-urgent requests dispatches a timer in a different project than that in which messages are received and sent. The problem with this is that in C\# projects cannot have ``circular dependencies'', and thus there is no good way to call back to the messaging service once the timer has completed. Therefore, while the request is being assigned correctly by the timer callback once the request has become urgent, it will not notify the bus of this fact. As a workaround as the deadline approached, a decision was made to treat \emph{all} requests as urgent; this avoids the timer and keeps the appropriate information around with which to send a \lstinline{ROUTE_CHANGE_REQUEST} message to the appropriate bus.
+
 \subsection{Testing and Evaluation}
 The efficacy of this (admittedly complicated) distributed algorithm versus a naive, static scheduling approach was evaluated. The static scheduling approach is similar to that employed by real public bus systems in the world: there are $N$ buses, each with a predetermined route $R$ through a number of stops.
 
@@ -206,9 +212,9 @@ Evaluation metrics include
 A variety of request patterns were used for evaluation. The scale of these patterns range from two passengers to ???, from two bus stops to ???, and from two buses to ???.
 
 \subsubsection{Specification and Evaluation of Static Approach}
-The control for this experiment was a static, ``dummy'' approach (which we call the \emph{Traversal} approach) in which $N$ buses traverse the line of stops from one end to the other, and then back again. Its efficacy was evaluated from a purely theoretical standpoint; there is no implementation of the static algorithm. For each Request Pattern on which the Smart-Bus algorithm was tested, the minimum number of buses required by the Traversal approach to serve those requests on time (or, with minimal lateness) was computed. The results are summarized in Table~\ref{tbl:traversal} below.
+The control for this experiment was a static, ``dummy'' approach (which we call the \emph{Traversal} approach) in which $N$ buses traverse the line of stops from one end to the other, and then back again. Its efficacy was evaluated from a purely theoretical standpoint; there is no implementation of the static algorithm.
 
-The method for computing the values in the table is quite simple, given the assumptions made about the toplogy and travel time between stops. For a traversing bus $B_i$, its route $R = \langle 0, 1, 2, \dots, N-1, N, N-1, N-2, \dots, 1, 0, 1, 2, \dots \rangle$, repeated until the total travel time is greater than its operating window: $T_{B_i} > (l_0 - e_0)$. Thus, given a system with hop duration $H$ and stop duration $S$, the number of stops along a bus's route is $B_S = \frac{l_0 - e_0}{H + S} + 1$ and the number of traversals made by a bus is $B_T = \frac{B_S}{N}$, and the time it takes for a traversal in a system with $N$ stops is $T_N = N (H + S) + S$.
+The method for computing the minimunm number of buses and total lateness using the traversal approach is quite simple, given the assumptions made about the toplogy and travel time between stops. For a traversing bus $B_i$, its route $R = \langle 0, 1, 2, \dots, N-1, N, N-1, N-2, \dots, 1, 0, 1, 2, \dots \rangle$, repeated until the total travel time is greater than its operating window: $T_{B_i} > (l_0 - e_0)$. Thus, given a system with hop duration $H$ and stop duration $S$, the number of stops along a bus's route is $B_S = \frac{l_0 - e_0}{H + S} + 1$ and the number of traversals made by a bus is $B_T = \frac{B_S}{N}$, and the time it takes for a traversal in a system with $N$ stops is $T_N = N (H + S) + S$. In this model, buses start at a passenger stop, not a terminus. As an example, in a traversal system using two buses, each will start the the opposite end of the line, and travel towards each other to start.
 
 Since a bus will never change its route, it is trivial to predict exactly where it will be along its route at a given point in time. This information can then be used to determine, at the time a request is made, when the next bus to that stop will arrive and how long it will take to arrive at the request's destination. If any request cannot be served in time, an extra bus must be placed in the network. By repeatedly applying these calculations, we compute the minimum number of buses required to serve all requests in time.
 
@@ -218,14 +224,15 @@ Since a bus will never change its route, it is trivial to predict exactly where 
 \caption{Evaluating the Traversal Approach.}
 \begin{tabular}{c c c}
 Request Pattern & Min \# of Buses & Total Lateness \\ \hline
-2P\_2B\_2S & ? & ?\\
-4P\_2B\_2S & ? & ?\\
-6P\_4B\_4S & ? & ?\\
-8P\_4B\_8S & ? & ?\\
+1P\_2S\_1B & $1$ & $-8$ \\
+2P\_2S\_1B & $1$ & $-1$ \\
+2P\_4S\_1B & $2$ & $5$ \\
 \hline
 \end{tabular}
 \label{tbl:traversal}
 \end{table}
+
+Care was taken when devising the Request Patterns not to intentionally disadvantage the static approach. Considerations made include accounting for the fact that, in the real world, passengers will be aware of the schedule and will appear at stops approximately when a bus would be there. However, the results to point to the fact that the Smart Bus algorithm improves on the traversal approach for these patterns.
 
 \section{Using the Smart-Bus Application}
 There are several steps to running the application:
