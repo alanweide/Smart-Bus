@@ -8,22 +8,32 @@ namespace Smart_Bus
     public struct Bus_info
     {
         public int busId;
-        public const int capacity = 5;
-        public int terminusLocation;
+        public const int capacity = 5; //the maximal seats for passenger
+        public int terminusLocation; //the id of bus terminus
         public int busStartTime; //ts_k: expected start time at terminus 
         public int busEndTime; //te_k: expected end time terminus
-        public int NumServed;
-        public Request_v[] routeInfo;
-        public Request_v[] pending_routeInfo;
+        public int NumServed; //the number of served location in the route
+        public Request_v[] routeInfo; //the current route info
+        public Request_v[] pending_routeInfo; //the temprorary route info when adding a new request to current route
     }
 
     public enum BusStop_State
     {
         REQUEST_NULL = 0,
+        /* There is no request in request_list to assign */
+
         REQUEST_WAIT_FOR_ROUTE_INFO = 1,
+        /* Whenever BusStop send ROUTE_INFO_REQUEST to all buses, */
+        /* BusStop should wait all ROUTE_INFO_RESPONSE message to synchronize the newest route info of all buses */
+
         REQUEST_READY_TO_BE_ASSIGNED = 2,
+        /* There is no pending request assignment, BusStop can start to assign a urgent request from request_list */
+
         REQUEST_WAIT_FOR_TIMER = 3,
+        /* There is no pending request assignment and no urgent requests, BusStop starts a timer to wait to assign the closest urgent request */
+
         REQUEST_ASSIGNED_AND_SENDING_TO_BUS = 4
+        /* There is a pending request sent to matched bus, BusStop need to wait for ROUTE_CHANGE_ACK */
     }
     
     public class BusStop
@@ -32,11 +42,11 @@ namespace Smart_Bus
         public BusStop_State stop_state;
         public Bus_info[] bus_list;
         public Request[] request_list;
-        public int pending_request_index;
+        public int pending_request_index; //the index of pending request in request_list
         public const int urgencyThreshold = int.MaxValue; // Requests are always "urgent"
         public DateTime SimStart;
-        public int numBuses;
-        public int num_route_info_rsp_rcvd;
+        public int numBuses;  //number of buses in the system
+        public int num_route_info_rsp_rcvd; //number of ROUTE_INFO_RESPONSE received so far
 
         public BusStop(int id)
         {
@@ -49,16 +59,13 @@ namespace Smart_Bus
 
         public void Receive_request(Request new_request)
         {
-            //TimeSpan elapsedTime = DateTime.Now - SimStart;
-            //int simulationMillis = (int)elapsedTime.Milliseconds;
-
             Debug.Print("Received new request");
             Debug.Print("Request ID" + new_request.origin.requestId);
             Debug.Print("Origin: " + new_request.origin.stop.id + ", Destination: " + new_request.destination.stop.id);
             Debug.Print("EarliestPickupTime: " + new_request.origin.earliestServingTime + ", LatestPickupTime: " + new_request.origin.latestServingTime);
             Debug.Print("EarliestDeliveryTime: " + new_request.destination.earliestServingTime + ", LatestDeliveryTime: " + new_request.destination.latestServingTime);
             
-            //First, add the new request to the request list
+            //add the new request to the request list
             Add_request(new_request);
         }
 
@@ -67,34 +74,6 @@ namespace Smart_Bus
             stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
             Lookup_request();
         }
-
-
-        /*
-        public void update_receive(Bus bus, bool is_update)
-        {
-            Debug.Print("Received route update from bus: " + bus.id + ", is_update: " + is_update);
-
-            if (busInfo_list == null && is_update == true)
-            {
-                this.busInfo_list = Append_busInfo(bus);
-            }
-            
-            
-            for (int i = 0; i < busInfo_list.Length; i++)
-            {
-                //remove the bus info
-                if (busInfo_list[i].id == bus.id)
-                {
-                    this.busInfo_list = Remove_busInfo(i);
-                }
-            }
-
-            if (is_update)
-            {
-                this.busInfo_list = Append_busInfo(bus);
-            }
-        }
-        */
 
         public int Lookup_request()
         {
@@ -120,17 +99,17 @@ namespace Smart_Bus
             }
 
             //check if the request is urgent
-            if (request_list[served_request_index].destination.latestServingTime - simulationMillis <= urgencyThreshold)
+            if (request_list[served_request_index].destination.latestServingTime - simulationMillis < urgencyThreshold)
             {
                 int bus_index = Assign_request(request_list[served_request_index]);
 
-                // if successfully assign the request, then we need to return the bus index
+                // if successfully assign the request, then we need to return the bus index in bus_list
                 if (bus_index != -1)
                 {
+                    //save the the index of pending request in request_list
                     pending_request_index = served_request_index;
                     return bus_index;
                 }
-                 
             }
             else
             {
@@ -143,6 +122,7 @@ namespace Smart_Bus
             return -1;
         }
 
+        //assign this requests to the best matched bus
         public int Assign_request(Request request)
         {
             int max_flex, flex_tmp;
@@ -152,8 +132,7 @@ namespace Smart_Bus
 
             max_flex = -1000000;
             matched_bus_index = -1;
-            //assign this requests to the best matched bus
-
+            
             //check if there is any bus info
             if (bus_list != null)
             {
@@ -169,6 +148,7 @@ namespace Smart_Bus
 
                         break;
                     }
+
 
                     Request_v[] routeInfo_tmp = new Request_v[bus_list[i].routeInfo.Length];
 
@@ -193,6 +173,8 @@ namespace Smart_Bus
                     
                     //assign the request to the mateched available bus
                     insert_request_to_route(bus_list[matched_bus_index], matched_bus_index, bus_list[matched_bus_index].routeInfo, request);
+
+                    //update the routeInfo after inserting the new quest
                     bus_list[matched_bus_index].routeInfo = bus_list[matched_bus_index].pending_routeInfo;
 
                     return matched_bus_index;
@@ -200,69 +182,15 @@ namespace Smart_Bus
             }
             return -1;
         }
-
-        /*
-        public void request_assign(Request new_request)
-        {
-            int max_flex, flex_tmp;
-            int matched_bus_index;
-
-            Debug.Print("Assigning request: " + new_request);
-
-            max_flex = -1000000;
-            matched_bus_index = -1;
-            //assign this requests to the best matched bus
-            //check if there is any bus info
-            if (busInfo_list != null)
-            {
-                for (int i = 0; i < busInfo_list.Length; i++)
-                {
-                    if (busInfo_list[i].routeInfo == null)
-                    {
-                        matched_bus_index = i;
-
-                        //calculate the flexibility after insert the new request to the current route of target bus
-                        flex_tmp = route_reschedule(busInfo_list[i], null, new_request);
-                        Debug.Print("After inserting, bus " + busInfo_list[i].id + " has flexibility of " + flex_tmp);
-
-                        break;
-                    }
-
-                    Request_v[] routeInfo_tmp = new Request_v[busInfo_list[i].routeInfo.Length];
-
-                    for (int c = 0; c < busInfo_list[i].routeInfo.Length; c++)
-                    {
-                        routeInfo_tmp[c] = busInfo_list[i].routeInfo[c];
-                    }
-                    
-                    //calculate the flexibility after insert the new request to the current route of target bus
-                    flex_tmp = route_reschedule(busInfo_list[i], routeInfo_tmp, new_request);
-                    Debug.Print("After inserting, bus " + busInfo_list[i].id + " has flexibility of " + flex_tmp);
-
-                    if (flex_tmp > max_flex)
-                    {
-                        matched_bus_index = i;
-                    }
-                }
-
-                if (matched_bus_index != -1)
-                {
-                    //assign the request to the mateched available bus
-                    //route_reschedule(busInfo_list[matched_bus_index], busInfo_list[matched_bus_index].routeInfo, new_request);
-                    
-                    Debug.Print("Assign the request to bus: " + matched_bus_index);
-                }
-            }
-        }
-        */
+       
         public int route_reschedule(Bus_info bus, Request_v[] routeInfo, Request new_request)
         {
             Request_v[] routeInfo_tmp;
 
             Request_v new_origin = new Request_v(), new_destination = new Request_v();
             int flex, max_flex = -1000000;
-            //int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
 
+            //Here we create new_origin and new_destination content and then try to insert these two location to the bus route
             new_origin.earliestServingTime = new_request.origin.earliestServingTime;
             new_origin.latestServingTime = new_request.origin.latestServingTime;
             new_origin.is_origin = true;
@@ -278,12 +206,14 @@ namespace Smart_Bus
             //The bus has not been assigned any request
             if (routeInfo == null)
             {
+                //Then we directly append new_origin and new_destination to bus route and calculate the flexibility 
                 Request_v[] routeInfo_tmp_o = Append_route(null, new_origin);
                 Request_v[] routeInfo_tmp_o_d = Append_route(routeInfo_tmp_o, new_destination);
                 return flexibility_calculate(bus, routeInfo_tmp_o_d);
             }
             else
             {
+                //creat a route info content to save possible sequences of route after inserting new_origin and new_destination
                 routeInfo_tmp = new Request_v[routeInfo.Length];
             }
 
@@ -298,9 +228,11 @@ namespace Smart_Bus
                 // check all available insertion points to find the maximal flexibility
                 if (i == routeInfo_tmp.Length)
                 {
+                    //If the insertion point for new_origin is at the last in route, then we directly append new_origin and new_destination to the last
                     Request_v[] routeInfo_tmp_o = Insert_route(routeInfo_tmp, new_origin, i);
                     Request_v[] routeInfo_tmp_o_d = Insert_route(routeInfo_tmp_o, new_destination, i+1);
 
+                    //we must make sure the bus has seats to serve new passenger for the new route
                     if (bus_capacity_check(routeInfo_tmp_o_d, Bus.capacity) == true)
                     {
                         flex = flexibility_calculate(bus, routeInfo_tmp_o_d);
@@ -312,15 +244,20 @@ namespace Smart_Bus
                 }
                 else
                 {
+                    //We cannot insert new_origin and new_destination before the served locations
                     if (routeInfo_tmp[i].served == false)
                     {
+                        //Pick up a insert point for new_origin first
                         Request_v[] routeInfo_tmp_o = Insert_route(routeInfo_tmp, new_origin, i);
 
                         for (int j = i + 1; j < routeInfo_tmp_o.Length + 1; j++)
                         {
                             //Debug.Print("j: " + j);
+
+                            //And then try all possible insert point for new_destination after new_origin
                             Request_v[] routeInfo_tmp_o_d = Insert_route(routeInfo_tmp_o, new_destination, j);
 
+                            //we must make sure the bus has seats to serve new passenger for the new route
                             if (bus_capacity_check(routeInfo_tmp_o_d, Bus.capacity) == true)
                             {
                                 flex = flexibility_calculate(bus, routeInfo_tmp_o_d);
@@ -343,8 +280,8 @@ namespace Smart_Bus
 
             Request_v new_origin = new Request_v(), new_destination = new Request_v();
             int flex, max_flex = -1000000;
-            //int p_origin = -1, p_destination = -1; //the insertion point with maximal flexibility
 
+            //Here we create new_origin and new_destination content and then try to insert these two location to the bus route
             new_origin.earliestServingTime = new_request.origin.earliestServingTime;
             new_origin.latestServingTime = new_request.origin.latestServingTime;
             new_origin.is_origin = true;
@@ -360,6 +297,7 @@ namespace Smart_Bus
             //The bus has not been assigned any request
             if (routeInfo == null)
             {
+                //Then we directly append new_origin and new_destination to bus route and calculate the flexibility 
                 Request_v[] routeInfo_tmp_o = Append_route(null, new_origin);
                 Request_v[] routeInfo_tmp_o_d = Append_route(routeInfo_tmp_o, new_destination);
                 bus_list[bus_index].pending_routeInfo = routeInfo_tmp_o_d;
@@ -367,6 +305,7 @@ namespace Smart_Bus
             }
             else
             {
+                //creat a route info content to save possible sequences of route after inserting new_origin and new_destination
                 routeInfo_tmp = new Request_v[routeInfo.Length];
             }
 
@@ -381,9 +320,11 @@ namespace Smart_Bus
                 // check all available insertion points to find the maximal flexibility
                 if (i == routeInfo_tmp.Length)
                 {
+                    //If the insertion point for new_origin is at the last in route, then we directly append new_origin and new_destination to the last
                     Request_v[] routeInfo_tmp_o = Insert_route(routeInfo_tmp, new_origin, i);
                     Request_v[] routeInfo_tmp_o_d = Insert_route(routeInfo_tmp_o, new_destination, i + 1);
 
+                    //we must make sure the bus has seats to serve new passenger for the new route
                     if (bus_capacity_check(routeInfo_tmp_o_d, Bus.capacity) == true)
                     {
                         flex = flexibility_calculate(bus, routeInfo_tmp_o_d);
@@ -396,21 +337,29 @@ namespace Smart_Bus
                 }
                 else
                 {
+                    //We cannot insert new_origin and new_destination before the served locations
                     if (routeInfo_tmp[i].served == false)
                     {
+                        //Pick up a insert point for new_origin first
                         Request_v[] routeInfo_tmp_o = Insert_route(routeInfo_tmp, new_origin, i);
 
                         for (int j = i + 1; j < routeInfo_tmp_o.Length + 1; j++)
                         {
                             //Debug.Print("j: " + j);
+
+                            //And then try all possible insert point for new_destination after new_origin
                             Request_v[] routeInfo_tmp_o_d = Insert_route(routeInfo_tmp_o, new_destination, j);
 
+                            //we must make sure the bus has seats to serve new passenger for the new route
                             if (bus_capacity_check(routeInfo_tmp_o_d, Bus.capacity) == true)
                             {
                                 flex = flexibility_calculate(bus, routeInfo_tmp_o_d);
                                 if (flex > max_flex)
                                 {
                                     max_flex = flex;
+
+                                    //Here we find the route with maximal flexibility after inserting new_origin and new_destination to the bus
+                                    //Save the route to pending_routeInfo and then ready to send ROUTE_CHANGE_REQUEST
                                     bus_list[bus_index].pending_routeInfo = routeInfo_tmp_o_d;
                                 }
                             }
@@ -521,36 +470,6 @@ namespace Smart_Bus
                 bus_list = new_list;
             }
         }
-
-
-        /*
-        public Bus[] Remove_busInfo(int index)
-        {
-            if (this.busInfo_list == null)
-            {
-                return null;
-            }
-
-            if (this.busInfo_list.Length == 0 && index == 0)
-            {
-                return null;
-            }
-
-            Bus[] new_list = new Bus[this.busInfo_list.Length - 1];
-
-            for (int i = 0; i < index; i++)
-            {
-                new_list[i] = this.busInfo_list[i];
-            }
-
-            for (int i = index; i < this.busInfo_list.Length-1; i++)
-            {
-                new_list[i] = this.busInfo_list[i+1];
-            }
-
-            return new_list;
-        }
-        */
 
         public void Add_request(Request element)
         {   
