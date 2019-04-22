@@ -6,6 +6,8 @@ using Microsoft.SPOT.Hardware;
 using Microsoft.SPOT.Messaging;
 using System.IO.Ports;
 using Samraksh.SPOT.Emulator.Network;
+using System.Collections;
+
 
 namespace Smart_Bus
 {
@@ -43,6 +45,16 @@ namespace Smart_Bus
             return BusStopDriver.instance;
         }
 
+        private static void SendRouteChangeRequest(int bus_index)
+        {
+            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, instance.myBusStop.id);
+            SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS, instance.myBusStop.bus_list[bus_index].busId);
+            IMessagePayload payload = new Route(instance.myBusStop.bus_list[bus_index].routeInfo);
+            SBMessage message = new SBMessage(SBMessage.MessageType.ROUTE_CHANGE_REQUEST, origin, destination, payload);
+            message.Broadcast(BusStopDriver.getInstance().NetPort);
+
+        }
+
         public static void ReadNetworkPkt(byte[] msg, int size)
         {
 
@@ -52,52 +64,170 @@ namespace Smart_Bus
             SBMessage.MessageType msgType = message.header.type;
             BusStop stop = BusStopDriver.getInstance().myBusStop;
 
-            switch (msgType)
-            {
-                case SBMessage.MessageType.START_SIMULATION:
-                    {
-                        BusStopDriver.SimStart = ((PayloadDateTime)message.payload).date;
-                        Utilities.SimStart = BusStopDriver.SimStart;
-                        instance.myBusStop.SimStart = BusStopDriver.SimStart;
-                        break;
-                    }
-                case SBMessage.MessageType.SEND_PASSENGER_REQUEST:
-                    {
-                        Request new_request = (Request)message.payload;
 
-                        //If the bus stop does not have any busInfo, it has to send ROUTE_INFO_REQUEST first
-                        if (instance.myBusStop.busInfo_list == null)
+            // Only handle the message if it is meant for the stop
+            SBMessage.MessageEndpoint msgDest = message.header.destination;
+            if (msgDest.endptType == SBMessage.MessageEndpoint.EndpointType.BROADCAST ||
+                (msgDest.endptType == SBMessage.MessageEndpoint.EndpointType.BUS_STOP &&
+                    msgDest.endptId == instance.myBusStop.id))
+            {
+
+                switch (msgType)
+                {
+                    case SBMessage.MessageType.START_SIMULATION:
                         {
-                            SBMessage.MessageSource origin = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.BUS_STOP);
-                            SBMessage.MessageSource destination = new SBMessage.MessageSource();
-                            IMessagePayload payload = null;
-                            SBMessage m = new SBMessage(SBMessage.MessageType.ROUTE_INFO_REQUEST, origin, destination, payload);
+                            BusStopDriver.SimStart = ((PayloadSimStart)message.payload).date;
+                            Utilities.SimStart = BusStopDriver.SimStart;
+                            instance.myBusStop.SimStart = BusStopDriver.SimStart;
+
+                            //here we know the number of buses in the network, 
+                            //so we can know how many messages of ROUTE_INFO_RESPONSE the stop has to wait after sending ROUTE_INFO_REQUEST
+                            PayloadSimStart payload = (PayloadSimStart)message.payload;
+                            instance.myBusStop.numBuses = payload.numBuses;
+
+                            break;
+                        }
+                    case SBMessage.MessageType.SEND_PASSENGER_REQUEST:
+                        {
+                            //Send ROUTE_INFO_REQUEST to buses while receiving a request but the stop does not have route info
+                            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, instance.myBusStop.id);
+                            SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint();
+                            SBMessage m = new SBMessage(SBMessage.MessageType.ROUTE_INFO_REQUEST, origin, destination, new PayloadSimpleString());
                             m.Broadcast(BusStopDriver.getInstance().NetPort);
 
-                            instance.myBusStop.request_receive(new_request, true);
+                            switch (instance.myBusStop.stop_state)
+                            {
+                                case BusStop_State.REQUEST_NULL:
+                                case BusStop_State.REQUEST_READY_TO_BE_ASSIGNED:
+                                    instance.myBusStop.stop_state = BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO;
+
+                                    //reset the counter for collecting ROUTE_INFO_RESPONSE
+                                    instance.myBusStop.num_route_info_rsp_rcvd = 0;
+                                    break;
+
+                                case BusStop_State.REQUEST_WAIT_FOR_TIMER:
+
+                                    //reset the counter for collecting ROUTE_INFO_RESPONSE
+                                    instance.myBusStop.num_route_info_rsp_rcvd = 0;
+
+                                    break;
+
+                                case BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO:
+                                case BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS:
+                                    //do nothing
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            Request new_request = (Request)message.payload;
+                            //Save the request to request_list
+                            instance.myBusStop.Receive_request(new_request);
+
+                            break;
                         }
-                        else
+                    case SBMessage.MessageType.ROUTE_INFO_RESPONSE:
                         {
-                            instance.myBusStop.request_receive(new_request, false);
+                            //Update the route info
+                            Bus_info element = new Bus_info();
+                            element.busId = message.header.source.endptId;
 
-                            //Send ROUTE_CHANGE_REQUEST to the matched bus
+                            Route payload = (Route)message.payload;
+                            element.NumServed = payload.NumServed;
+                            element.routeInfo = payload.ToArray();
+                            element.busStartTime = Bus.START_TIME;
+                            element.busEndTime = Bus.END_TIME;
+                            element.terminusLocation = Bus.TERMINUS;
+
+                            instance.myBusStop.Update_busRoute(element);
+
+                            switch (instance.myBusStop.stop_state)
+                            {
+                                case BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO:
+                                    instance.myBusStop.num_route_info_rsp_rcvd++;
+
+                                    if (instance.myBusStop.num_route_info_rsp_rcvd == instance.myBusStop.numBuses)
+                                    {
+                                        instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+                                        //Start to assign request
+                                        int bus_index = instance.myBusStop.Lookup_request();
+                                        if (bus_index != -1)
+                                        {
+                                            SendRouteChangeRequest(bus_index);
+                                            instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                        }
+                                    }
+                                    break;
+
+                                case BusStop_State.REQUEST_NULL:
+                                case BusStop_State.REQUEST_READY_TO_BE_ASSIGNED:
+                                case BusStop_State.REQUEST_WAIT_FOR_TIMER:
+                                case BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS:
+                                    //do nothing
+                                    break;
+                                default:
+                                    break;
+                            }
+
+
+                            break;
                         }
+                    case SBMessage.MessageType.ROUTE_CHANGE_ACK:
+                        {
+                            switch (instance.myBusStop.stop_state)
+                            {
+                                case BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS:
 
-                        break;
-                    }
-                case SBMessage.MessageType.ROUTE_INFO_RESPONSE:
-                    {
-                        //Save the bus info (with route) to busInfo_list
-                        //instance.myBusStop.Append_busInfo();
+                                    PayloadRouteChangeAckResponse ack = (PayloadRouteChangeAckResponse)message.payload;
 
+                                    if (ack.didAcceptRouteChange == true)
+                                    {
+                                        //The request has been accept, delete the request from request_list
+                                        instance.myBusStop.Remove_request(instance.myBusStop.pending_request_index);
 
-                        break;
-                    }
-                case SBMessage.MessageType.ROUTE_CHANGE_ACK:
-                    {
-                        //The request has been accept, delete the request from request_list
-                        break;
-                    }
+                                        if (instance.myBusStop.request_list == null)
+                                        {
+                                            //If there is no other requests, 
+                                            instance.myBusStop.stop_state = BusStop_State.REQUEST_NULL;
+                                        }
+                                        else
+                                        {
+                                            //If there is still other requests, start to assign requests again
+                                            instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+                                            instance.myBusStop.Lookup_request();
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        //The request has been reject, retry to assign requests again
+                                        instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+
+                                        //Start to assign request
+                                        int bus_index = instance.myBusStop.Lookup_request();
+                                        if (bus_index != -1)
+                                        {
+                                            SendRouteChangeRequest(bus_index);
+                                            instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                        }
+                                    }
+
+                                    break;
+
+                                case BusStop_State.REQUEST_NULL:
+                                case BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO:
+                                case BusStop_State.REQUEST_WAIT_FOR_TIMER:
+                                case BusStop_State.REQUEST_READY_TO_BE_ASSIGNED:
+                                    //do nothing
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            //The request has been accept, delete the request from request_list
+                            break;
+                        }
+                }
             }
         }
 

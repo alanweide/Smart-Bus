@@ -12,7 +12,7 @@ namespace Smart_Bus
     public class RequestDriver
     {
 
-        private static int getRealSendTime(int simulationMillis)
+        private static int GetRealSendTime(int simulationMillis)
         {
             return simulationMillis / Constants.TIME_MULTIPLIER;
         }
@@ -22,6 +22,7 @@ namespace Smart_Bus
         NetInst NetPort;
         NetInst.ReceivePktCallback rcvcallBack;
 
+        IRequestPattern pattern;
         static UInt16 appId;
 
         private RequestDriver()
@@ -30,16 +31,12 @@ namespace Smart_Bus
             NetPort = new NetInst(rcvcallBack);
         }
 
-        //private void NetworkBroadcast(byte[] msg, int size)
-        //{
-        //    NetPort.Broadcast(msg, size);
-        //}
-
         private static void BuildAndSendStartSimBroadcast(DateTime startTime)
         {
-            SBMessage.MessageSource origin = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.PASSENGER);
-            SBMessage.MessageSource destination = new SBMessage.MessageSource();
-            IMessagePayload payload = new PayloadDateTime(startTime);
+            RequestDriver driver = RequestDriver.getInstance();
+            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
+            SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint();
+            IMessagePayload payload = new PayloadSimStart(startTime, driver.pattern.numberOfBuses());
             SBMessage message = new SBMessage(SBMessage.MessageType.START_SIMULATION, origin, destination, payload);
             message.Broadcast(RequestDriver.getInstance().NetPort);
         }
@@ -47,17 +44,11 @@ namespace Smart_Bus
         private static void BuildAndSendPassengerRequest(object obj)
         {
             Request req = obj as Request;
-            SBMessage.MessageSource origin = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.PASSENGER);
-            SBMessage.MessageSource destination = new SBMessage.MessageSource(SBMessage.MessageSource.SourceType.BUS_STOP, req.origin.id);
+            SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.PASSENGER);
+            SBMessage.MessageEndpoint destination = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, req.origin.stop.id);
             IMessagePayload payload = req;
             SBMessage message = new SBMessage(SBMessage.MessageType.SEND_PASSENGER_REQUEST, origin, destination, payload);
             message.Broadcast(RequestDriver.getInstance().NetPort);
-
-            //String msg = BuildMessage(req);
-            //Debug.Print("Sending message " + msg);
-            //RequestDriver driver = RequestDriver.getInstance();
-            //byte[] msgBytes = Utilities.StringToByteArray(msg);
-            //driver.NetworkBroadcast(msgBytes, msg.Length);
         }
 
         public static RequestDriver getInstance()
@@ -67,17 +58,6 @@ namespace Smart_Bus
                 RequestDriver.instance = new RequestDriver();
             }
             return RequestDriver.instance;
-        }
-
-        private static string BuildMessage(Request request)
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.Append(appId.ToString() + " ");
-            msg.Append(request.origin.id.ToString() + " ");
-            msg.Append(request.destination.id.ToString() + " ");
-            msg.Append(request.earliestPickupTime.ToString() + " ");
-            msg.Append(request.earliestDeliveryTime.ToString());
-            return msg.ToString();
         }
 
         public static void ReadNetworkPkt(byte[] msg, int size)
@@ -92,26 +72,25 @@ namespace Smart_Bus
         public static void Main()
         {
             RequestDriver driver = RequestDriver.getInstance();
+            driver.pattern = new RequestPattern_2P_2S_1B();
             driver.NetPort.Init();
             Thread.Sleep(100);
             appId = driver.NetPort.GetID();
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
             DateTime startTime = DateTime.Now;
+            Utilities.SimStart = startTime;
             BuildAndSendStartSimBroadcast(startTime);
             Debug.Print("startTime = " + startTime.ToString("HH:mm:ss.fff"));
-            IRequestPattern pattern = new RequestPattern_2P_2S_2B();
             int i = 0;
 
-            while (pattern.remainingRequests() > 0)
+            while (driver.pattern.remainingRequests() > 0)
             {
-                Request request = pattern.getNextRequest();
-                TimeSpan elapsedTime = DateTime.Now - startTime;
-                int elapsedMillis = (int)elapsedTime.Milliseconds;
-                int delayTilSend = System.Math.Max(0, getRealSendTime(request.earliestPickupTime) - elapsedMillis);
-                Debug.Print("--------\nScheduling request " + i + " for " + delayTilSend + " ms");
+                Request request = driver.pattern.NextRequest();
+                int elapsedMillis = Utilities.ElapsedMillis();
+                int delayTilSend = System.Math.Max(0, GetRealSendTime(request.origin.earliestServingTime) - elapsedMillis);
                 new Timer(new TimerCallback(BuildAndSendPassengerRequest), request, delayTilSend, 0);
-                Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms\n--------");
+                Debug.Print("Scheduled request " + i++ + " for " + delayTilSend + " ms");
             }
 
             Thread.Sleep(Timeout.Infinite);

@@ -7,283 +7,150 @@ namespace Smart_Bus
 {
     public class Route : IMessagePayload
     {
-        IList stops;
-        IList requests;
+        IList importantStops;
 
-        private struct RouteBuilderPair
+        // NumServed marks served requests as such, in addition to
+        //  computing the number of served requests.
+        public int NumServed
         {
-            public Request_v origin;
-            public int requestId;
-
-            public RouteBuilderPair(Request_v origin, int requestId)
+            get
             {
-                this.origin = origin;
-                this.requestId = requestId;
+                int simElapsedMillis = Utilities.ElapsedSimulationMillis();
+                int computeTime = Bus.START_TIME;
+                int i = 0;
+                int servedCount = 0;
+                while (i < this.importantStops.Count - 1 && computeTime < simElapsedMillis)
+                {
+                    Request_v stop = this[i];
+                    computeTime = System.Math.Max(computeTime, stop.earliestServingTime) + Constants.STOP_DURATION;
+                    if (computeTime < simElapsedMillis)
+                    {
+                        // We still haven't gotten to the last request we've served, 
+                        //  so compute how long it will take to get to the next stop
+                        servedCount++;
+                        stop.served = true;
+                        Request_v nextStop = this[i + 1];
+                        computeTime += Utilities.TravelTime(stop.stop, nextStop.stop);
+                    }
+                    i++;
+                }
+                return servedCount;
             }
         }
 
-        public int StopCount
+        public int Count
         {
-            get { return this.stops.Count; }
-            private set { }
-        }
-
-        public int RequestCount
-        {
-            get { return this.requests.Count; }
-            private set { }
+            get { return this.importantStops.Count; }
         }
 
         public Route()
         {
-            this.stops = new ArrayList();
-            this.requests = new ArrayList();
+            this.importantStops = new ArrayList();
+            //BusStop terminusStop = new BusStop(Bus.TERMINUS);
+            //Request_v terminusStart = new Request_v(-1, Bus.START_TIME, Bus.END_TIME, true, terminusStop, false);
+            //Request_v terminusEnd = new Request_v(-1, Bus.START_TIME, Bus.END_TIME, false, terminusStop, false);
+            //this.importantStops.Add(terminusStart);
+            //this.importantStops.Add(terminusEnd);
         }
 
-        public Route(Request_v[] importantStops, int[] requestIds)
+        public Route(Request_v[] arr)
         {
-            Debug.Assert(importantStops.Length == requestIds.Length);
-            Debug.Assert(importantStops.Length % 2 == 0);
-            Debug.Assert(importantStops.Length > 0);
-
-            IList startedRequests = new ArrayList();
-
-            this.stops = new ArrayList();
-            this.stops.Add(new RouteStop(importantStops[0].stop.id, 0, 0));
-            for (int i = 1; i < importantStops.Length; i++)
+            this.importantStops = new ArrayList();
+            foreach(Request_v stop in arr)
             {
-                RouteStop prevStop = (RouteStop)this.stops[this.stops.Count - 1];
-                Request_v thisStop = importantStops[i];
-                if (prevStop.stopId == thisStop.stop.id)
-                {
-                    // This is a second pickup/dropoff at the same stop
-                    if (thisStop.is_origin)
-                    {
-                        // This is the origin for a request, so add it to the "started" list
-                        startedRequests.Add(new RouteBuilderPair(thisStop, requestIds[i]));
-                        prevStop.capDelta--;
-                    }
-                    else
-                    {
-                        // This is the destination for a request
-                        prevStop.capDelta++;
-                        Request_v origin = new Request_v();
-
-                        // Find the origin for this request, and remove it from the started list
-                        int j;
-                        for (j = 0; j < startedRequests.Count; j++)
-                        {
-                            RouteBuilderPair pair = (RouteBuilderPair)startedRequests[i];
-                            if (pair.requestId == requestIds[i])
-                            {
-                                origin = pair.origin;
-                                break;
-                            }
-                        }
-                        startedRequests.RemoveAt(j);
-
-                        // Add this request to the completed list
-                        this.requests.Add(new Request(origin, thisStop));
-                    }
-                }
-                else
-                {
-                    RouteStop newStop = new RouteStop(thisStop.stop.id, 0, Constants.STOP_DURATION);
-
-                    // Fill in intermediate/transient stops along the route
-                    if (thisStop.stop.id > prevStop.stopId)
-                    {
-                        for (int j = prevStop.stopId + 1; j <= thisStop.stop.id; j++)
-                        {
-                            this.stops.Add(new RouteStop(j, 0, 0));
-                        }
-                    }
-                    else
-                    {
-                        for (int j = thisStop.stop.id - 1; j >= prevStop.stopId; j--)
-                        {
-                            this.stops.Add(new RouteStop(j, 0, 0));
-                        }
-                    }
-                    if (thisStop.is_origin)
-                    {
-                        // This is the origin, so add it to the "started" list
-                        startedRequests.Add(new RouteBuilderPair(thisStop, requestIds[i]));
-                        newStop.capDelta--;
-                    }
-                    else
-                    {
-                        newStop.capDelta++;
-                        Request_v origin = new Request_v();
-
-                        // Find the origin for this request, and remove it from the started list
-                        int j;
-                        for (j = 0; j < startedRequests.Count; j++)
-                        {
-                            RouteBuilderPair pair = (RouteBuilderPair)startedRequests[i];
-                            if (pair.requestId == requestIds[i])
-                            {
-                                origin = pair.origin;
-                                break;
-                            }
-                        }
-                        startedRequests.RemoveAt(j);
-
-                        // Add this request to the served list
-                        this.requests.Add(new Request(origin, thisStop));
-                    }
-                    
-                    // Append this new stop to the end of this.stops
-                    this.stops.Add(newStop);
-                }
+                this.importantStops.Add(stop);
             }
         }
 
         public Route(string[] messageComponents, ref int startIdx)
         {
-            this.stops = new ArrayList();
-            this.requests = new ArrayList();
-            int numStops = int.Parse(messageComponents[startIdx]);
-            int i = startIdx + 1;
-            while (i < numStops)
+            this.importantStops = new ArrayList();
+            while (startIdx < messageComponents.Length)
             {
-                // WARNING: This RouteStop constructor updates i to the index
-                // in the array of the element immediately following this stop
-                RouteStop newStop = new RouteStop(messageComponents, ref i);
-
-                this.stops.Add(newStop);
+                Request_v stop = new Request_v(messageComponents, ref startIdx);
+                this.importantStops.Add(stop);
             }
-            while (i < messageComponents.Length)
+
+            int foo = this.NumServed;
+        }
+
+        public Request_v this[int i]
+        {
+            get { return (Request_v)this.importantStops[i]; }
+            set { this.importantStops[i] = value; }
+        }
+
+        public Request_v[] ToArray()
+        {
+            Request_v[] arr = new Request_v[this.importantStops.Count];
+            for (int i = 0; i < this.importantStops.Count; i++)
             {
-                // WARNING: This Request_v constructor updates i to the index
-                // in the array of the element immediately following this request
-                Request_v request = new Request_v(messageComponents, ref i);
-
-                this.requests.Add(request);
+                arr[i] = this[i];
             }
+            return arr;
         }
 
-        public void AddStop(int stopId, int duration, int capDelta)
+        public void InsertStop(int idx, Request_v stop)
         {
-            RouteStop newStop = new RouteStop(stopId, duration, capDelta);
-            this.stops.Add(newStop);
+            this.importantStops.Insert(idx, stop);
         }
 
-        public void InsertStop(int stopId, int duration, int capDelta, int routeIdx)
+        public Request_v RemoveStopAt(int i)
         {
-            RouteStop newStop = new RouteStop(stopId, duration, capDelta);
-            this.stops.Insert(routeIdx, newStop);
-        }
-
-        public RouteStop RemoveStop(int index)
-        {
-            RouteStop removed = (RouteStop)this.stops[index];
-            this.stops.RemoveAt(index);
+            Request_v removed = this[i];
+            this.importantStops.RemoveAt(i);
             return removed;
-        }
-
-        public RouteStop this[int i]
-        {
-            get { return (RouteStop)this.stops[i]; }
-            private set { }
-        }
-
-        public void AddRequest(Request r)
-        {
-            this.requests.Add(r);
-        }
-
-        public Request RemoveEarliestRequest()
-        {
-            Request minRequest = null;
-            for (int i = 0; i < this.requests.Count; i++)
-            {
-                Request thisRequest = this.requests[i] as Request;
-                if (minRequest == null || thisRequest.origin.earliestServingTime < minRequest.origin.earliestServingTime)
-                {
-                    minRequest = thisRequest;
-                }
-            }
-            return minRequest;
-        }
-
-        public void SetRequests(IList requests)
-        {
-            this.requests = requests;
-        }
-
-        public string BuildPayload()
-        {
-            StringBuilder payload = new StringBuilder();
-            for (int i = 0; i < this.stops.Count; i++)
-            {
-                payload.Append(this.stops[i].ToString() + " ");
-            }
-            return payload.ToString();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == this) { return true; }
-            Route other = obj as Route;
-            if (other == null) { return false; }
-            if (other.stops.Count != this.stops.Count) { return false; }
-            bool areEqual = true;
-            for (int i = 0; areEqual && i < this.stops.Count; i++)
-            {
-                areEqual = this.stops[i].Equals(other.stops[i]);
-            }
-            return areEqual;
         }
 
         public bool IsRequestSubsetOf(Route other)
         {
             bool requestsMatch = true;
-            for (int i = 0; i < this.requests.Count && requestsMatch; i++)
+            for (int i = 0; i < this.importantStops.Count && requestsMatch; i++)
             {
                 bool otherContainsThisRequest = false;
-                for (int j = 0; j < other.requests.Count && !otherContainsThisRequest; j++)
+                for (int j = 0; j < other.importantStops.Count && !otherContainsThisRequest; j++)
                 {
-                    otherContainsThisRequest = other.requests[j] == this.requests[i];
+                    otherContainsThisRequest = other[j].Equals(this[i]);
                 }
                 requestsMatch = otherContainsThisRequest;
             }
             return requestsMatch;
         }
-    }
 
-    public struct RouteStop
-    {
-        public int stopId;
-        public int duration;
-        public int capDelta;
-
-        public RouteStop(int stopId, int duration, int capDelta)
+        public String BuildPayload()
         {
-            this.stopId = stopId;
-            this.duration = duration;
-            this.capDelta = capDelta;
+            StringBuilder payload = new StringBuilder();
+            int numServed = this.NumServed;
+            for (int i = 0; i < this.importantStops.Count; i++)
+            {
+                Request_v stop = this[i];
+                if (i < numServed)
+                {
+                    stop.served = true;
+                }
+                payload.Append(stop.BuildPayload());
+            }
+            return payload.ToString();
         }
 
-        public RouteStop(string[] messageComponents, ref int startIdx)
+        internal int CurrentCapacity()
         {
-            this.stopId = int.Parse(messageComponents[startIdx++]);
-            this.duration = int.Parse(messageComponents[startIdx++]);
-            this.capDelta = int.Parse(messageComponents[startIdx++]);
-        }
-
-        public override string ToString()
-        {
-            return this.stopId.ToString() + " " + this.duration.ToString() + " " + this.capDelta.ToString();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is RouteStop))
-                return false;
-
-            RouteStop other = (RouteStop)obj;
-            return this.stopId == other.stopId && this.duration == other.duration && this.capDelta == other.capDelta;
+            int elapsedSimulationMillis = Utilities.ElapsedSimulationMillis();
+            int currCap = Bus.CAPACITY;
+            int numServed = this.NumServed;
+            for (int i = 0; i < numServed; i++)
+            {
+                Request_v stop = this[i];
+                if (stop.is_origin)
+                {
+                    currCap--;
+                }
+                else
+                {
+                    currCap++;
+                }
+            }
+            return currCap;
         }
     }
 }

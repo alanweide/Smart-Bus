@@ -11,7 +11,7 @@ namespace Smart_Bus
         int remainingRequests();
 
         // Gets the next request in order, and advances the cursor
-        Request getNextRequest();
+        Request NextRequest();
 
         int numberOfPassengers();
         int numberOfStops();

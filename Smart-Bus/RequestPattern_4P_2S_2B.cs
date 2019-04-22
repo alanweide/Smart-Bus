@@ -8,11 +8,11 @@ namespace Smart_Bus
     {
 
         private Request[] requests = 
-        { 
-            new Request(1000, 2000, 0, 1), 
-            new Request(2000, 3000, 1, 0),
-            new Request(3000, 4000, 0, 1), 
-            new Request(4000, 5000, 1, 0) 
+        {
+            new Request(1, 1 * 60 * 1000, 11 * 60 * 1000, 1, 2), 
+            new Request(2, 2 * 60 * 1000, 12 * 60 * 1000, 1, 1),
+            new Request(3, 3 * 60 * 1000, 13 * 60 * 1000, 1, 2), 
+            new Request(4, 4 * 60 * 1000, 14 * 60 * 1000, 1, 1) 
         };
         
         private int currentRequest = 0;
@@ -22,7 +22,8 @@ namespace Smart_Bus
         public RequestPattern_4P_2S_2B()
         {
             // Sort the requests array in order of earliestServingTime on startup
-            // This is in-place selection sort so it's inefficient, but there won't be many requests so it's fine
+            // This is in-place selection sort so it's inefficient, but there 
+            // won't be many requests during testing so it's fine
             for (int i = 0; i < requests.Length - 1; i++)
             {
                 int minIdx = i;
@@ -62,7 +63,7 @@ namespace Smart_Bus
             return requests.Length - currentRequest;
         }
 
-        public Request getNextRequest()
+        public Request NextRequest()
         {
             currentRequest++;
             return requests[currentRequest - 1];

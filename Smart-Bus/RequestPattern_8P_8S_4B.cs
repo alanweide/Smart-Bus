@@ -4,23 +4,30 @@ using Smart_Bus;
 
 namespace Smart_Bus
 {
-    class RequestPattern_2P_2S_2B: IRequestPattern
+    class RequestPattern_8P_8S_4B: IRequestPattern
     {
 
         private Request[] requests = 
-        { 
-            new Request(5000, 6000, 0, 1), 
-            new Request(10000, 11000, 1, 0)
+        {
+            new Request(1, 1 * 1000, 11 * 1000, 1, 5), 
+            new Request(2, 2 * 1000, 12 * 1000, 1 ,8),
+            new Request(3, 3 * 1000, 13 * 1000, 1, 2), 
+            new Request(4, 4 * 1000, 14 * 1000, 1, 6),
+            new Request(5, 5 * 1000, 15 * 1000, 1, 5), 
+            new Request(6, 6 * 1000, 16 * 1000, 1, 4),
+            new Request(7, 7 * 1000, 17 * 1000, 1, 2), 
+            new Request(8, 8 * 1000, 18 * 1000, 1, 7) 
         };
         
         private int currentRequest = 0;
-        private int numStops = 2;
-        private int numBuses = 2;
+        private int numStops = 8;
+        private int numBuses = 4;
 
-        public RequestPattern_2P_2S_2B()
+        public RequestPattern_8P_8S_4B()
         {
             // Sort the requests array in order of earliestServingTime on startup
-            // This is in-place selection sort so it's inefficient, but there won't be many requests so it's fine
+            // This is in-place selection sort so it's inefficient, but there 
+            // won't be many requests during testing so it's fine
             for (int i = 0; i < requests.Length - 1; i++)
             {
                 int minIdx = i;
@@ -60,7 +67,7 @@ namespace Smart_Bus
             return requests.Length - currentRequest;
         }
 
-        public Request getNextRequest()
+        public Request NextRequest()
         {
             currentRequest++;
             return requests[currentRequest - 1];

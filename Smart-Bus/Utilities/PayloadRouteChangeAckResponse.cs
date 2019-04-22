@@ -22,7 +22,7 @@ namespace Smart_Bus
 
         public string BuildPayload()
         {
-            return (didAcceptRouteChange ? "1" : "0") + " " + latestRoute.ToString();
+            return (didAcceptRouteChange ? "1 " : "0 ") + latestRoute.BuildPayload();
         }
     }
 }
