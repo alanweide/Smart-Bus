@@ -45,6 +45,83 @@ namespace Smart_Bus
             return BusStopDriver.instance;
         }
 
+        public static int Lookup_request()
+        {
+            int simulationMillis = Utilities.ElapsedSimulationMillis();
+            int min_latestServingTime = 10000000;
+            int served_request_index = -1;
+            int urgencyThreshold = BusStop.urgencyThreshold;
+
+            if (instance.myBusStop.request_list == null)
+            {
+                Debug.Print("No any serving request.");
+                return -1;
+            }
+
+            Debug.Print("BusStop Start to lookup any urgent request to assign.");
+
+            //check request_list to find the request with minimal latestDeliveryTime
+            for (int i = 0; i < instance.myBusStop.request_list.Length; i++)
+            {
+                if (instance.myBusStop.request_list[i].destination.latestServingTime < min_latestServingTime)
+                {
+                    min_latestServingTime = instance.myBusStop.request_list[i].destination.latestServingTime;
+                    served_request_index = i;
+                }
+            }
+
+            //check if the request is urgent
+            if (instance.myBusStop.request_list[served_request_index].destination.latestServingTime - simulationMillis < urgencyThreshold)
+            {
+                Debug.Print("Urgent request found.");
+                
+                int bus_index = instance.myBusStop.Assign_request(instance.myBusStop.request_list[served_request_index]);
+
+                // if successfully assign the request, then we need to return the bus index in bus_list
+                if (bus_index != -1)
+                {
+                    //save the the index of pending request in request_list
+                    instance.myBusStop.pending_request_index = served_request_index;
+                    return bus_index;
+                }
+            }
+            else
+            {
+                Debug.Print("No Urgent request found.");
+                //There is no urgent request, start a timer to assign requests later
+                instance.myBusStop.stop_state = BusStop_State.REQUEST_WAIT_FOR_TIMER;
+                PrintState();
+
+                int timerDuration = (instance.myBusStop.request_list[served_request_index].destination.latestServingTime - (simulationMillis + urgencyThreshold)) / Constants.TIME_MULTIPLIER;
+                new Timer(new TimerCallback(RequestTimerExpiry), null, timerDuration, 0);
+            }
+
+            return -1;
+        }
+
+        private static void PrintState()
+        {
+            Debug.Print("Current BusStop state:" + instance.myBusStop.stop_state);
+        }
+
+        private static void RequestTimerExpiry(object obj)
+        {
+            //Trigger BusStop to assign request
+            //because now the non-urgent request with minimal latestDeliveryTime has become urgent
+            instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+            PrintState();
+
+            //Start to assign request
+            int bus_index = Lookup_request();
+            if (bus_index != -1)
+            {
+                //BusStop find an request and its matched bus to assign
+                SendRouteChangeRequest(bus_index);
+                instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                PrintState();
+            }
+        }
+
         private static void SendRouteChangeRequest(int bus_index)
         {
             SBMessage.MessageEndpoint origin = new SBMessage.MessageEndpoint(SBMessage.MessageEndpoint.EndpointType.BUS_STOP, instance.myBusStop.id);
@@ -102,6 +179,7 @@ namespace Smart_Bus
 
                                     //BusStop has to wait for receving all ROUTE_INFO_RESPONSE, then it's allowed to assigned requests
                                     instance.myBusStop.stop_state = BusStop_State.REQUEST_WAIT_FOR_ROUTE_INFO;
+                                    PrintState();
 
                                     //reset the counter for collecting ROUTE_INFO_RESPONSE
                                     instance.myBusStop.num_route_info_rsp_rcvd = 0;
@@ -154,14 +232,16 @@ namespace Smart_Bus
                                     {
                                         //received all ROUTE_INFO_RESPONSE, then BusStop have enough route info to assign request
                                         instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+                                        PrintState();
                                         
                                         //Start to assign request
-                                        int bus_index = instance.myBusStop.Lookup_request();
+                                        int bus_index = Lookup_request();
                                         if (bus_index != -1)
                                         {
                                             //BusStop find an request and its matched bus to assign
                                             SendRouteChangeRequest(bus_index);
                                             instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                            PrintState();
                                         }
                                     }
                                     break;
@@ -196,18 +276,21 @@ namespace Smart_Bus
                                         {
                                             //If there is no other requests, 
                                             instance.myBusStop.stop_state = BusStop_State.REQUEST_NULL;
+                                            PrintState();
                                         }
                                         else
                                         {
                                             //If there is still other requests, start to assign requests again
                                             instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+                                            PrintState();
 
-                                            int bus_index = instance.myBusStop.Lookup_request();
+                                            int bus_index = Lookup_request();
                                             if (bus_index != -1)
                                             {
                                                 //BusStop find an request and its matched bus to assign
                                                 SendRouteChangeRequest(bus_index);
                                                 instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                                PrintState();
                                             }
                                         }
 
@@ -229,14 +312,16 @@ namespace Smart_Bus
                                         
                                         //The request has been reject, retry to assign requests again
                                         instance.myBusStop.stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
+                                        PrintState();
 
                                         //Start to assign request
-                                        int bus_index = instance.myBusStop.Lookup_request();
+                                        int bus_index = Lookup_request();
                                         if (bus_index != -1)
                                         {
                                             //BusStop find an request and its matched bus to assign
                                             SendRouteChangeRequest(bus_index);
                                             instance.myBusStop.stop_state = BusStop_State.REQUEST_ASSIGNED_AND_SENDING_TO_BUS;
+                                            PrintState();
                                         }
                                     }
 
@@ -268,6 +353,7 @@ namespace Smart_Bus
             Debug.Print("Successfully got ID from the Hub: " + appId.ToString());
 
             instance.myBusStop = new Smart_Bus.BusStop(appId);
+            PrintState();
 
             Thread.Sleep(Timeout.Infinite);
         }
