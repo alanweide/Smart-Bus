@@ -69,59 +69,6 @@ namespace Smart_Bus
             Add_request(new_request);
         }
 
-        private void request_lookup_timer_handler(object obj)
-        {
-            stop_state = BusStop_State.REQUEST_READY_TO_BE_ASSIGNED;
-            Lookup_request();
-        }
-
-        public int Lookup_request()
-        {
-            int simulationMillis = Utilities.ElapsedSimulationMillis();
-            int min_latestServingTime = 10000000;
-            int served_request_index = -1;
-
-            if (request_list == null)
-            {
-                Debug.Print("No any serving request.");
-                return -1;
-            }
-
-
-            //check request_list to find the request with minimal latestDeliveryTime
-            for (int i=0; i<request_list.Length; i++)
-            {
-                if (request_list[i].destination.latestServingTime < min_latestServingTime)
-                {
-                    min_latestServingTime = request_list[i].destination.latestServingTime;
-                    served_request_index = i;
-                }
-            }
-
-            //check if the request is urgent
-            if (request_list[served_request_index].destination.latestServingTime - simulationMillis < urgencyThreshold)
-            {
-                int bus_index = Assign_request(request_list[served_request_index]);
-
-                // if successfully assign the request, then we need to return the bus index in bus_list
-                if (bus_index != -1)
-                {
-                    //save the the index of pending request in request_list
-                    pending_request_index = served_request_index;
-                    return bus_index;
-                }
-            }
-            else
-            {
-                //There is no urgent request, start a timer to assign requests later
-                stop_state = BusStop_State.REQUEST_WAIT_FOR_TIMER;
-                int timerDuration = (request_list[served_request_index].destination.latestServingTime - (simulationMillis + urgencyThreshold)) / Constants.TIME_MULTIPLIER;
-                new Timer(new TimerCallback(request_lookup_timer_handler), null, timerDuration, 0);
-            }
-
-            return -1;
-        }
-
         //assign this requests to the best matched bus
         public int Assign_request(Request request)
         {
