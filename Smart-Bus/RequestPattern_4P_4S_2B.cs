@@ -12,8 +12,8 @@ namespace Smart_Bus
         { 
             new Request(1, 5 * 60 * 1000, 15 * 60 * 1000, 1, 2),
             new Request(2, 10 * 60 * 1000, 20 * 60 * 1000, 4, 3),
-            new Request(3, 5 * 60 * 1000, 15 * 60 * 1000, 1, 4),
-            new Request(4, 10 * 60 * 1000, 20 * 60 * 1000, 3, 2)
+            new Request(3, 7 * 60 * 1000, 17 * 60 * 1000, 1, 4),
+            new Request(4, 12 * 60 * 1000, 22 * 60 * 1000, 3, 2)
         };
         
         private int currentRequest = 0;

@@ -43,7 +43,7 @@ namespace Smart_Bus
         public Bus_info[] bus_list;
         public Request[] request_list;
         public int pending_request_index; //the index of pending request in request_list
-        public const int urgencyThreshold = int.MaxValue; // Requests are always "urgent"
+        public const int urgencyThreshold = 3 * 60 * 1000; //int.MaxValue; // Requests are always "urgent"
         public DateTime SimStart;
         public int numBuses;  //number of buses in the system
         public int num_route_info_rsp_rcvd; //number of ROUTE_INFO_RESPONSE received so far
